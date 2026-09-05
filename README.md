@@ -368,6 +368,7 @@ Migrate incrementally. Each rung adds governance without rewriting existing logi
 | `crate/` | Live Admit crate gap-schema-profile-v13 for the v1.3 profile. |
 | `crate-closed-wall-deny/` | Live Admit crate gap-closed-wall-deny where enabled is load-time and closed-wall Deny names walls and a retry must seal a new capsule. |
 | `crate-proof-live-bundle/` | Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure. Optional proof algorithms stay off the default live bundle. |
+| `crate-snapshot-hygiene/` | Snapshot hygiene crate gap-snapshot-hygiene. README must name the shipped crate binaries and must not list a structural CLI. |
 | `docs/CLASSIC-GAP-VS-AEP-2.8.5.md` | Fit analysis of classic GAP against AEP 2.8.5 evaluation. http://100.118.184.18:3003/thePM001/GAP/src/branch/main/docs/CLASSIC-GAP-VS-AEP-2.8.5.md |
 
 Required classic GAP tickets live on Gitea as .gap source under docs/dev-tickets.
