@@ -1267,3 +1267,83 @@ pub mod enabled_is_load_time {
     }
 }
 
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn sample_yaml_rank() -> String {
+        String::from("address:\n  domain: com.example.old\n  id: rank-doc\npattern: old pattern\naction:\n  type: template\n  content: hello\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n  trust_ring: user\n")
+    }
+
+    fn sample_yaml_profile() -> String {
+        String::from("address:\n  domain: com.example.live\n  id: profile-doc\npattern:\n  guard:\n    expr: wrap == finance\n    lang: gapdsl\naction:\n  type: template\n  content: hello\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n  agent_may:\n    - agent_id: agent-a\n      action: write\n  wrap: finance\n  action_path_prefix: finance\nenabled: false\n")
+    }
+
+    #[test]
+    fn yaml_gap_source_parses() {
+        let mut doc = Value::Null;
+        let mut err = String::new();
+        parse_gap_source(&sample_yaml_profile(), &mut doc, &mut err);
+        assert_eq!(err.as_str(), "");
+        let mut id = String::new();
+        json_str(&doc["address"], "id", &mut id);
+        assert_eq!(id.as_str(), "profile-doc");
+        assert_eq!(doc.get("enabled").and_then(|v| v.as_bool()), Some(false));
+    }
+
+    #[test]
+    fn json_gap_source_parses() {
+        let src = "{\"address\":{\"domain\":\"com.example.live\",\"id\":\"json-doc\"},\"pattern\":\"p\",\"action\":{\"type\":\"template\",\"content\":\"c\"},\"weight\":1.0,\"composition\":{\"type\":\"atomic\"},\"metadata\":{\"provenance\":\"system.seed\",\"version\":\"1.0.0\",\"stability\":\"experimental\"}}";
+        let mut doc = Value::Null;
+        let mut err = String::new();
+        parse_gap_source(src, &mut doc, &mut err);
+        assert_eq!(err.as_str(), "");
+        let mut id = String::new();
+        json_str(&doc["address"], "id", &mut id);
+        assert_eq!(id.as_str(), "json-doc");
+    }
+
+    #[test]
+    fn structured_guard_parses() {
+        let mut doc = Value::Null;
+        let mut err = String::new();
+        parse_gap_source(&sample_yaml_profile(), &mut doc, &mut err);
+        assert_eq!(err.as_str(), "");
+        let mut wall = AdmitWall { id: String::new(), closed: false, reason: String::new() };
+        compile_guard_wall(&doc, &mut wall);
+        assert_eq!(wall.closed, false);
+        let g = doc["pattern"]["guard"]["expr"].as_str().unwrap_or("");
+        assert_eq!(g.contains("finance"), true);
+    }
+
+    #[test]
+    fn old_v12_rank_doc_still_parses() {
+        let mut doc = Value::Null;
+        let mut err = String::new();
+        parse_gap_source(&sample_yaml_rank(), &mut doc, &mut err);
+        assert_eq!(err.as_str(), "");
+        let mut ring = String::new();
+        json_str(meta_of(&doc), "trust_ring", &mut ring);
+        assert_eq!(ring.as_str(), "user");
+    }
+
+    #[test]
+    fn trust_ring_user_fails_live_admit() {
+        let req = LiveAdmitRequest::default();
+        let mut result = AdmitResult { allow: true, closed: Vec::new() };
+        let mut err = String::new();
+        live_admit_gap_profile(&sample_yaml_rank(), &req, &mut result, &mut err);
+        assert_eq!(err.as_str(), "");
+        assert_eq!(result.allow, false);
+        let mut hit = false;
+        let mut i = 0usize;
+        while i < result.closed.len() {
+            if result.closed[i].id == WALL_TRUST_RING_RANK {
+                hit = true;
+            }
+            i += 1;
+        }
+        assert_eq!(hit, true);
+    }
+}
