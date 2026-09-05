@@ -10,7 +10,7 @@ action:
   content: |
     id: GAP-285-P3
     title: Classic GAP must not teach skip. Closed-wall Deny and reseal on retry.
-    status: open
+    status: closed
     priority: P1
     track: classic-gap-aep-2.8.5
     wave: instruction-honesty
