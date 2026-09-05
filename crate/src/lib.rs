@@ -763,3 +763,122 @@ fn yaml_lines(src: &str, out: &mut Vec<YamlLine>) {
     }
 }
 
+
+fn parse_yaml_block(lines: &[YamlLine], start: usize, parent_indent: usize, out: &mut Value, next_i: &mut usize) {
+    if lines.len() <= start {
+        *out = Value::Null;
+        *next_i = start;
+        return;
+    }
+    let is_list = lines[start].text.starts_with("- ");
+    if is_list {
+        let mut arr: Vec<Value> = Vec::new();
+        let mut i = start;
+        while i < lines.len() {
+            if lines[i].indent < parent_indent {
+                break;
+            }
+            if lines[i].indent == parent_indent && lines[i].text.starts_with("- ") == false {
+                break;
+            }
+            if lines[i].indent != parent_indent || lines[i].text.starts_with("- ") == false {
+                break;
+            }
+            let item = lines[i].text[2..].trim();
+            if item.is_empty() {
+                let mut child = Value::Null;
+                let mut n = 0usize;
+                parse_yaml_block(lines, i + 1, parent_indent + 2, &mut child, &mut n);
+                arr.push(child);
+                i = n;
+                continue;
+            }
+            if let Some((k, v)) = item.split_once(char::from(58)) {
+                let key = k.trim();
+                let rest = v.trim();
+                let mut map = Map::new();
+                if rest.is_empty() {
+                    let mut child = Value::Null;
+                    let mut n = 0usize;
+                    parse_yaml_block(lines, i + 1, lines[i].indent + 2, &mut child, &mut n);
+                    map.insert(key.to_string(), child);
+                    i = n;
+                } else {
+                    let mut sc = Value::Null;
+                    parse_scalar(rest, &mut sc);
+                    map.insert(key.to_string(), sc);
+                    i += 1;
+                }
+                while i < lines.len() && parent_indent < lines[i].indent && lines[i].text.starts_with("- ") == false {
+                    if let Some((k2, v2)) = lines[i].text.split_once(char::from(58)) {
+                        let key2 = k2.trim();
+                        let rest2 = v2.trim();
+                        if rest2.is_empty() {
+                            let mut child = Value::Null;
+                            let mut n = 0usize;
+                            parse_yaml_block(lines, i + 1, lines[i].indent + 2, &mut child, &mut n);
+                            map.insert(key2.to_string(), child);
+                            i = n;
+                        } else {
+                            let mut sc = Value::Null;
+                            parse_scalar(rest2, &mut sc);
+                            map.insert(key2.to_string(), sc);
+                            i += 1;
+                        }
+                    } else {
+                        i += 1;
+                    }
+                }
+                arr.push(Value::Object(map));
+                continue;
+            }
+            let mut sc = Value::Null;
+            parse_scalar(item, &mut sc);
+            arr.push(sc);
+            i += 1;
+        }
+        *out = Value::Array(arr);
+        *next_i = i;
+        return;
+    }
+    let mut map = Map::new();
+    let mut i = start;
+    while i < lines.len() {
+        if lines[i].indent < parent_indent {
+            break;
+        }
+        if lines[i].indent == parent_indent && lines[i].text.starts_with("- ") {
+            break;
+        }
+        if lines[i].indent != parent_indent {
+            break;
+        }
+        if let Some((k, v)) = lines[i].text.split_once(char::from(58)) {
+            let key = k.trim();
+            let rest = v.trim();
+            if rest.is_empty() {
+                if i + 1 < lines.len() && parent_indent < lines[i + 1].indent {
+                    let next_indent = lines[i + 1].indent;
+                    let mut child = Value::Null;
+                    let mut n = 0usize;
+                    parse_yaml_block(lines, i + 1, next_indent, &mut child, &mut n);
+                    map.insert(key.to_string(), child);
+                    i = n;
+                } else {
+                    map.insert(key.to_string(), Value::Null);
+                    i += 1;
+                }
+            } else {
+                let mut sc = Value::Null;
+                parse_scalar(rest, &mut sc);
+                map.insert(key.to_string(), sc);
+                i += 1;
+            }
+        } else {
+            i += 1;
+        }
+    }
+    *out = Value::Object(map);
+    *next_i = i;
+}
+
