@@ -354,7 +354,7 @@ mod tests {
     #[test]
     fn missing_bin_named() {
         let src = String::from(
-            "gap-schema-profile-v13 gap-closed-wall-deny gap-proof-live-bundle-mode\ncargo run --manifest-path crate/Cargo.toml --bin gap-schema-profile-v13\ncargo run --manifest-path crate-closed-wall-deny/Cargo.toml --bin gap-closed-wall-deny\ncargo run --manifest-path crate-proof-live-bundle/Cargo.toml --bin gap-proof-live-bundle-mode\ncargo run --manifest-path crate-snapshot-hygiene/Cargo.toml --bin gap-snapshot-hygiene\n",
+            "gap-schema-profile-v13 gap-closed-wall-deny gap-proof-live-bundle-mode\ncargo run --manifest-path crate/Cargo.toml --bin gap-schema-profile-v13\ncargo run --manifest-path crate-closed-wall-deny/Cargo.toml --bin gap-closed-wall-deny\ncargo run --manifest-path crate-proof-live-bundle/Cargo.toml --bin gap-proof-live-bundle-mode\n",
         );
         match scan_readme_snapshot_hygiene(&src) {
             Ok(_) => fail(),
