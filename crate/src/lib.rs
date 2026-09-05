@@ -464,7 +464,7 @@ pub fn action_path_matches_prefix(action_path: &str, prefix: &str, out: &mut boo
         return;
     }
     let rest = &a[p.len()..];
-    *out = rest.starts_with(char::from(58).to_string().as_str()) || rest.starts_with(char::from(47).to_string().as_str());
+    *out = rest.starts_with(":") || rest.starts_with("/");
 }
 
 pub fn wrap_or_prefix_binds(gap_wrap: &str, gap_prefix: &str, node_wrap: &str, action_path: &str, out: &mut bool) {
@@ -675,7 +675,7 @@ fn yaml_lines(src: &str, out: &mut Vec<YamlLine>) {
             indent += 1;
         }
         let text = raw[indent..].trim_end().to_string();
-        if text.is_empty() || text.starts_with(char::from(35).to_string().as_str()) {
+        if text.is_empty() || text.starts_with("#") {
             continue;
         }
         out.push(YamlLine { indent, text });
@@ -1084,7 +1084,7 @@ pub mod parse_gap_source {
             }
         }
         pub fn process(&mut self) {
-            parse_gap_source(&self.source, &mut self.result, &mut self.err);
+            super::parse_gap_source(&self.source, &mut self.result, &mut self.err);
         }
     }
 }
@@ -1110,7 +1110,7 @@ pub mod live_admit_gap_profile {
             }
         }
         pub fn process(&mut self) {
-            live_admit_gap_profile(&self.source, &self.request, &mut self.result, &mut self.err);
+            super::live_admit_gap_profile(&self.source, &self.request, &mut self.result, &mut self.err);
         }
     }
 }
@@ -1129,7 +1129,7 @@ pub mod enabled_is_load_time {
         }
         pub fn process(&mut self) {
             let _ = &self.source;
-            enabled_is_load_time(&mut self.result);
+            super::enabled_is_load_time(&mut self.result);
         }
     }
 }
