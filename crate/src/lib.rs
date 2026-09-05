@@ -314,3 +314,96 @@ pub fn agent_may_wall_id(agent: &str, action: &str, out: &mut String) {
     out.push_str(action);
 }
 
+
+fn grant_from_value(v: &Value, out: &mut AgentMayGrant, ok: &mut bool) {
+    *ok = false;
+    if let Some(s) = v.as_str() {
+        let s = s.trim();
+        if s.is_empty() {
+            return;
+        }
+        if let Some((a, act)) = s.split_once(char::from(47)) {
+            let agent_id = a.trim();
+            let action = act.trim();
+            if agent_id.is_empty() == false && action.is_empty() == false {
+                out.agent_id = String::from(agent_id);
+                out.action = String::from(action);
+                *ok = true;
+                return;
+            }
+        }
+        out.agent_id = String::from("*");
+        out.action = String::from(s);
+        *ok = true;
+        return;
+    }
+    if v.is_object() {
+        let mut agent_id = String::new();
+        let mut action = String::new();
+        json_str(v, "agent_id", &mut agent_id);
+        json_str(v, "action", &mut action);
+        if agent_id.is_empty() || action.is_empty() {
+            return;
+        }
+        out.agent_id = agent_id;
+        out.action = action;
+        *ok = true;
+    }
+}
+
+pub fn grants_from_doc(doc: &Value, out: &mut Vec<AgentMayGrant>) {
+    out.clear();
+    let meta = meta_of(doc);
+    if let Some(arr) = meta.get("agent_may").and_then(|x| x.as_array()) {
+        let mut i = 0usize;
+        while i < arr.len() {
+            let mut g = AgentMayGrant {
+                agent_id: String::new(),
+                action: String::new(),
+            };
+            let mut ok = false;
+            grant_from_value(&arr[i], &mut g, &mut ok);
+            if ok {
+                out.push(g);
+            }
+            i += 1;
+        }
+    }
+}
+
+fn grant_matches(grant: &AgentMayGrant, agent_id: &str, action: &str, out: &mut bool) {
+    let star = grant.agent_id == "*" && agent_id.is_empty() == false;
+    let named = agent_id.is_empty() == false && grant.agent_id == agent_id;
+    let unbound = grant.agent_id == "unbound" && agent_id.is_empty();
+    let agent_ok = star || named || unbound;
+    let action_ok = grant.action == "*" || grant.action == action;
+    *out = agent_ok && action_ok;
+}
+
+pub fn agent_is_granted(agent_id: &str, action: &str, grants: &[AgentMayGrant], out: &mut bool) {
+    *out = false;
+    let mut i = 0usize;
+    while i < grants.len() {
+        let mut hit = false;
+        grant_matches(&grants[i], agent_id, action, &mut hit);
+        if hit {
+            *out = true;
+            return;
+        }
+        i += 1;
+    }
+}
+
+pub fn agent_may_wall_id(agent: &str, action: &str, out: &mut String) {
+    out.clear();
+    out.push_str(WALL_AGENT_MAY);
+    out.push(char::from(58));
+    if agent.is_empty() {
+        out.push_str("unbound");
+    } else {
+        out.push_str(agent);
+    }
+    out.push(char::from(58));
+    out.push_str(action);
+}
+
