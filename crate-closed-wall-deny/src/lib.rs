@@ -17,7 +17,7 @@ pub const REPAIR_SEQUENCE: &str = "bind sequence on the sealed capsule then rese
 pub const REPAIR_WRITING: &str = "repair writing then reseal a new capsule";
 pub const ENABLED_CONTRACT: &str = "Load-time flag. When false the instruction is still loaded. Live Admit still evaluates walls.";
 
-fn gap_285_p3_probe() {}
+pub fn gap_285_p3_probe() {}
 
 fn hex_nibble(n: u8) -> char {
     if n < 10 {
@@ -115,7 +115,7 @@ pub fn structure_digest(data: &[u8], out: &mut String) {
     out.clear();
     let a = fnv1a64(data, 0xcbf29ce484222325);
     let b = fnv1a64(data, 0x00000100000001b3);
-    let mut parts: [u64; 2] = [a, b];
+    let parts: [u64; 2] = [a, b];
     let mut p = 0usize;
     while p < 2 {
         let bytes = parts[p].to_be_bytes();
@@ -205,6 +205,7 @@ pub fn collect_all(walls: &[ClosedWall], out: &mut ClosedWallDeny) {
 }
 
 pub fn live_admit(env: &AdmitEnvelope, out: &mut ClosedWallDeny) {
+    gap_285_p3_probe();
     let mut omit = true;
     enabled_omits_admit(env.enabled, &mut omit);
     let mut load = false;
