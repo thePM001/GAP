@@ -70,7 +70,7 @@ Fifteen named rows are a derived ledger of that evaluation. The ledger is a fore
 | 11 | Gate | Human or webhook approval |
 | 12 | Cross-agent | Counterparty identity handshake |
 | 13 | Knowledge | Covenant-scoped retrieval |
-| 14 | Scanners | Content scanners, lattice and perception bounds |
+| 14 | Scanners | Content scanners, lattice and perception bounds. |
 
 Attractors stay forensic records.
 
@@ -168,7 +168,7 @@ metadata:
     max_cost: 0.50
 ```
 
-Who-may is `agent_may`. Agent A may X. Agent B may Y. Empty grants fail closed for agent actions.
+Who-may is `agent_may`. Agent A may X. Agent B may Y. Empty grants DENY on miss for agent actions.
 
 ### With self-generation
 
@@ -282,7 +282,7 @@ Every instruction carries governance inline:
 |-------|-------------|
 | agent_may | Who-may grants. Agent A may X. Agent B may Y |
 | wrap | Lattice wrap or action_path prefix this wall binds to. Writing and security stay always on |
-| scanners | PII, Injection, Secrets, Jailbreak, Toxicity, URL, Data Profiler, Prediction, Brand, Regulatory and Temporal |
+| scanners | Content scanners cover PII, Injection, Secrets, Jailbreak, Toxicity, URL, Data Profiler, Prediction, Brand, Regulatory and Temporal. |
 | covenants | Behavioural constraints with `[hard]` or `[soft]` severity |
 | budget | Token and cost limits recorded on the derived ledger |
 | proof | Signed proof bundles with Ed25519. Post-quantum signatures are an optional proof algorithm |
@@ -331,22 +331,31 @@ Domain-specific validators that appear on the derived ledger:
 
 ## GAP toolchain
 
-`.gap` files load through the GAP toolchain. Structural validation runs at load. Live Admit still waits for freeze-at-seal, the 1000 ms kernel pulse and collect-all walls.
+This snapshot ships the `gap-schema-profile-v13` CLI in `crate/`. That binary runs collect-all live Admit on the classic GAP v1.3 profile. Who-may is agent_may. trust_ring is not a live Admit floor.
+
+This snapshot does not ship `gapc`. There is no `structural` CLI in this tree.
+
+`.gap` files are GAP source. Live Admit still waits for freeze-at-seal, the 1000 ms kernel pulse and collect-all walls.
 
 ## GAP commands
 
+Build and run the shipped CLI:
+
 ```
-structural compile <file.gap>                    # Compile to canonical artifacts
-structural compile gap-instructions/             # Compile all instructions
-structural lint                                  # Static analysis and warnings
-structural graph                                 # Visualize instruction dependency graph
-structural run <file.gap>                        # Execute an instruction
-structural test <file.gap> <dataset>             # Test against a dataset
-structural export <adapter> <file.gap>           # Export via adapter (n8n, rego, jsonschema)
-structural subprotocol register <name> <path>    # Register custom subprotocol
-structural validator register <name> <path>      # Register custom validator
-structural adapter register <name> <path>        # Register custom export adapter
+cargo run --manifest-path crate/Cargo.toml --bin gap-schema-profile-v13
 ```
+
+Stdin is one key per line:
+
+```
+source=<gap source>
+agent_id=<id>
+action=<action>
+wrap=<wrap>
+action_path=<path>
+```
+
+Stdout is `allow=true` or `allow=false` and zero or more `closed=` rows.
 
 ## Adoption ladder
 
@@ -363,13 +372,17 @@ Migrate incrementally. Each rung adds governance without rewriting existing logi
 
 ## Repository files
 
+This OSS snapshot does not include `GAP v1 spec sheet.md` or `BIOSECURITY.md`. Those files live in the GAPLUNE tree and are not copied here.
+
 | File | Description |
 |------|-------------|
 | `README.md` | This file. Live evaluation story. |
 | `GAP meta schema v1.json` | JSON Schema 2020-12. Layer 1 constraint mask artifact. |
 | `GAP meta schema v1.2.json` | Updated meta schema with v1.1 additions (LRT, MLE, latent governance). |
-| `docs/CLASSIC-GAP-VS-AEP-2.8.5.md` | Fit analysis of classic GAP against AEP 2.8.5 evaluation. |
-| `docs/dev-tickets/GAP-285-P0.gap` | Dev ticket for this live-evaluation rewrite. |
+| `GAP meta schema v1.3.json` | Classic GAP v1.3 profile. agent_may, wrap, action_path_prefix and pattern.guard. |
+| `crate/` | Rust crate that ships the `gap-schema-profile-v13` CLI. |
+
+Fit analysis of classic GAP against AEP 2.8.5 evaluation is at http://100.118.184.18:3003/thePM001/GAP/src/branch/main/docs/CLASSIC-GAP-VS-AEP-2.8.5.md . GAP-285 tickets live as `.gap` source under docs/dev-tickets/.
 
 ## Research
 
