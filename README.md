@@ -68,6 +68,10 @@ A builder who wants a different wait rebuilds Base Node with a different compile
 
 Unbound scene, dock, timestamp or sequence closes Admit.
 
+### Live trust bundle
+
+Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure. Optional proof algorithms may still name Ed25519 or ML-DSA-65. The signatures loader denies an ML-DSA claim on sha256-structure. Signed proof is not the default live AEP 2.8.5 attach.
+
 ## File format
 
 Live kernel policies may be JSON-encoded GAP instructions and YAML remains valid GAP source. Writing and security are always-on stems so they evaluate on every action_path while other GAP walls bind to a wrap or prefix. The kernel reads the instruction object not the skin so a JSON GAP object is legal kernel policy. A finance wrap GAP item does not close an inventory wrap ping and a non-always-on GAP with empty wrap does not fold onto every event. Kernel bind detail lives at http://100.118.184.18:3003/thePM001/GAP/src/branch/main/docs/kernel-json-wrap.md .
@@ -153,6 +157,8 @@ metadata:
     max_tokens: 30000
     max_cost: 0.50
 ```
+
+The proof.algorithm field names an optional proof algorithm. Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure so Ed25519 and ML-DSA-65 stay optional rather than the default live bundle.
 
 Who-may is `agent_may` so Agent A may X and Agent B may Y. Empty grants DENY on miss for agent actions and that Deny is the live who-may outcome.
 
@@ -274,7 +280,7 @@ Every instruction carries governance inline:
 | scanners | PII, Injection, Secrets, Jailbreak, Toxicity, URL, Data Profiler, Prediction, Brand, Regulatory and Temporal |
 | covenants | Behavioural constraints with `[hard]` or `[soft]` severity |
 | budget | Token and cost limits recorded on the derived ledger |
-| proof | Signed proof bundles with Ed25519. Post-quantum signatures are an optional proof algorithm |
+| proof | Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure. Optional proof algorithms may name Ed25519 |
 | fleet | Multi-instance governance with spawn policy |
 | knowledge | Scoped knowledge base with anti-context-rot |
 | tools | Allowed and forbidden tool lists |
@@ -361,6 +367,7 @@ Migrate incrementally. Each rung adds governance without rewriting existing logi
 | `GAP meta schema v1.3.json` | Classic GAP 2.8.5 profile where who-may is agent_may and wrap plus action_path_prefix bind. pattern.guard is a string or a structured ConstraintExpression. trust_ring is documentary and is not a live Admit floor and enabled is load-time. |
 | `crate/` | Live Admit crate gap-schema-profile-v13 for the v1.3 profile. |
 | `crate-closed-wall-deny/` | Live Admit crate gap-closed-wall-deny where enabled is load-time and closed-wall Deny names walls and a retry must seal a new capsule. |
+| `crate-proof-live-bundle/` | Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure. Optional proof algorithms stay off the default live bundle. |
 | `docs/CLASSIC-GAP-VS-AEP-2.8.5.md` | Fit analysis of classic GAP against AEP 2.8.5 evaluation. http://100.118.184.18:3003/thePM001/GAP/src/branch/main/docs/CLASSIC-GAP-VS-AEP-2.8.5.md |
 
 Required classic GAP tickets live on Gitea as .gap source under docs/dev-tickets.
@@ -399,7 +406,7 @@ GAP is a complete programming language. It handles structural constraints native
 - A derived fifteen-row ledger of that evaluation
 - agent_may who-may grants
 - Behavioural covenants
-- Signed proof bundles with Ed25519 and optional post-quantum signatures
+- Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure with optional proof algorithms
 - Self-generating instructions that evolve specialized variants
 - Statistical self-generation (LRT) and weight estimation (MLE)
 - Latent governance inference from rejection patterns
