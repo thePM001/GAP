@@ -2,17 +2,17 @@
 
 Native instructions language for governed, self-improving, mathematically verifiable agency. Part of the Agent Element Protocol ecosystem.
 
-GAP is a complete structural programming language for governed agency and an instruction is the atomic unit so agents, workflows, validators, compositions and governance rules are all instructions that generate further instructions as the native mechanism of growth and adaptation.
+GAP is a complete structural programming language for governed agency. An instruction is the atomic unit. Agents, workflows, validators, compositions and governance rules are all instructions. Instructions generate instructions. This is the native mechanism of growth and adaptation.
 
 Live evaluation follows AEP 2.8.5: seal a capsule, freeze the clock at seal, wait 1000 ms then run every check together then Apply. An agent who implements GAP from this README must build that collect-all Admit path.
 
 ## First Principles
 
-Instructions are the primitive so everything is an instruction while patterns guard and actions resolve with a clear split of condition and effect. Composition is native because atomic, sequence, conditional, loop, parallel, gate and abstraction are first-class and self-generation is fundamental when high-quality resolutions create new instructions. Governance is structural because covenants, scanners, proofs and agent_may grants live on the instruction itself. Mathematical truth is enforced so physical and geometric invariants stay native and the lattice validates them. Strong typing applies at the logits level when possible and mathematical validators cover every type. Subprotocol-first composability makes every domain a first-class subprotocol with its own validators. Provenance and stability are tracked because every instruction carries history, quality signals and a proof chain. GAP is self-sufficient with optional compatibility so it enforces correctness through its own Meta-Schema and governance lattice while external tools may be used as accelerators. The language is self-governing by construction because agents writing GAP instructions are constrained by the GAP Meta-Schema at the logits level so incorrect GAP is not possible.
+Instructions are the primitive of GAP and everything in the language is an instruction. Patterns guard and actions resolve so condition and effect stay separate. Composition is native: atomic, sequence, conditional, loop, parallel, gate and abstraction are first-class. Self-generation is fundamental because high-quality resolutions create new instructions. Governance is structural: covenants, scanners, proofs and agent_may grants live on the instruction itself. Mathematical truth is enforced because physical and geometric invariants are native and the lattice validates them. Simple types use constrained decoding during authoring when possible and complex types use native validators so typing is strong at the logits level and mathematical validation still runs everywhere. Subprotocol-first composability means every domain is a first-class subprotocol with its own validators. Provenance and stability are tracked because every instruction carries its history, quality signals and proof chain. GAP enforces correctness natively through its own Meta-Schema and governance lattice while remaining self-sufficient with optional compatibility, so external tools may be used as accelerators. Agents writing GAP instructions are constrained by the GAP Meta-Schema at the logits level so the language enforces itself and incorrect GAP is not possible.
 
 ## Three-layer enforcement
 
-GAP guarantees correctness through three independent layers and no layer requires the LLM to have seen GAP during training because authoring a `.gap` file is an instruction write while Layer 3 Admit runs after a sealed capsule.
+GAP guarantees correctness through three independent layers. No layer requires the LLM to have seen GAP during training. Authoring a `.gap` file is an instruction write. Layer 3 Admit runs after a sealed capsule.
 
 | Layer | What it prevents | When it runs | Training required |
 |-------|-----------------|-------------|------------------|
@@ -20,23 +20,23 @@ GAP guarantees correctness through three independent layers and no layer require
 | Layer 2: Structural validation | Unresolved references, invalid constraints, composition cycles and type mismatches | After generation, at load | No |
 | Layer 3: Base Node kernel | Closed-wall collect-all Admit after freeze-at-seal and the 1000 ms kernel pulse | After a sealed capsule is opened, then Apply | No |
 
-Layer 1 constrained decoding is an authoring gate while Admit is Layer 3 collect-all after freeze-at-seal and the 1000 ms kernel pulse.
+Layer 1 constrained decoding is an authoring gate. Admit is Layer 3 collect-all after freeze-at-seal and the 1000 ms kernel pulse.
 
 Any LLM, trained on any corpus, can author valid governed GAP instructions. GAP's constraint engine eliminates invalid tokens from the decoding space. The lattice enforces policy together after the kernel pulse.
 
 ## Live evaluation
 
-The AEP 2.8.5 live path seals a lattice-channel capsule, freezes the clock at seal, waits 1000 ms for the compiled Base Node kernel pulse (`PULSE_MS` is a kernel constant rather than a dynAEP YAML key), runs every check together as collect-all Admit and then Applies the allowed action.
+AEP 2.8.5 live path seals a lattice-channel capsule, freezes the clock at seal, waits 1000 ms, runs every check together as collect-all Admit and then Applies the allowed action. That wait is the compiled Base Node kernel pulse (`PULSE_MS`) and it is a kernel constant rather than a dynAEP YAML key.
 
 Putting a capsule on the dock is a transport step. After the wait the client collects by capsule hash. A closed-wall Deny names the closed walls, the reasons and a prescribed repair for missing fields and writing. Grant lists stay off that repair. A retry must seal a new capsule.
 
-Skip is not a live verb because all applicable walls are judged together so if two walls fail both are listed and row order does not change yes or no.
+Omission of a lattice wall is not a live Admit outcome. All applicable walls are judged together and if two walls fail both are listed so row order does not change yes or no.
 
-Writing and security are always-on stems so they evaluate on every action_path. Other GAP walls bind to a wrap or prefix.
+Writing and security stems evaluate on every action_path and other GAP walls bind to a wrap or an action_path prefix.
 
 ### Derived fifteen-row ledger
 
-Fifteen named rows are a derived ledger of that evaluation and the ledger is a forensic record written from the check.
+Fifteen named rows are a derived ledger of that evaluation. The ledger is a forensic record written from the check.
 
 | Row | Name | Description |
 |------|------|-------------|
@@ -54,67 +54,29 @@ Fifteen named rows are a derived ledger of that evaluation and the ledger is a f
 | 11 | Gate | Human or webhook approval |
 | 12 | Cross-agent | Counterparty identity handshake |
 | 13 | Knowledge | Covenant-scoped retrieval |
-| 14 | Scanners | Content scanners, lattice and perception bounds. |
+| 14 | Scanners | Content scanners, lattice and perception bounds |
 
-Attractors stay forensic records on that derived ledger rather than live Admit skips.
+Attractors stay forensic records and they do not omit live Admit.
 
 ### Kernel pulse
 
 Pulse hold is the wait after a sealed capsule is opened. Base Node freezes the clock at seal, waits 1000 ms, then runs every check together and only then carries out the allowed action. Allowed clock drift is 50 ms against the freeze. A capsule held longer than five seconds is aged out.
 
-Wire `sent_at` freshness is a separate clock before open and the wire window is wider because it covers transit while pulse age covers hold after freeze.
+Wire `sent_at` freshness is a separate clock before open. The wire window is wider because it covers transit. Pulse age covers hold after freeze.
 
-A builder who wants a different wait rebuilds Base Node with a different compiled pulse length while freeze-at-seal stays and allowed drift stays independent of the wait length so pulse age stays longer than the wait.
+A builder who wants a different wait rebuilds Base Node with a different compiled pulse length. Freeze-at-seal stays and allowed drift stays independent of the wait length while pulse age stays longer than the wait.
 
-Unbound scene, dock, timestamp or sequence closes Admit because those fields must be bound before collect-all.
+Unbound scene, dock, timestamp or sequence closes Admit.
 
 ## File format
 
-Live kernel policies may be JSON-encoded GAP instructions and YAML remains valid GAP source. Writing and security are always-on stems so they evaluate on every action_path while other GAP walls bind to a wrap or prefix. The kernel reads the instruction object not the skin so a JSON GAP object is legal kernel policy. A finance wrap GAP item does not close an inventory wrap ping and a non-always-on GAP with empty wrap does not fold onto every event and kernel bind detail lives at http://100.118.184.18:3003/thePM001/GAP/src/branch/main/docs/kernel-json-wrap.md .
-
 - Extension: `.gap`
 - Encoding: UTF-8
-- Syntax: YAML 1.2 source. Live kernel policies may be JSON-encoded GAP instructions. YAML remains valid GAP source. The kernel reads the instruction object not the skin.
+- Syntax: YAML 1.2 source. Live kernel policies may be JSON-encoded GAP instruction objects. The kernel reads the instruction object.
 - One instruction per document. Multi-instruction families use YAML multi-document syntax (`---` separators).
 - Keep `.gap` as GAP source.
 
-### YAML GAP source
-
-```yaml
-address:
-  domain: com.example.finance
-  id: pay.v1
-pattern:
-  guard: true
-action:
-  type: template
-  content: pay
-weight: 1.0
-composition:
-  type: atomic
-metadata:
-  provenance: "system.seed"
-  version: "1.0.0"
-  stability: experimental
-  wrap: finance
-```
-
-### JSON-encoded kernel policy
-
-AEP 2.8.5 reference policies are JSON objects with pattern.guard and the same instruction fields. The source below is legal GAP because the kernel reads the instruction object not the skin.
-
-```json
-{
-  "address": {"domain": "aep.reference.writing", "id": "conventions.v1"},
-  "pattern": {"guard": "true"},
-  "action": {"type": "reference"},
-  "weight": 1.0,
-  "composition": {"type": "atomic"},
-  "metadata": {"provenance": "AEP 2.8.5", "version": "1.0.0", "stability": "stable"}
-}
-```
-
-## First example
+## Quick start
 
 ### Minimal instruction
 
@@ -190,7 +152,9 @@ metadata:
     max_cost: 0.50
 ```
 
-Who-may is `agent_may` so Agent A may X and Agent B may Y while empty grants DENY on miss for agent actions.
+Who-may is `agent_may` so Agent A may X and Agent B may Y. Empty grants DENY on miss for agent actions and that Deny is the live who-may outcome.
+
+`trust_ring` is a documentary label on classic v1 and v1.2. It is not a live Admit floor and rank use warns then denies while who-may stays `agent_may`. `enabled` is load-time: when false the instruction is still loaded and live Admit still evaluates walls. Closed-wall Deny names the closed walls, the reasons and a prescribed repair. A retry must seal a new capsule.
 
 ### With self-generation
 
@@ -220,7 +184,7 @@ GAP types go beyond JSON Schema. Mathematical types carry native validators:
 | OBB | Half-extents > 0, rotation unit-norm | obb_valid |
 | Frustum | Closed convex volume | frustum_check |
 
-Two-phase enforcement uses simple constraints at logits level during authoring (Layer 1) and mathematical validators after generation (Layer 2) while live Admit is Layer 3 collect-all after the kernel pulse.
+Two-phase enforcement: simple constraints at logits level during authoring (Layer 1) and mathematical validators after generation (Layer 2). Live Admit is Layer 3 collect-all after the kernel pulse.
 
 ## Composition model
 
@@ -256,7 +220,7 @@ Instructions can spawn specialized children when resolution quality exceeds thre
 - **Drift detection**: Derived-ledger intent-drift row
 - **Proof chain**: Full ancestry traceable
 - **Recursion depth**: `max_generation_depth` (default 3)
-- **Load-time enabled**: `enabled` is load-time
+- **Load-time enabled**: `enabled` is load-time. Live Admit still evaluates walls.
 
 ### Statistical self-generation (v1.1)
 
@@ -265,11 +229,11 @@ The likelihood ratio test (LRT) replaces the threshold-only trigger with a forma
 - H0: One instruction is sufficient (all classes share quality distribution)
 - H1: Specialization needed (class C has significantly different quality)
 
-The LRT answers whether the quality difference is real or noise and only statistically significant deviations trigger child creation while the `min_quality_threshold` remains as an absolute floor.
+The LRT answers: is the quality difference real or noise ? Only statistically significant deviations trigger child creation for a new specialized instruction. The `min_quality_threshold` remains as an absolute quality floor for every child.
 
 ## Weight estimation via MLE (v1.1)
 
-Static weights degrade over time so MLE estimates the true weight from execution history:
+Static instruction weights degrade over time without a data-driven estimate. MLE estimates the true weight from execution history:
 
 ```
 weight_effective = argmax_θ L(θ | execution_data)
@@ -303,8 +267,9 @@ Every instruction carries governance inline:
 | Field | Description |
 |-------|-------------|
 | agent_may | Who-may grants. Agent A may X. Agent B may Y |
-| wrap | Lattice wrap or action_path prefix this wall binds to. Writing and security are always-on stems |
-| scanners | Content scanners cover PII, Injection, Secrets, Jailbreak, Toxicity, URL, Data Profiler, Prediction, Brand, Regulatory and Temporal. |
+| wrap | Lattice wrap or action_path prefix this wall binds to. Writing and security stay always on |
+| action_path_prefix | action_path prefix this wall binds to |
+| scanners | PII, Injection, Secrets, Jailbreak, Toxicity, URL, Data Profiler, Prediction, Brand, Regulatory and Temporal |
 | covenants | Behavioural constraints with `[hard]` or `[soft]` severity |
 | budget | Token and cost limits recorded on the derived ledger |
 | proof | Signed proof bundles with Ed25519. Post-quantum signatures are an optional proof algorithm |
@@ -353,31 +318,26 @@ Domain-specific validators that appear on the derived ledger:
 
 ## GAP toolchain
 
-This snapshot ships the `gap-schema-profile-v13` CLI in `crate/` and that binary runs collect-all live Admit on the classic GAP v1.3 profile. Who-may is agent_may and trust_ring is not a live Admit floor. This snapshot does not ship `gapc` and there is no `structural` CLI in this tree. `.gap` files are GAP source and live Admit still waits for freeze-at-seal, the 1000 ms kernel pulse and collect-all walls.
+`.gap` files load through the GAP toolchain. Structural validation runs at load. Live Admit still waits for freeze-at-seal, the 1000 ms kernel pulse and collect-all walls.
 
 ## GAP commands
 
-Build and run the shipped CLI:
-
 ```
-cargo run --manifest-path crate/Cargo.toml --bin gap-schema-profile-v13
+structural compile <file.gap>                    # Compile to canonical artifacts
+structural compile gap-instructions/             # Compile all instructions
+structural lint                                  # Static analysis and warnings
+structural graph                                 # Visualize instruction dependency graph
+structural run <file.gap>                        # Execute an instruction
+structural test <file.gap> <dataset>             # Test against a dataset
+structural export <adapter> <file.gap>           # Export via adapter (n8n, rego, jsonschema)
+structural subprotocol register <name> <path>    # Register custom subprotocol
+structural validator register <name> <path>      # Register custom validator
+structural adapter register <name> <path>        # Register custom export adapter
 ```
-
-Stdin is one key per line:
-
-```
-source=<gap source>
-agent_id=<id>
-action=<action>
-wrap=<wrap>
-action_path=<path>
-```
-
-Stdout is `allow=true` or `allow=false` and zero or more `closed=` rows.
 
 ## Adoption ladder
 
-Migrate incrementally because each rung adds governance without rewriting existing logic.
+Migrate incrementally. Each rung adds governance without rewriting existing logic.
 
 | Rung | What you get | Entry point |
 |------|-------------|------------|
@@ -390,18 +350,29 @@ Migrate incrementally because each rung adds governance without rewriting existi
 
 ## Repository files
 
-This OSS snapshot does not include `GAP v1 spec sheet.md` or `BIOSECURITY.md` because those files live in the GAPLUNE tree and are not copied here.
-
 | File | Description |
 |------|-------------|
-| `README.md` | This file. Live evaluation story plus kernel policy skin and wrap bind. |
-| `docs/kernel-json-wrap.md` | JSON-encoded kernel policies, YAML remains valid GAP source, always-on stems and wrap or prefix bind. |
+| `README.md` | This file. Live evaluation story. http://100.118.184.18:3003/thePM001/GAP/src/branch/main/README.md |
 | `GAP meta schema v1.json` | JSON Schema 2020-12. Layer 1 constraint mask artifact. |
-| `GAP meta schema v1.2.json` | Updated meta schema with v1.1 additions (LRT, MLE, latent governance). |
-| `GAP meta schema v1.3.json` | Classic GAP v1.3 profile. agent_may, wrap, action_path_prefix and pattern.guard. |
-| `crate/` | Rust crate that ships the `gap-schema-profile-v13` CLI. |
+| `GAP meta schema v1.2.json` | Updated meta schema with v1.1 additions (LRT, MLE, latent governance) where enabled is load-time and live Admit still evaluates walls so closed-wall Deny names closed walls and a retry must seal a new capsule. |
+| `GAP meta schema v1.3.json` | Classic GAP 2.8.5 profile where who-may is agent_may and wrap plus action_path_prefix bind. pattern.guard is a string or a structured ConstraintExpression. trust_ring is documentary and is not a live Admit floor and enabled is load-time. |
+| `crate/` | Live Admit crate gap-schema-profile-v13 for the v1.3 profile. |
+| `crate-closed-wall-deny/` | Live Admit crate gap-closed-wall-deny where enabled is load-time and closed-wall Deny names walls and a retry must seal a new capsule. |
+| `docs/CLASSIC-GAP-VS-AEP-2.8.5.md` | Fit analysis of classic GAP against AEP 2.8.5 evaluation. http://100.118.184.18:3003/thePM001/GAP/src/branch/main/docs/CLASSIC-GAP-VS-AEP-2.8.5.md |
 
-Fit analysis of classic GAP against AEP 2.8.5 evaluation is at http://100.118.184.18:3003/thePM001/GAP/src/branch/main/docs/CLASSIC-GAP-VS-AEP-2.8.5.md . Product tickets live as `.gap` source under docs/dev-tickets/.
+Required classic GAP tickets live on Gitea as .gap source under docs/dev-tickets.
+
+GAP-285-P3 (priority P1) is at http://100.118.184.18:3003/thePM001/GAP/src/commit/6aa964c6a8b52570df84fcb710fba8e15035c6d1/docs/dev-tickets/GAP-285-P3.gap with commit 6aa964c6a8b52570df84fcb710fba8e15035c6d1. Metadata.enabled false is loaded and live Admit still evaluates walls. Closed-wall Deny names closed wall ids, reasons and a prescribed repair. A retry must seal a new capsule.
+
+## Schema profiles
+
+Classic GAP keeps three JSON Schema documents:
+
+- v1: original meta schema. Keep for old documents.
+- v1.2: LRT, MLE and latent governance. Keep for old documents. covenants and scanners stay. enabled is load-time. Live Admit still evaluates walls. Closed-wall Deny names closed wall ids, reasons and a prescribed repair. A retry must seal a new capsule. Attractors stay forensic records.
+- v1.3: Classic GAP 2.8.5 profile. Adds metadata.agent_may, metadata.wrap, metadata.action_path_prefix and pattern.guard as a string or a structured ConstraintExpression. enabled stays load-time. Live Admit still evaluates walls. A document that uses trust_ring as rank fails live Admit.
+
+Live Admit for the v1.3 profile is collect-all and walls are gap:trust_ring:rank, gap:agent_may, gap:wrap:bind and gap:pattern:guard. YAML GAP source still parses and JSON-encoded GAP instruction objects also parse.
 
 ## Research
 
@@ -414,9 +385,9 @@ GAP is backed by formal proofs published in Research Paper 002: https://github.c
 
 ## Comparison: GAP vs dottxt
 
-dottxt constrains tokens to match JSON Schema, regex or CFG at the logits level. That is the entirety of what it does and it is a structural constraint tool.
+dottxt constrains tokens to match JSON Schema, regex or CFG at the logits level and that structural constraint work is the entirety of what it does.
 
-GAP is a complete programming language that handles structural constraints natively through its own constraint engine and additionally provides:
+GAP is a complete programming language. It handles structural constraints natively through its own constraint engine and additionally provides:
 
 - Mathematical types with native validators (Quaternion, Tensor, Matrix3x3)
 - Collect-all Admit then Apply after freeze-at-seal and the 1000 ms kernel pulse
