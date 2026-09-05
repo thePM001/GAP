@@ -4,6 +4,7 @@ Native instructions language for governed, self-improving, mathematically verifi
 
 GAP is a complete structural programming language for governed agency. An instruction is the atomic unit. Agents, workflows, validators, compositions and governance rules are all instructions. Instructions generate instructions. This is the native mechanism of growth and adaptation.
 
+Live evaluation follows AEP 2.8.5: seal a capsule, freeze the clock at seal, wait 1000 ms then run every check together then Apply. An agent who implements GAP from this README must build that collect-all Admit path.
 
 ## First Principles
 
@@ -11,37 +12,89 @@ GAP is a complete structural programming language for governed agency. An instru
 2. **Patterns guard, actions resolve.** Clear separation of condition and effect.
 3. **Composition is native.** Atomic, sequence, conditional, loop, parallel, gate and abstraction are first-class.
 4. **Self-generation is fundamental.** High-quality resolutions create new instructions.
-5. **Governance is structural.** Trust, covenants, 
+5. **Governance is structural.** Covenants, scanners, proofs and agent_may grants are part of the instruction itself.
 6. **Mathematical truth is enforced.** Physical and geometric invariants are native, validated by the lattice.
-7. **Strongly typed at the logits level where possible, mathematically validated everywhere.** Simple types use constrained decoding. Complex types use native validators.
+7. **Strongly typed at the logits level where possible, mathematically validated everywhere.** Simple types use constrained decoding during authoring. Complex types use native validators.
 8. **Subprotocol-first composability.** Every domain is a first-class subprotocol with its own validators.
 9. **Provenance and stability are tracked.** Every instruction carries its history, quality signals and proof chain.
 10. **Self-sufficient with optional compatibility.** GAP enforces correctness natively through its own Meta-Schema and governance lattice. External tools may optionally be used as accelerators.
 11. **Self-governing by construction.** Agents writing GAP instructions are constrained by the GAP Meta-Schema at the logits level. The language enforces itself. Incorrect GAP is not possible.
 
-## Three-Layer Enforcement
+## Three-layer enforcement
 
-GAP guarantees correctness through three independent, non-bypassable layers. No layer requires the LLM to have seen GAP during training.
+GAP guarantees correctness through three independent layers. No layer requires the LLM to have seen GAP during training. Authoring a `.gap` file is an instruction write. Layer 3 Admit runs after a sealed capsule.
 
-| Layer | What It Prevents | When It Runs | Training Required |
+| Layer | What it prevents | When it runs | Training required |
 |-------|-----------------|-------------|------------------|
-| Layer 1: Constrained Decoding | Invalid YAML, unknown fields, wrong types, missing required fields, out-of-range values | During token generation (before each token is selected) | No |
-| Layer 2: Structural Validation | Unresolved references, invalid constraints, composition cycles, type mismatches | After generation, before activation | No |
-| Layer 3: Governance Lattice | Ring escalation, trust verification, covenant enforcement, proof chain validation | After validation, before activation | No |
+| Layer 1: Constrained decoding | Invalid YAML, unknown fields, wrong types, missing required fields and out-of-range values | Authoring gate during token generation, before each token is selected | No |
+| Layer 2: Structural validation | Unresolved references, invalid constraints, composition cycles and type mismatches | After generation, at load | No |
+| Layer 3: Base Node kernel | Closed-wall collect-all Admit after freeze-at-seal and the 1000 ms kernel pulse | After a sealed capsule is opened, then Apply | No |
 
-Any LLM, trained on any corpus, produces valid governed GAP instructions. GAP's constraint engine eliminates invalid tokens from the decoding space. The lattice enforces governance policy deterministically.
+Layer 1 constrained decoding is an authoring gate. Admit is Layer 3 collect-all after freeze-at-seal and the 1000 ms kernel pulse.
 
-## File Format
+Any LLM, trained on any corpus, can author valid governed GAP instructions. GAP's constraint engine eliminates invalid tokens from the decoding space. The lattice enforces policy together after the kernel pulse.
+
+## Live evaluation
+
+AEP 2.8.5 live path:
+
+1. Seal a lattice-channel capsule.
+2. Freeze the clock at seal.
+3. Wait 1000 ms. That wait is the compiled Base Node kernel pulse (`PULSE_MS`). It is a kernel constant rather than a dynAEP YAML key.
+4. Run every check together (collect-all Admit).
+5. Apply the allowed action.
+
+Putting a capsule on the dock is a transport step. After the wait the client collects by capsule hash. A closed-wall Deny names the closed walls, the reasons and a prescribed repair for missing fields and writing. Grant lists stay off that repair. A retry must seal a new capsule.
+
+Skip is not a live verb. All applicable walls are judged together. If two walls fail, both are listed. Row order does not change yes or no.
+
+Writing and security stems evaluate on every action_path. Other GAP walls bind to a wrap or an action_path prefix.
+
+### Derived fifteen-row ledger
+
+Fifteen named rows are a derived ledger of that evaluation. The ledger is a forensic record written from the check.
+
+| Row | Name | Description |
+|------|------|-------------|
+| 0 | Task scope | Action within subtask scope |
+| 1 | Session state | Session active and valid |
+| 2 | Who may act | agent_may: this agent is written as allowed to do this action |
+| 3 | System rate limit | Planetwide cap not exceeded |
+| 4 | Session rate limit | Per-session cap not exceeded |
+| 5 | Intent drift | Action aligns with baseline behaviour |
+| 6 | Escalation | Higher authority required |
+| 7 | Covenant evaluation | Permit, forbid and require rules |
+| 8 | Pattern check | Environment forbidden patterns |
+| 9 | Capability | Written capabilities. Who-may stays agent_may. A numeric trust score is evidence on the derived ledger |
+| 10 | Budget | Token, cost and time limits |
+| 11 | Gate | Human or webhook approval |
+| 12 | Cross-agent | Counterparty identity handshake |
+| 13 | Knowledge | Covenant-scoped retrieval |
+| 14 | Scanners | Content scanners, lattice and perception bounds |
+
+Attractors stay forensic records.
+
+### Kernel pulse
+
+Pulse hold is the wait after a sealed capsule is opened. Base Node freezes the clock at seal, waits 1000 ms, then runs every check together and only then carries out the allowed action. Allowed clock drift is 50 ms against the freeze. A capsule held longer than five seconds is aged out.
+
+Wire `sent_at` freshness is a separate clock before open. The wire window is wider because it covers transit. Pulse age covers hold after freeze.
+
+A builder who wants a different wait rebuilds Base Node with a different compiled pulse length. Freeze-at-seal stays. Allowed drift stays independent of the wait length. Pulse age stays longer than the wait.
+
+Unbound scene, dock, timestamp or sequence closes Admit.
+
+## File format
 
 - Extension: `.gap`
 - Encoding: UTF-8
-- Syntax: Pure YAML 1.2
-- One instruction per YAML document. Multi-instruction families use YAML multi-document syntax (`---` separators).
-- No Markdown. No mixed formats. One parser reads the whole file.
+- Syntax: YAML 1.2 source. Live kernel policies may be JSON-encoded GAP instruction objects. The kernel reads the instruction object.
+- One instruction per document. Multi-instruction families use YAML multi-document syntax (`---` separators).
+- Keep `.gap` as GAP source.
 
-## Quick Start
+## Quick start
 
-### Minimal Instruction
+### Minimal instruction
 
 ```yaml
 address:
@@ -69,6 +122,8 @@ metadata:
   version: "1.0.0"
   stability: stable
   grade: 8
+  agent_may:
+    - review.pull_request
 
 execution:
   retry:
@@ -88,12 +143,19 @@ types:
         values: [approve, request_changes, comment_only]
 ```
 
-### With Governance
+Instruction-runtime retry lives on the instruction. Live Admit is collect-all after the kernel pulse.
+
+### With governance
 
 ```yaml
 metadata:
-  trust_ring: user
-   secrets, injection]
+  agent_may:
+    - review.pull_request
+  wrap: governance
+  scanners:
+    - pii
+    - secrets
+    - injection
   covenants:
     - "every comment must reference a file and line number [hard]"
     - "verdict must be one of: approve, request_changes, comment_only [hard]"
@@ -106,7 +168,9 @@ metadata:
     max_cost: 0.50
 ```
 
-### With Self-Generation
+Who-may is `agent_may`. Agent A may X. Agent B may Y. Empty grants fail closed for agent actions.
+
+### With self-generation
 
 ```yaml
 composition:
@@ -120,23 +184,23 @@ composition:
       significance: 0.01
 ```
 
-## Type System
+## Type system
 
 GAP types go beyond JSON Schema. Mathematical types carry native validators:
 
 | Type | Invariant | Validator |
 |------|-----------|-----------|
 | Vector2f/3f/4f | Per-component range | range_check |
-| Quaternion | &#124;&#124;q&#124;&#124; = 1 within tolerance | unit_norm |
+| Quaternion | \|\|q\|\| = 1 within tolerance | unit_norm |
 | Matrix3x3/4x4 | Symmetry, PSD, orthogonal, affine | matrix_check |
 | Tensor | Shape, dtype, range, NaN/Inf rejection | tensor_integrity |
 | AABB | min < max on all axes | aabb_valid |
 | OBB | Half-extents > 0, rotation unit-norm | obb_valid |
 | Frustum | Closed convex volume | frustum_check |
 
-Two-phase enforcement: simple constraints at logits level (Phase 1), mathematical validators post-generation (Phase 2, lattice Step 3.5).
+Two-phase enforcement: simple constraints at logits level during authoring (Layer 1) and mathematical validators after generation (Layer 2). Live Admit is Layer 3 collect-all after the kernel pulse.
 
-## Composition Model
+## Composition model
 
 Six native composition types:
 
@@ -153,26 +217,26 @@ Pipeline operators for inline execution flow:
 
 | Operator | Meaning |
 |----------|---------|
-| `→` | Pipe: output of left feeds input of right |
-| `∥` | Parallel: execute concurrently, all must succeed |
+| `->` | Pipe: output of left feeds input of right |
+| `\|\|` | Parallel: execute concurrently, all must succeed |
 | `>>` | Gate: pause for approval before continuing |
 
-## Self-Generation
+## Self-generation
 
 Instructions can spawn specialized children when resolution quality exceeds thresholds. Ten safety controls govern the process:
 
 - **max_variants**: Hard cap on total children
 - **min_quality_threshold**: Absolute quality floor
 - **Covenant inheritance**: Child inherits all parent covenants, cannot weaken, can add new covenants (adding is strengthening)
-- **Trust reduction**: Child trust = parent trust minus `fleet.spawn.trust_reduction`
-- **Ring ceiling**: Child ring cannot exceed `fleet.spawn.ring_ceiling`
-- **Stability ladder**: experimental → beta → stable with execution minimums
+- **Capability inheritance**: Child `agent_may` stays a subset of parent `agent_may`
+- **Stability ladder**: experimental to beta to stable with execution minimums
 - **Variant pruning**: Lowest-weight variant deprecated before new creation
-- **Drift detection**: Lattice Step 5 output distribution check
+- **Drift detection**: Derived-ledger intent-drift row
 - **Proof chain**: Full ancestry traceable
 - **Recursion depth**: `max_generation_depth` (default 3)
+- **Load-time enabled**: `enabled` is load-time
 
-### Statistical Self-Generation (v1.1)
+### Statistical self-generation (v1.1)
 
 The likelihood ratio test (LRT) replaces the threshold-only trigger with a formal hypothesis test:
 
@@ -181,7 +245,7 @@ The likelihood ratio test (LRT) replaces the threshold-only trigger with a forma
 
 The LRT answers: is the quality difference real or noise ? Only statistically significant deviations trigger child creation. The `min_quality_threshold` remains as an absolute floor.
 
-## Weight Estimation via MLE (v1.1)
+## Weight estimation via MLE (v1.1)
 
 Static weights degrade over time. MLE estimates the true weight from execution history:
 
@@ -191,11 +255,11 @@ weight_effective = argmax_θ L(θ | execution_data)
 
 The lattice tracks (input_class, verdict, quality_score) per instruction. After `min_samples` executions, the static weight is replaced by the data-driven estimate. Weight self-corrects: degrading instructions drop automatically.
 
-## Latent Governance Inference (v1.1)
+## Latent governance inference (v1.1)
 
 Covenants are written by authors but some governance preferences emerge only from observed rejections. Latent governance inference observes rejection patterns and proposes covenants:
 
-- Tracks (rejection_step,  input_class) per instruction
+- Tracks (rejection_step, input_class) per instruction
 - Proposes a covenant when rejection rate exceeds threshold
 - Proposals are tagged `provenance: "latent"`
 - Default: proposals require human or gate approval before activation (`auto_apply: false`)
@@ -216,27 +280,28 @@ Every instruction carries governance inline:
 
 | Field | Description |
 |-------|-------------|
-| trust_ring | sandbox (Ring 3), user (Ring 2), system (Ring 1), enterprise (Ring 0) |
-|  Injection, Secrets, Jailbreak, Toxicity, URL, Data Profiler, Prediction, Brand, Regulatory, Temporal |
+| agent_may | Who-may grants. Agent A may X. Agent B may Y |
+| wrap | Lattice wrap or action_path prefix this wall binds to. Writing and security stay always on |
+| scanners | PII, Injection, Secrets, Jailbreak, Toxicity, URL, Data Profiler, Prediction, Brand, Regulatory and Temporal |
 | covenants | Behavioural constraints with `[hard]` or `[soft]` severity |
-| budget | Token and cost limits enforced at lattice Step 10 |
-| proof | Signed proof bundles with Ed25519 or ML-DSA-65 signatures |
+| budget | Token and cost limits recorded on the derived ledger |
+| proof | Signed proof bundles with Ed25519. Post-quantum signatures are an optional proof algorithm |
 | fleet | Multi-instance governance with spawn policy |
 | knowledge | Scoped knowledge base with anti-context-rot |
 | tools | Allowed and forbidden tool lists |
-| aspect | Classification label (`objective`, `subjective`, `procedural`, `heuristic`) used by lattice Step 5 for intent drift detection |
+| aspect | Classification label (`objective`, `subjective`, `procedural`, `heuristic`) used on the derived-ledger intent-drift row |
 
-The 15-step deterministic evaluation chain validates every instruction action. Same input, same governance state, same result.
+Same sealed bytes plus same governance state is replay. Replay is keyed by capsule hash.
 
-## Structured Generation
+## Structured generation
 
-For json, yaml and text format types, the constraint engine compiles the type definition into a constraint mask. GAP enforces this mask natively.
+For json, yaml and text format types, the constraint engine compiles the type definition into a constraint mask. GAP enforces this mask natively during authoring.
 
-When external decoding engines are available, GAP's normalized constraint mask can optionally be delegated to them as accelerators. This is a performance optimization, not a requirement.
+When external decoding engines are available, GAP's normalized constraint mask can optionally be delegated to them as accelerators. This is a performance evaluation choice rather than a requirement.
 
 **Compatible external engines (optional):**
 
-| Engine | Constraint Method |
+| Engine | Constraint method |
 |--------|-----------|
 | Outlines | JSON Schema, regex, CFG at logits level |
 | xgrammar | Grammar-constrained decoding |
@@ -244,11 +309,11 @@ When external decoding engines are available, GAP's normalized constraint mask c
 | llama.cpp | GGUF grammar mode |
 | Provider-native | OpenAI structured outputs, Anthropic tool_use |
 
-GAP does not depend on any of these. Without them, GAP's own constraint engine, validator and lattice provide the same correctness guarantees.
+GAP's own constraint engine, validator and collect-all Admit provide the correctness guarantees with or without those engines.
 
 ## Subprotocols
 
-Domain-specific validators loaded at lattice Step 3.5:
+Domain-specific validators that appear on the derived ledger:
 
 | Subprotocol | Domain |
 |-------------|--------|
@@ -264,11 +329,11 @@ Domain-specific validators loaded at lattice Step 3.5:
 | robotics | Joint angles, torques, end-effector, collision zones |
 | material-science | Crystal symmetries, alloy compositions, phase constraints |
 
-## structural Toolchain
+## GAP toolchain
 
-`.gap` files are directly executable via `structural run`. Validation and lattice checks run inline at load time.
+`.gap` files load through the GAP toolchain. Structural validation runs at load. Live Admit still waits for freeze-at-seal, the 1000 ms kernel pulse and collect-all walls.
 
-## structural Commands
+## GAP commands
 
 ```
 structural compile <file.gap>                    # Compile to canonical artifacts
@@ -283,28 +348,28 @@ structural validator register <name> <path>      # Register custom validator
 structural adapter register <name> <path>        # Register custom export adapter
 ```
 
-## Adoption Ladder
+## Adoption ladder
 
 Migrate incrementally. Each rung adds governance without rewriting existing logic.
 
-| Rung | What You Get | Entry Point |
+| Rung | What you get | Entry point |
 |------|-------------|------------|
-| 1: Structured Generation | Schema enforcement via GAP constraint engine | Raw prompts |
-| 2: Types and Constraints | Mathematical type validation | JSON Schema / dottxt users |
-| 3: Covenants and Scanners | Behavioural governance + content scanning | LangChain / LangGraph users |
+| 1: Structured generation | Schema enforcement via GAP constraint engine during authoring | Raw prompts |
+| 2: Types and constraints | Mathematical type validation | JSON Schema / dottxt users |
+| 3: Covenants and scanners | Behavioural governance plus content scanning | LangChain / LangGraph users |
 | 4: Composition | Sequence, conditional, parallel orchestration | n8n / Zapier users |
-| 5: Self-Generation | Automatic specialization from quality data | Any production pipeline |
-| 6: Full Governance | Trust rings, proof bundles, 15-step lattice | Production-grade governed agency |
+| 5: Self-generation | Automatic specialization from quality data | Any production pipeline |
+| 6: Full governance | agent_may, proof bundles, collect-all Admit then Apply | Production-grade governed agency |
 
-## Repository Files
+## Repository files
 
 | File | Description |
 |------|-------------|
-| `GAP v1 spec sheet.md` | Full language specification. The authority. |
-| `GAP meta schema v1.json` | JSON Schema 2020-12. The Layer 1 constraint mask artifact. |
+| `README.md` | This file. Live evaluation story. |
+| `GAP meta schema v1.json` | JSON Schema 2020-12. Layer 1 constraint mask artifact. |
 | `GAP meta schema v1.2.json` | Updated meta schema with v1.1 additions (LRT, MLE, latent governance). |
-| `README.md` | This file. |
-| `BIOSECURITY.md` | AI-eligibility status notice. |
+| `docs/CLASSIC-GAP-VS-AEP-2.8.5.md` | Fit analysis of classic GAP against AEP 2.8.5 evaluation. |
+| `docs/dev-tickets/GAP-285-P0.gap` | Dev ticket for this live-evaluation rewrite. |
 
 ## Research
 
@@ -322,9 +387,11 @@ dottxt constrains tokens to match JSON Schema, regex or CFG at the logits level.
 GAP is a complete programming language. It handles structural constraints natively through its own constraint engine and additionally provides:
 
 - Mathematical types with native validators (Quaternion, Tensor, Matrix3x3)
-- 15-step deterministic evaluation chain
-- Trust scoring, execution rings, behavioural covenants
-- Signed proof bundles with post-quantum signatures
+- Collect-all Admit then Apply after freeze-at-seal and the 1000 ms kernel pulse
+- A derived fifteen-row ledger of that evaluation
+- agent_may who-may grants
+- Behavioural covenants
+- Signed proof bundles with Ed25519 and optional post-quantum signatures
 - Self-generating instructions that evolve specialized variants
 - Statistical self-generation (LRT) and weight estimation (MLE)
 - Latent governance inference from rejection patterns
@@ -332,7 +399,7 @@ GAP is a complete programming language. It handles structural constraints native
 - Six composition primitives with pipeline operators
 - Agent fleet governance, knowledge base, perception governance
 
-dottxt's structural constraint capability is equivalent to one action flag in GAP: `structured_generation: true`. GAP does everything dottxt does and everything dottxt cannot do. 
+dottxt's structural constraint capability is equivalent to one action flag in GAP: `structured_generation: true`. GAP covers that authoring gate plus live collect-all Admit.
 
 ## References
 
@@ -350,7 +417,8 @@ Apache-2.0
 
 ---
 
-*GAP: Governed Agentic Programming. Language Specification v1.1. Part of the Agent Element Protocol ecosystem. Author: thePM_001*
+*GAP: Governed Agentic Programming. Language Specification v1.1 aligned to AEP 2.8.5 live evaluation. Part of the Agent Element Protocol ecosystem. Author: thePM_001*
 
-## AI-Eligibility Status
+## AI-eligibility status
+
 To win the fight against the synthetic nano-parasites (SNP/NanoSinp) alien WMD, we must be intelligent and biosecure. It is recommended that bioinsecure humans do not use the provided technology/protocol to avoid bad techno-spiritual AI outcomes for them. [*"bioinsecure" = has installed injectable synthetic nano-parasites growth medium controllers - SNP GMCs]
