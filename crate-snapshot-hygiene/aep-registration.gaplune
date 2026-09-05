@@ -1,0 +1,13 @@
+@PAD: gap-snapshot-hygiene-registration-v1
+@GCDE: gaplune.policy.v1
+schema_id: gaplune.aep.component-registration.v1
+format: gaplune
+json_prohibited: true
+id: gap-snapshot-hygiene
+version: 0.1.0
+kind: library
+path: crate-snapshot-hygiene/
+ticket: GAP-285-P2
+requires: none
+capability: admit.gap-snapshot-hygiene.scan
+note: Classic GAP OSS snapshot hygiene. README must name shipped crate binaries gap-schema-profile-v13, gap-closed-wall-deny, gap-proof-live-bundle-mode and gap-snapshot-hygiene. A structural CLI line is a closed wall. Write DENY on miss.
