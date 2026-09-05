@@ -10,7 +10,7 @@ action:
   content: |
     id: GAP-285-P2
     title: Classic GAP OSS snapshot hygiene. README claims must match the tree.
-    status: open
+    status: closed
     priority: P1
     track: classic-gap-aep-2.8.5
     wave: instruction-honesty
