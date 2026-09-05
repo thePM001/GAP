@@ -1134,3 +1134,136 @@ pub mod enabled_is_load_time {
     }
 }
 
+
+pub fn parse_yaml_gap(src: &str, out: &mut Value, err: &mut String) {
+    err.clear();
+    let mut lines: Vec<YamlLine> = Vec::new();
+    yaml_lines(src, &mut lines);
+    if lines.is_empty() {
+        err.push_str("empty GAP source");
+        return;
+    }
+    let indent = lines[0].indent;
+    let mut next_i = 0usize;
+    parse_yaml_block(&lines, 0, indent, out, &mut next_i);
+    if out.is_null() {
+        err.push_str("YAML GAP source parsed empty");
+    }
+}
+
+pub fn parse_gap_source(src: &str, out: &mut Value, err: &mut String) {
+    err.clear();
+    let t = src.trim();
+    if t.is_empty() {
+        err.push_str("empty GAP source");
+        return;
+    }
+    let bytes = t.as_bytes();
+    if bytes[0] == 123 {
+        match serde_json::from_str(t) {
+            Ok(v) => {
+                *out = v;
+            }
+            Err(e) => {
+                err.push_str("JSON GAP source parse failed: ");
+                err.push_str(&e.to_string());
+            }
+        }
+        return;
+    }
+    parse_yaml_gap(t, out, err);
+}
+
+pub fn live_admit_gap_profile(source: &str, req: &LiveAdmitRequest, out: &mut AdmitResult, err: &mut String) {
+    err.clear();
+    let mut doc = Value::Null;
+    parse_gap_source(source, &mut doc, err);
+    if err.is_empty() == false {
+        return;
+    }
+    let mut walls: Vec<AdmitWall> = Vec::new();
+    let mut w1 = AdmitWall {
+        id: String::new(),
+        closed: false,
+        reason: String::new(),
+    };
+    let mut w2 = w1.clone();
+    let mut w3 = w1.clone();
+    let mut w4 = w1.clone();
+    compile_trust_ring_rank_wall(&doc, &mut w1);
+    compile_agent_may_profile_wall(&doc, req, &mut w2);
+    compile_wrap_prefix_bind(&doc, req, &mut w3);
+    compile_guard_wall(&doc, &mut w4);
+    walls.push(w1);
+    walls.push(w2);
+    walls.push(w3);
+    walls.push(w4);
+    admit_collect_all(&walls, out);
+}
+
+pub mod parse_gap_source {
+    use super::{parse_gap_source, Value};
+    pub struct ParseGapSource {
+        pub source: String,
+        pub result: Value,
+        pub err: String,
+    }
+    impl ParseGapSource {
+        pub fn new() -> Self {
+            Self {
+                source: String::new(),
+                result: Value::Null,
+                err: String::new(),
+            }
+        }
+        pub fn process(&mut self) {
+            parse_gap_source(&self.source, &mut self.result, &mut self.err);
+        }
+    }
+}
+
+pub mod live_admit_gap_profile {
+    use super::{live_admit_gap_profile, AdmitResult, LiveAdmitRequest};
+    pub struct LiveAdmitGapProfile {
+        pub source: String,
+        pub request: LiveAdmitRequest,
+        pub result: AdmitResult,
+        pub err: String,
+    }
+    impl LiveAdmitGapProfile {
+        pub fn new() -> Self {
+            Self {
+                source: String::new(),
+                request: LiveAdmitRequest::default(),
+                result: AdmitResult {
+                    allow: true,
+                    closed: Vec::new(),
+                },
+                err: String::new(),
+            }
+        }
+        pub fn process(&mut self) {
+            live_admit_gap_profile(&self.source, &self.request, &mut self.result, &mut self.err);
+        }
+    }
+}
+
+pub mod enabled_is_load_time {
+    pub struct EnabledIsLoadTime {
+        pub source: String,
+        pub result: bool,
+    }
+    impl EnabledIsLoadTime {
+        pub fn new() -> Self {
+            Self {
+                source: String::new(),
+                result: true,
+            }
+        }
+        pub fn process(&mut self) {
+            let _ = &self.source;
+            enabled_is_load_time(&mut self.result);
+        }
+    }
+}
+
