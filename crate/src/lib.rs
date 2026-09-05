@@ -504,3 +504,100 @@ pub fn compile_wrap_prefix_bind(doc: &Value, req: &LiveAdmitRequest, wall: &mut 
     }
 }
 
+
+pub fn compile_agent_may_profile_wall(doc: &Value, req: &LiveAdmitRequest, wall: &mut AdmitWall) {
+    let agent_id = req.agent_id.trim();
+    let action = req.action.trim();
+    if agent_id.is_empty() && action.is_empty() {
+        AdmitWall::open_into(WALL_AGENT_MAY, wall);
+        return;
+    }
+    let mut grants: Vec<AgentMayGrant> = Vec::new();
+    grants_from_doc(doc, &mut grants);
+    let mut id = String::new();
+    agent_may_wall_id(agent_id, action, &mut id);
+    if grants.is_empty() {
+        AdmitWall::close_into(
+            &id,
+            "GAP dimension agent_may closed: empty grants fail closed for agent actions",
+            wall,
+        );
+        return;
+    }
+    let mut granted = false;
+    agent_is_granted(agent_id, action, &grants, &mut granted);
+    if granted {
+        AdmitWall::open_into(&id, wall);
+        return;
+    }
+    let mut reason = String::from("GAP dimension agent_may closed: agent ");
+    if agent_id.is_empty() {
+        reason.push_str("unbound");
+    } else {
+        reason.push_str(agent_id);
+    }
+    reason.push_str(" may not ");
+    reason.push_str(action);
+    AdmitWall::close_into(&id, &reason, wall);
+}
+
+pub fn action_path_matches_prefix(action_path: &str, prefix: &str, out: &mut bool) {
+    let p = prefix.trim();
+    let a = action_path.trim();
+    *out = false;
+    if p.is_empty() || a.is_empty() {
+        return;
+    }
+    if a == p {
+        *out = true;
+        return;
+    }
+    if a.starts_with(p) == false {
+        return;
+    }
+    let last = p.as_bytes()[p.len() - 1];
+    if last == 58 || last == 47 {
+        *out = true;
+        return;
+    }
+    let rest = &a[p.len()..];
+    *out = rest.starts_with(char::from(58).to_string().as_str()) || rest.starts_with(char::from(47).to_string().as_str());
+}
+
+pub fn wrap_or_prefix_binds(gap_wrap: &str, gap_prefix: &str, node_wrap: &str, action_path: &str, out: &mut bool) {
+    *out = false;
+    let w = gap_wrap.trim();
+    let nw = node_wrap.trim();
+    if w.is_empty() == false && w == nw {
+        *out = true;
+        return;
+    }
+    let pref = gap_prefix.trim();
+    if pref.is_empty() == false {
+        action_path_matches_prefix(action_path, pref, out);
+    }
+}
+
+pub fn compile_wrap_prefix_bind(doc: &Value, req: &LiveAdmitRequest, wall: &mut AdmitWall) {
+    let meta = meta_of(doc);
+    let mut wrap = String::new();
+    let mut prefix = String::new();
+    json_str(meta, "wrap", &mut wrap);
+    json_str(meta, "action_path_prefix", &mut prefix);
+    if wrap.is_empty() && prefix.is_empty() {
+        AdmitWall::open_into(WALL_WRAP_BIND, wall);
+        return;
+    }
+    let mut binds = false;
+    wrap_or_prefix_binds(&wrap, &prefix, &req.wrap, &req.action_path, &mut binds);
+    if binds {
+        AdmitWall::open_into(WALL_WRAP_BIND, wall);
+    } else {
+        AdmitWall::close_into(
+            WALL_WRAP_BIND,
+            "wrap or action_path_prefix does not bind this action_path",
+            wall,
+        );
+    }
+}
+
