@@ -32,7 +32,7 @@ Putting a capsule on the dock is a transport step. After the wait the client col
 
 Omission of a lattice wall is not a live Admit outcome. All applicable walls are judged together and if two walls fail both are listed so row order does not change yes or no.
 
-Writing and security stems evaluate on every action_path and other GAP walls bind to a wrap or an action_path prefix.
+Writing and security are always-on stems so they evaluate on every action_path while other GAP walls bind to a wrap or prefix.
 
 ### Derived fifteen-row ledger
 
@@ -70,9 +70,11 @@ Unbound scene, dock, timestamp or sequence closes Admit.
 
 ## File format
 
+Live kernel policies may be JSON-encoded GAP instructions and YAML remains valid GAP source. Writing and security are always-on stems so they evaluate on every action_path while other GAP walls bind to a wrap or prefix. The kernel reads the instruction object not the skin so a JSON GAP object is legal kernel policy. A finance wrap GAP item does not close an inventory wrap ping and a non-always-on GAP with empty wrap does not fold onto every event. Kernel bind detail lives at http://100.118.184.18:3003/thePM001/GAP/src/branch/main/docs/kernel-json-wrap.md .
+
 - Extension: `.gap`
 - Encoding: UTF-8
-- Syntax: YAML 1.2 source. Live kernel policies may be JSON-encoded GAP instruction objects. The kernel reads the instruction object.
+- Syntax: YAML 1.2 source. Live kernel policies may be JSON-encoded GAP instructions. YAML remains valid GAP source. The kernel reads the instruction object not the skin.
 - One instruction per document. Multi-instruction families use YAML multi-document syntax (`---` separators).
 - Keep `.gap` as GAP source.
 
@@ -352,7 +354,8 @@ Migrate incrementally. Each rung adds governance without rewriting existing logi
 
 | File | Description |
 |------|-------------|
-| `README.md` | This file. Live evaluation story. http://100.118.184.18:3003/thePM001/GAP/src/branch/main/README.md |
+| `README.md` | This file. Live evaluation story plus kernel policy skin and wrap bind. http://100.118.184.18:3003/thePM001/GAP/src/branch/main/README.md |
+| `docs/kernel-json-wrap.md` | JSON-encoded kernel policies with YAML remains valid GAP source, always-on stems and wrap or prefix bind. http://100.118.184.18:3003/thePM001/GAP/src/branch/main/docs/kernel-json-wrap.md |
 | `GAP meta schema v1.json` | JSON Schema 2020-12. Layer 1 constraint mask artifact. |
 | `GAP meta schema v1.2.json` | Updated meta schema with v1.1 additions (LRT, MLE, latent governance) where enabled is load-time and live Admit still evaluates walls so closed-wall Deny names closed walls and a retry must seal a new capsule. |
 | `GAP meta schema v1.3.json` | Classic GAP 2.8.5 profile where who-may is agent_may and wrap plus action_path_prefix bind. pattern.guard is a string or a structured ConstraintExpression. trust_ring is documentary and is not a live Admit floor and enabled is load-time. |
@@ -364,6 +367,8 @@ Required classic GAP tickets live on Gitea as .gap source under docs/dev-tickets
 
 GAP-285-P3 (priority P1) is at http://100.118.184.18:3003/thePM001/GAP/src/commit/6aa964c6a8b52570df84fcb710fba8e15035c6d1/docs/dev-tickets/GAP-285-P3.gap with commit 6aa964c6a8b52570df84fcb710fba8e15035c6d1. Metadata.enabled false is loaded and live Admit still evaluates walls. Closed-wall Deny names closed wall ids, reasons and a prescribed repair. A retry must seal a new capsule.
 
+GAP-285-P5 (priority P1) is at http://100.118.184.18:3003/thePM001/GAP/src/commit/416a13aa691188ee9e45ee67b868fbdc12ff8a80/docs/dev-tickets/GAP-285-P5.gap with commit 416a13aa691188ee9e45ee67b868fbdc12ff8a80. Live kernel policies may be JSON-encoded GAP instructions and YAML remains valid GAP source because writing and security are always-on stems while other GAP walls bind to a wrap or prefix.
+
 ## Schema profiles
 
 Classic GAP keeps three JSON Schema documents:
@@ -372,7 +377,7 @@ Classic GAP keeps three JSON Schema documents:
 - v1.2: LRT, MLE and latent governance. Keep for old documents. covenants and scanners stay. enabled is load-time. Live Admit still evaluates walls. Closed-wall Deny names closed wall ids, reasons and a prescribed repair. A retry must seal a new capsule. Attractors stay forensic records.
 - v1.3: Classic GAP 2.8.5 profile. Adds metadata.agent_may, metadata.wrap, metadata.action_path_prefix and pattern.guard as a string or a structured ConstraintExpression. enabled stays load-time. Live Admit still evaluates walls. A document that uses trust_ring as rank fails live Admit.
 
-Live Admit for the v1.3 profile is collect-all and walls are gap:trust_ring:rank, gap:agent_may, gap:wrap:bind and gap:pattern:guard. YAML GAP source still parses and JSON-encoded GAP instruction objects also parse.
+Live Admit for the v1.3 profile is collect-all and walls are gap:trust_ring:rank, gap:agent_may, gap:wrap:bind and gap:pattern:guard. Live kernel policies may be JSON-encoded GAP instructions and YAML remains valid GAP source so both skins parse into the same instruction object.
 
 ## Research
 
