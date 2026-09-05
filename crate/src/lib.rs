@@ -1558,3 +1558,134 @@ mod tests_more {
         assert_eq!(load, true);
     }
 }
+
+#[cfg(test)]
+mod tests_more {
+    use super::*;
+
+    fn profile() -> String {
+        String::from("address:\n  domain: com.example.live\n  id: profile-doc\npattern:\n  guard:\n    expr: wrap == finance\n    lang: gapdsl\naction:\n  type: template\n  content: hello\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n  agent_may:\n    - agent_id: agent-a\n      action: write\n  wrap: finance\n  action_path_prefix: finance\nenabled: false\n")
+    }
+
+    #[test]
+    fn enabled_false_still_evaluates_agent_may() {
+        let req = LiveAdmitRequest {
+            agent_id: String::from("agent-b"),
+            action: String::from("write"),
+            wrap: String::from("finance"),
+            action_path: String::from("finance/pay"),
+        };
+        let mut result = AdmitResult { allow: true, closed: Vec::new() };
+        let mut err = String::new();
+        live_admit_gap_profile(&profile(), &req, &mut result, &mut err);
+        assert_eq!(err.as_str(), "");
+        assert_eq!(result.allow, false);
+        let mut may_id = String::new();
+        agent_may_wall_id("agent-b", "write", &mut may_id);
+        let mut hit = false;
+        let mut i = 0usize;
+        while i < result.closed.len() {
+            if result.closed[i].id == may_id {
+                hit = true;
+            }
+            i += 1;
+        }
+        assert_eq!(hit, true);
+        let mut skip = true;
+        enabled_skips_admit(&Value::Bool(false), &mut skip);
+        assert_eq!(skip, false);
+        let mut load = false;
+        enabled_is_load_time(&mut load);
+        assert_eq!(load, true);
+    }
+
+    #[test]
+    fn agent_a_may_write_not_agent_b() {
+        let mut doc = Value::Null;
+        let mut err = String::new();
+        parse_gap_source(&profile(), &mut doc, &mut err);
+        assert_eq!(err.as_str(), "");
+        let mut a = AdmitWall { id: String::new(), closed: false, reason: String::new() };
+        let mut b = a.clone();
+        compile_agent_may_profile_wall(&doc, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::from("finance"), action_path: String::from("finance/pay") }, &mut a);
+        compile_agent_may_profile_wall(&doc, &LiveAdmitRequest { agent_id: String::from("agent-b"), action: String::from("write"), wrap: String::from("finance"), action_path: String::from("finance/pay") }, &mut b);
+        assert_eq!(a.closed, false);
+        assert_eq!(b.closed, true);
+    }
+
+    #[test]
+    fn wrap_finance_not_inventory() {
+        let mut doc = Value::Null;
+        let mut err = String::new();
+        parse_gap_source(&profile(), &mut doc, &mut err);
+        assert_eq!(err.as_str(), "");
+        let mut okw = AdmitWall { id: String::new(), closed: false, reason: String::new() };
+        let mut bad = okw.clone();
+        compile_wrap_prefix_bind(&doc, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::from("finance"), action_path: String::from("finance/pay") }, &mut okw);
+        compile_wrap_prefix_bind(&doc, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::from("inventory"), action_path: String::from("inventory/stock") }, &mut bad);
+        assert_eq!(okw.closed, false);
+        assert_eq!(bad.closed, true);
+    }
+
+    #[test]
+    fn schema_v13_body_contains_required_fields() {
+        let mut body = String::new();
+        schema_v13_body(&mut body);
+        assert_eq!(body.contains("agent_may"), true);
+        assert_eq!(body.contains("action_path_prefix"), true);
+        assert_eq!(body.contains("wrap"), true);
+        assert_eq!(body.contains("oneOf"), true);
+        assert_eq!(body.contains("load-time"), true);
+        assert_eq!(body.contains("Not a live Admit floor"), true);
+        assert_eq!(body.contains("covenants"), true);
+        assert_eq!(body.contains("scanners"), true);
+        assert_eq!(body.contains("v1.3"), true);
+    }
+
+    #[test]
+    fn classic_v1_and_v12_keep_covenants_and_scanners() {
+        let v1 = include_str!("../../GAP meta schema v1.json");
+        let v12 = include_str!("../../GAP meta schema v1.2.json");
+        assert_eq!(v1.contains("\"covenants\""), true);
+        assert_eq!(v1.contains("\"scanners\""), true);
+        assert_eq!(v12.contains("\"covenants\""), true);
+        assert_eq!(v12.contains("\"scanners\""), true);
+        assert_eq!(v12.contains("\"trust_ring\""), true);
+        assert_eq!(v12.contains("sandbox"), true);
+    }
+
+    #[test]
+    fn empty_grants_fail_closed_for_agent_action() {
+        let src = String::from("address:\n  domain: com.example.live\n  id: empty-grants\npattern: p\naction:\n  type: template\n  content: c\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n");
+        let mut result = AdmitResult { allow: true, closed: Vec::new() };
+        let mut err = String::new();
+        live_admit_gap_profile(&src, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::new(), action_path: String::new() }, &mut result, &mut err);
+        assert_eq!(err.as_str(), "");
+        assert_eq!(result.allow, false);
+        let mut hit = false;
+        let mut i = 0usize;
+        while i < result.closed.len() {
+            if result.closed[i].id.starts_with(WALL_AGENT_MAY) {
+                hit = true;
+            }
+            i += 1;
+        }
+        assert_eq!(hit, true);
+    }
+
+    #[test]
+    fn hvvc_as_process_live_admit() {
+        let mut svc = live_admit_gap_profile::LiveAdmitGapProfile::new();
+        svc.source = profile();
+        svc.request.agent_id = String::from("agent-a");
+        svc.request.action = String::from("write");
+        svc.request.wrap = String::from("finance");
+        svc.request.action_path = String::from("finance/pay");
+        svc.process();
+        assert_eq!(svc.err.as_str(), "");
+        assert_eq!(svc.result.allow, true);
+        let mut load = false;
+        enabled_is_load_time(&mut load);
+        assert_eq!(load, true);
+    }
+}
