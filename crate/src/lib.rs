@@ -601,3 +601,84 @@ pub fn compile_wrap_prefix_bind(doc: &Value, req: &LiveAdmitRequest, wall: &mut 
     }
 }
 
+
+pub fn compile_guard_wall(doc: &Value, wall: &mut AdmitWall) {
+    let p = doc.get("pattern");
+    if p.is_none() {
+        AdmitWall::open_into(WALL_PATTERN_GUARD, wall);
+        return;
+    }
+    let p = p.unwrap();
+    if p.is_string() {
+        AdmitWall::open_into(WALL_PATTERN_GUARD, wall);
+        return;
+    }
+    let g = p.get("guard");
+    if g.is_none() {
+        AdmitWall::open_into(WALL_PATTERN_GUARD, wall);
+        return;
+    }
+    let g = g.unwrap();
+    if g.is_string() {
+        AdmitWall::open_into(WALL_PATTERN_GUARD, wall);
+        return;
+    }
+    if g.is_object() {
+        let expr = g.get("expr").and_then(|x| x.as_str()).unwrap_or("").trim();
+        if expr.is_empty() {
+            AdmitWall::close_into(WALL_PATTERN_GUARD, "structured pattern.guard requires expr", wall);
+        } else {
+            AdmitWall::open_into(WALL_PATTERN_GUARD, wall);
+        }
+        return;
+    }
+    AdmitWall::close_into(WALL_PATTERN_GUARD, "pattern.guard must be a string or a structured object", wall);
+}
+
+fn parse_scalar(raw: &str, out: &mut Value) {
+    let s = raw.trim();
+    if s == "true" {
+        *out = Value::Bool(true);
+        return;
+    }
+    if s == "false" {
+        *out = Value::Bool(false);
+        return;
+    }
+    if s == "null" || s == "~" {
+        *out = Value::Null;
+        return;
+    }
+    if let Ok(n) = s.parse::<i64>() {
+        *out = Value::Number(n.into());
+        return;
+    }
+    let bytes = s.as_bytes();
+    if 1 < s.len() && bytes[0] == 34 && bytes[s.len() - 1] == 34 {
+        *out = Value::String(s[1..s.len() - 1].to_string());
+        return;
+    }
+    *out = Value::String(String::from(s));
+}
+
+struct YamlLine {
+    indent: usize,
+    text: String,
+}
+
+fn yaml_lines(src: &str, out: &mut Vec<YamlLine>) {
+    out.clear();
+    for raw in src.lines() {
+        let mut indent = 0usize;
+        let bytes = raw.as_bytes();
+        while indent < bytes.len() && bytes[indent] == 32 {
+            indent += 1;
+        }
+        let text = raw[indent..].trim_end().to_string();
+        if text.is_empty() || text.starts_with(char::from(35).to_string().as_str()) {
+            continue;
+        }
+        out.push(YamlLine { indent, text });
+    }
+}
+
