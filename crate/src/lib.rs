@@ -71,3 +71,78 @@ impl AdmitResult {
     }
 }
 
+
+pub fn admit_collect_all(walls: &[AdmitWall], out: &mut AdmitResult) {
+    let mut closed: Vec<AdmitWall> = Vec::new();
+    let mut i = 0usize;
+    while i < walls.len() {
+        if walls[i].closed {
+            closed.push(walls[i].clone());
+        }
+        i += 1;
+    }
+    closed.sort_by(|a, b| a.id.cmp(&b.id).then(a.reason.cmp(&b.reason)));
+    closed.dedup_by(|a, b| a.id == b.id && a.reason == b.reason);
+    out.allow = closed.is_empty();
+    out.closed = closed;
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AgentMayGrant {
+    pub agent_id: String,
+    pub action: String,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct LiveAdmitRequest {
+    pub agent_id: String,
+    pub action: String,
+    pub wrap: String,
+    pub action_path: String,
+}
+
+fn json_str(v: &Value, key: &str, out: &mut String) {
+    out.clear();
+    if let Some(x) = v.get(key) {
+        if let Some(s) = x.as_str() {
+            out.push_str(s.trim());
+        }
+    }
+}
+
+fn meta_of(doc: &Value) -> &Value {
+    if let Some(m) = doc.get("metadata") {
+        m
+    } else {
+        &Value::Null
+    }
+}
+
+pub fn enabled_is_load_time(out: &mut bool) {
+    *out = true;
+}
+
+pub fn enabled_skips_admit(_doc: &Value, out: &mut bool) {
+    *out = false;
+}
+
+fn is_rank_name(name: &str, out: &mut bool) {
+    *out = name == RANK_SANDBOX || name == RANK_USER || name == RANK_SYSTEM || name == RANK_ENTERPRISE;
+}
+
+pub fn compile_trust_ring_rank_wall(doc: &Value, wall: &mut AdmitWall) {
+    let mut ring = String::new();
+    json_str(meta_of(doc), "trust_ring", &mut ring);
+    if ring.is_empty() {
+        AdmitWall::open_into(WALL_TRUST_RING_RANK, wall);
+        return;
+    }
+    let mut rank = false;
+    is_rank_name(&ring, &mut rank);
+    AdmitWall::close_into(
+        WALL_TRUST_RING_RANK,
+        "warn: trust_ring is not a live Admit floor; who-may is agent_may; rank use denied",
+        wall,
+    );
+}
+
