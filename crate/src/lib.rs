@@ -604,7 +604,7 @@ pub fn live_admit_gap_profile(source: &str, req: &LiveAdmitRequest, out: &mut Ad
 }
 
 pub mod parse_gap_source {
-    use super::{parse_gap_source, Value};
+    use super::Value;
     pub struct ParseGapSource {
         pub source: String,
         pub result: Value,
@@ -625,7 +625,7 @@ pub mod parse_gap_source {
 }
 
 pub mod live_admit_gap_profile {
-    use super::{live_admit_gap_profile, AdmitResult, LiveAdmitRequest};
+    use super::{AdmitResult, LiveAdmitRequest};
     pub struct LiveAdmitGapProfile {
         pub source: String,
         pub request: LiveAdmitRequest,
