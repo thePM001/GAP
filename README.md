@@ -326,22 +326,22 @@ Domain-specific validators that appear on the derived ledger:
 
 ## GAP toolchain
 
-`.gap` files load through the GAP toolchain. Structural validation runs at load. Live Admit still waits for freeze-at-seal, the 1000 ms kernel pulse and collect-all walls.
+This snapshot ships crate binaries gap-schema-profile-v13, gap-closed-wall-deny, gap-proof-live-bundle-mode and gap-snapshot-hygiene. `.gap` files stay GAP source. Structural validation runs at load. Live Admit still waits for freeze-at-seal, the 1000 ms kernel pulse and collect-all walls.
+
+This snapshot does not ship a `structural` CLI and it does not ship `gapc`.
 
 ## GAP commands
 
+Build and run the shipped CLIs:
+
 ```
-structural compile <file.gap>                    # Compile to canonical artifacts
-structural compile gap-instructions/             # Compile all instructions
-structural lint                                  # Static analysis and warnings
-structural graph                                 # Visualize instruction dependency graph
-structural run <file.gap>                        # Execute an instruction
-structural test <file.gap> <dataset>             # Test against a dataset
-structural export <adapter> <file.gap>           # Export via adapter (n8n, rego, jsonschema)
-structural subprotocol register <name> <path>    # Register custom subprotocol
-structural validator register <name> <path>      # Register custom validator
-structural adapter register <name> <path>        # Register custom export adapter
+cargo run --manifest-path crate/Cargo.toml --bin gap-schema-profile-v13
+cargo run --manifest-path crate-closed-wall-deny/Cargo.toml --bin gap-closed-wall-deny
+cargo run --manifest-path crate-proof-live-bundle/Cargo.toml --bin gap-proof-live-bundle-mode
+cargo run --manifest-path crate-snapshot-hygiene/Cargo.toml --bin gap-snapshot-hygiene
 ```
+
+gap-schema-profile-v13 stdin is GAP source keys. gap-closed-wall-deny names closed walls and a prescribed repair. gap-proof-live-bundle-mode stdin is README and live bundle mode is sha256-structure. gap-snapshot-hygiene stdin is README and stdout is allow=true when the README names those binaries.
 
 ## Adoption ladder
 
