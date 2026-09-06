@@ -8,5 +8,4 @@ Product packages live under packages
 NLA-AEP-v2.8-open-source
 AEP-Components/gap/lib/gap-compile.mjs
 AEP-Components/gap/policies/reference/
-AEP-NOSHIP/AEP-Subprotocols/coding-governance/
 AEP-Components/gap/FILE-FORMAT.md
