@@ -5,7 +5,7 @@ format: gap
 json_prohibited: true
 id: GAP-285-P15
 title: AEP 2.8.5 kernel collect-all must run GAP v1.3 profile walls
-status: backlog
+status: closed
 priority: P0
 track: classic-gap-aep-2.8.5
 wave: operational-remediation
