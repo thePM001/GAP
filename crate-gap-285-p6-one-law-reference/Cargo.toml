@@ -1,9 +1,0 @@
-# @PAD: gap-285-p6-one-law-reference
-# @GCDE: gaplune.policy.v1
-[package]
-name = "gap-285-p6-one-law-reference"
-version = "0.1.0"
-edition = "2021"
-description = "GAP-285-P6 one-law reference. Presence of trust_ring is Deny. Who-may is agent_may. Wrap bind on walls that are not always-on."
-license = "UNLICENSED"
-publish = false
