@@ -1,5 +1,5 @@
 // crate: gap-schema-profile-v13
-// GAP-285-P1 classic GAP v1.3 live Admit profile.
+// GAP-285-P1 classic GAP v1.3 live Admit profile. GAP-285-P8 one-law: presence of trust_ring is Deny.
 use serde_json::{Map, Value};
 
 pub const TICKET: &str = "GAP-285-P1";
@@ -12,7 +12,7 @@ pub const RANK_SANDBOX: &str = "sandbox";
 pub const RANK_USER: &str = "user";
 pub const RANK_SYSTEM: &str = "system";
 pub const RANK_ENTERPRISE: &str = "enterprise";
-pub const SCHEMA_V13_CONTRACT: &str = "GAP Instruction Meta-Schema v1.3\nagent_may\nwrap\naction_path_prefix\noneOf\nload-time\nNot a live Admit floor.\ncovenants\nscanners\n";
+pub const SCHEMA_V13_CONTRACT: &str = "GAP Instruction Meta-Schema v1.3\nagent_may\nwrap\naction_path_prefix\noneOf\nload-time\nPresence of trust_ring is Deny.\ncovenants\nscanners\n";
 
 pub fn schema_v13_body(out: &mut String) {
     out.clear();
@@ -141,7 +141,7 @@ pub fn compile_trust_ring_rank_wall(doc: &Value, wall: &mut AdmitWall) {
     is_rank_name(&ring, &mut rank);
     AdmitWall::close_into(
         WALL_TRUST_RING_RANK,
-        "warn: trust_ring is not a live Admit floor; who-may is agent_may; rank use denied",
+        "presence of trust_ring is Deny; who-may is agent_may",
         wall,
     );
 }
@@ -254,7 +254,7 @@ pub fn compile_agent_may_profile_wall(doc: &Value, req: &LiveAdmitRequest, wall:
     if grants.is_empty() {
         AdmitWall::close_into(
             &id,
-            "GAP dimension agent_may closed: empty grants fail closed for agent actions",
+            "GAP dimension agent_may closed: empty grants DENY on miss when an agent action is judged",
             wall,
         );
         return;
@@ -687,11 +687,11 @@ mod tests {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(&sample_yaml_profile(), &mut doc, &mut err);
-        assert_eq!(err.as_str(), "");
+        assert_eq ! (err.as_str(), "");
         let mut id = String::new();
         json_str(&doc["address"], "id", &mut id);
-        assert_eq!(id.as_str(), "profile-doc");
-        assert_eq!(doc.get("enabled").and_then(|v| v.as_bool()), Some(false));
+        assert_eq ! (id.as_str(), "profile-doc");
+        assert_eq ! (doc.get("enabled").and_then(|v| v.as_bool()), Some(false));
     }
 
     #[test]
@@ -700,10 +700,10 @@ mod tests {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(src, &mut doc, &mut err);
-        assert_eq!(err.as_str(), "");
+        assert_eq ! (err.as_str(), "");
         let mut id = String::new();
         json_str(&doc["address"], "id", &mut id);
-        assert_eq!(id.as_str(), "json-doc");
+        assert_eq ! (id.as_str(), "json-doc");
     }
 
     #[test]
@@ -711,12 +711,12 @@ mod tests {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(&sample_yaml_profile(), &mut doc, &mut err);
-        assert_eq!(err.as_str(), "");
+        assert_eq ! (err.as_str(), "");
         let mut wall = AdmitWall { id: String::new(), closed: false, reason: String::new() };
         compile_guard_wall(&doc, &mut wall);
-        assert_eq!(wall.closed, false);
+        assert_eq ! (wall.closed, false);
         let g = doc["pattern"]["guard"]["expr"].as_str().unwrap_or("");
-        assert_eq!(g.contains("finance"), true);
+        assert_eq ! (g.contains("finance"), true);
     }
 
     #[test]
@@ -724,10 +724,10 @@ mod tests {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(&sample_yaml_rank(), &mut doc, &mut err);
-        assert_eq!(err.as_str(), "");
+        assert_eq ! (err.as_str(), "");
         let mut ring = String::new();
         json_str(meta_of(&doc), "trust_ring", &mut ring);
-        assert_eq!(ring.as_str(), "user");
+        assert_eq ! (ring.as_str(), "user");
     }
 
     #[test]
@@ -736,8 +736,8 @@ mod tests {
         let mut result = AdmitResult { allow: true, closed: Vec::new() };
         let mut err = String::new();
         live_admit_gap_profile(&sample_yaml_rank(), &req, &mut result, &mut err);
-        assert_eq!(err.as_str(), "");
-        assert_eq!(result.allow, false);
+        assert_eq ! (err.as_str(), "");
+        assert_eq ! (result.allow, false);
         let mut hit = false;
         let mut i = 0usize;
         while i < result.closed.len() {
@@ -746,7 +746,7 @@ mod tests {
             }
             i += 1;
         }
-        assert_eq!(hit, true);
+        assert_eq ! (hit, true);
     }
 }
 
@@ -769,8 +769,8 @@ mod tests_more {
         let mut result = AdmitResult { allow: true, closed: Vec::new() };
         let mut err = String::new();
         live_admit_gap_profile(&profile(), &req, &mut result, &mut err);
-        assert_eq!(err.as_str(), "");
-        assert_eq!(result.allow, false);
+        assert_eq ! (err.as_str(), "");
+        assert_eq ! (result.allow, false);
         let mut may_id = String::new();
         agent_may_wall_id("agent-b", "write", &mut may_id);
         let mut hit = false;
@@ -781,13 +781,13 @@ mod tests_more {
             }
             i += 1;
         }
-        assert_eq!(hit, true);
+        assert_eq ! (hit, true);
         let mut skip = true;
         enabled_skips_admit(&Value::Bool(false), &mut skip);
-        assert_eq!(skip, false);
+        assert_eq ! (skip, false);
         let mut load = false;
         enabled_is_load_time(&mut load);
-        assert_eq!(load, true);
+        assert_eq ! (load, true);
     }
 
     #[test]
@@ -795,13 +795,13 @@ mod tests_more {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(&profile(), &mut doc, &mut err);
-        assert_eq!(err.as_str(), "");
+        assert_eq ! (err.as_str(), "");
         let mut a = AdmitWall { id: String::new(), closed: false, reason: String::new() };
         let mut b = a.clone();
         compile_agent_may_profile_wall(&doc, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::from("finance"), action_path: String::from("finance/pay") }, &mut a);
         compile_agent_may_profile_wall(&doc, &LiveAdmitRequest { agent_id: String::from("agent-b"), action: String::from("write"), wrap: String::from("finance"), action_path: String::from("finance/pay") }, &mut b);
-        assert_eq!(a.closed, false);
-        assert_eq!(b.closed, true);
+        assert_eq ! (a.closed, false);
+        assert_eq ! (b.closed, true);
     }
 
     #[test]
@@ -809,50 +809,60 @@ mod tests_more {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(&profile(), &mut doc, &mut err);
-        assert_eq!(err.as_str(), "");
+        assert_eq ! (err.as_str(), "");
         let mut okw = AdmitWall { id: String::new(), closed: false, reason: String::new() };
         let mut bad = okw.clone();
         compile_wrap_prefix_bind(&doc, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::from("finance"), action_path: String::from("finance/pay") }, &mut okw);
         compile_wrap_prefix_bind(&doc, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::from("inventory"), action_path: String::from("inventory/stock") }, &mut bad);
-        assert_eq!(okw.closed, false);
-        assert_eq!(bad.closed, true);
+        assert_eq ! (okw.closed, false);
+        assert_eq ! (bad.closed, true);
     }
 
     #[test]
     fn schema_v13_body_contains_required_fields() {
         let mut body = String::new();
         schema_v13_body(&mut body);
-        assert_eq!(body.contains("agent_may"), true);
-        assert_eq!(body.contains("action_path_prefix"), true);
-        assert_eq!(body.contains("wrap"), true);
-        assert_eq!(body.contains("oneOf"), true);
-        assert_eq!(body.contains("load-time"), true);
-        assert_eq!(body.contains("Not a live Admit floor"), true);
-        assert_eq!(body.contains("covenants"), true);
-        assert_eq!(body.contains("scanners"), true);
-        assert_eq!(body.contains("v1.3"), true);
+        assert_eq ! (body.contains("agent_may"), true);
+        assert_eq ! (body.contains("action_path_prefix"), true);
+        assert_eq ! (body.contains("wrap"), true);
+        assert_eq ! (body.contains("oneOf"), true);
+        assert_eq ! (body.contains("load-time"), true);
+        assert_eq ! (body.contains("Presence of trust_ring is Deny"), true);
+        assert_eq ! (body.contains("covenants"), true);
+        assert_eq ! (body.contains("scanners"), true);
+        assert_eq ! (body.contains("v1.3"), true);
     }
 
     #[test]
     fn classic_v1_and_v12_keep_covenants_and_scanners() {
-        let v1 = include_str!("../../GAP meta schema v1.json");
-        let v12 = include_str!("../../GAP meta schema v1.2.json");
-        assert_eq!(v1.contains("\"covenants\""), true);
-        assert_eq!(v1.contains("\"scanners\""), true);
-        assert_eq!(v12.contains("\"covenants\""), true);
-        assert_eq!(v12.contains("\"scanners\""), true);
-        assert_eq!(v12.contains("\"trust_ring\""), true);
-        assert_eq!(v12.contains("sandbox"), true);
+        let v1 = include_str ! ("../../GAP meta schema v1.json");
+        let v12 = include_str ! ("../../GAP meta schema v1.2.json");
+        assert_eq ! (v1.contains("\"covenants\""), true);
+        assert_eq ! (v1.contains("\"scanners\""), true);
+        assert_eq ! (v12.contains("\"covenants\""), true);
+        assert_eq ! (v12.contains("\"scanners\""), true);
+        assert_eq ! (v12.contains("\"trust_ring\""), true);
+        assert_eq ! (v12.contains("sandbox"), true);
     }
 
     #[test]
-    fn empty_grants_fail_closed_for_agent_action() {
+    fn schema_v13_json_presence_is_deny() {
+        let body = include_str ! ("schema_v13.body");
+        assert_eq ! (body.contains("Presence of trust_ring is Deny"), true);
+        assert_eq ! (body.contains("documentary"), false);
+        assert_eq ! (body.contains("Not a live Admit floor"), false);
+        assert_eq ! (body.contains("unused at Admit"), false);
+        assert_eq ! (body.contains("agent_may"), true);
+    }
+
+    #[test]
+    fn empty_grants_deny_on_miss_for_agent_action() {
         let src = String::from("address:\n  domain: com.example.live\n  id: empty-grants\npattern: p\naction:\n  type: template\n  content: c\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n");
         let mut result = AdmitResult { allow: true, closed: Vec::new() };
         let mut err = String::new();
         live_admit_gap_profile(&src, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::new(), action_path: String::new() }, &mut result, &mut err);
-        assert_eq!(err.as_str(), "");
-        assert_eq!(result.allow, false);
+        assert_eq ! (err.as_str(), "");
+        assert_eq ! (result.allow, false);
         let mut hit = false;
         let mut i = 0usize;
         while i < result.closed.len() {
@@ -861,7 +871,7 @@ mod tests_more {
             }
             i += 1;
         }
-        assert_eq!(hit, true);
+        assert_eq ! (hit, true);
     }
 
     #[test]
@@ -873,11 +883,11 @@ mod tests_more {
         svc.request.wrap = String::from("finance");
         svc.request.action_path = String::from("finance/pay");
         svc.process();
-        assert_eq!(svc.err.as_str(), "");
-        assert_eq!(svc.result.allow, true);
+        assert_eq ! (svc.err.as_str(), "");
+        assert_eq ! (svc.result.allow, true);
         let mut load = false;
         enabled_is_load_time(&mut load);
-        assert_eq!(load, true);
+        assert_eq ! (load, true);
     }
 }
 
