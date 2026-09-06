@@ -1,0 +1,13 @@
+@PAD: gap-285-p14-readme-tree-registration-v1
+@GCDE: gaplune.policy.v1
+schema_id: gaplune.aep.component-registration.v1
+format: gaplune
+json_prohibited: true
+id: gap-285-p14-readme-tree
+version: 0.1.0
+kind: library
+path: crate-gap-285-p14-readme-tree/
+ticket: GAP-285-P14
+requires: none
+capability: admit.gap-285-p14-readme-tree.scan
+note: GAP README tree truth. Schema files sit at repo root. Helper packages sit on GAP. Compile scripts and reference instructions live on the AEP vendor tree with a full Gitea http URL. Write DENY on miss.
