@@ -1,0 +1,13 @@
+# @PAD: gap-285-p2-snapshot-hygiene
+# @GCDE: gaplune.policy.v1
+[package]
+name = "gap-snapshot-hygiene"
+version = "0.1.0"
+edition = "2021"
+description = "GAP-285-P2. Classic GAP OSS snapshot hygiene. README must name shipped crate binaries and must not list a structural CLI."
+license = "UNLICENSED"
+publish = false
+
+[[bin]]
+name = "gap-snapshot-hygiene"
+path = "src/main.rs"
