@@ -28,4 +28,4 @@ This note tells operators how live GAP files are written and how collect-all Adm
 - A non-always-on GAP with empty wrap does not fold onto every event.
 - One instruction per document.
 - Multi-instruction families use YAML multi-document syntax with `---` separators.
-- Locator: http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-Components/gap/FILE-FORMAT.md
+- Locator: NLA-AEP-v2.8-open-source path AEP-Components/gap/FILE-FORMAT.md
