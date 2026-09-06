@@ -22,7 +22,6 @@ pub const HELPER_SNAPSHOT: &str = "`packages/gap-snapshot-hygiene/`";
 pub const VENDOR_HOST: &str = "NLA-AEP-v2.8-open-source";
 pub const COMPILE_PATH: &str = "AEP-Components/gap/lib/gap-compile.mjs";
 pub const REFERENCE_PATH: &str = "AEP-Components/gap/policies/reference/";
-pub const CODING_GOV_PATH: &str = "AEP-NOSHIP/AEP-Subprotocols/coding-governance/";
 pub const FILE_FORMAT_PATH: &str = "AEP-Components/gap/FILE-FORMAT.md";
 pub const PRIVATE_PORT: &str = ":3003/";
 
@@ -87,7 +86,6 @@ pub fn names_vendor_paths(src: &str) -> bool {
     src.contains(VENDOR_HOST)
         && src.contains(COMPILE_PATH)
         && src.contains(REFERENCE_PATH)
-        && src.contains(CODING_GOV_PATH)
         && src.contains(FILE_FORMAT_PATH)
 }
 
@@ -296,7 +294,6 @@ mod tests {
         s.push(char::from(10));
         s.push_str(REFERENCE_PATH);
         s.push(char::from(10));
-        s.push_str(CODING_GOV_PATH);
         s.push(char::from(10));
         s.push_str(FILE_FORMAT_PATH);
         s.push(char::from(10));
