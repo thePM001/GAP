@@ -279,7 +279,7 @@ Classic GAP source lives on this repository and `.gap` files stay GAP source.
 - Presence of trust_ring is Deny.
 - Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure.
 - Compile CAW profiles with `lib/gap-compile.mjs`.
-- The live classic GAP binary gap-schema-profile-v13 lives on thePM001/GAP and lives in crate/.
+- The live classic GAP binary gap-schema-profile-v13 lives in crate/.
 - This snapshot does not ship `gapc` and there is no `structural` CLI here.
 
 ## GAP commands
