@@ -12,7 +12,7 @@ pub const RANK_SANDBOX: &str = "sandbox";
 pub const RANK_USER: &str = "user";
 pub const RANK_SYSTEM: &str = "system";
 pub const RANK_ENTERPRISE: &str = "enterprise";
-pub const SCHEMA_V13_CONTRACT: &str = "GAP Instruction Meta-Schema v1.3\nagent_may\nwrap\naction_path_prefix\noneOf\nload-time\nPresence of trust_ring is Deny.\ncovenants\nscanners\n";
+pub const SCHEMA_V13_CONTRACT: &str = "GAP Instruction Meta-Schema v1.3\nagent_may\nwrap\naction_path_prefix\noneOf\nload-time\nPresence of trust_ring is Deny.\nEvery non-empty rank value is Deny.\ncovenants\nscanners\n";
 
 pub fn schema_v13_body(out: &mut String) {
     out.clear();
@@ -130,20 +130,84 @@ fn is_rank_name(name: &str, out: &mut bool) {
     *out = name == RANK_SANDBOX || name == RANK_USER || name == RANK_SYSTEM || name == RANK_ENTERPRISE;
 }
 
+fn field_present(v: &Value, key: &str, out: &mut bool) {
+    *out = v.get(key).is_some();
+}
+
+fn value_is_non_empty(v: &Value, out: &mut bool) {
+    *out = false;
+    match v {
+        Value::Null => {}
+        Value::Bool(_) => {
+            *out = true;
+        }
+        Value::Number(_) => {
+            *out = true;
+        }
+        Value::String(s) => {
+            *out = s.trim().is_empty() == false;
+        }
+        Value::Array(a) => {
+            *out = a.is_empty() == false;
+        }
+        Value::Object(o) => {
+            *out = o.is_empty() == false;
+        }
+    }
+}
+
 pub fn compile_trust_ring_rank_wall(doc: &Value, wall: &mut AdmitWall) {
+    let meta = meta_of(doc);
+    let mut present = false;
+    field_present(meta, "trust_ring", &mut present);
+    let mut rank_key = false;
+    field_present(meta, "rank", &mut rank_key);
     let mut ring = String::new();
-    json_str(meta_of(doc), "trust_ring", &mut ring);
-    if ring.is_empty() {
-        AdmitWall::open_into(WALL_TRUST_RING_RANK, wall);
+    json_str(meta, "trust_ring", &mut ring);
+    let mut rank_val = String::new();
+    json_str(meta, "rank", &mut rank_val);
+    let mut is_rank = false;
+    is_rank_name(&ring, &mut is_rank);
+    if is_rank == false {
+        is_rank_name(&rank_val, &mut is_rank);
+    }
+    let mut nonempty = false;
+    if let Some(x) = meta.get("trust_ring") {
+        value_is_non_empty(x, &mut nonempty);
+    }
+    if nonempty == false {
+        if let Some(x) = meta.get("rank") {
+            value_is_non_empty(x, &mut nonempty);
+        }
+    }
+    if let Some(fleet) = meta.get("fleet") {
+        if let Some(spawn) = fleet.get("spawn") {
+            let mut ceiling_present = false;
+            field_present(spawn, "ring_ceiling", &mut ceiling_present);
+            if ceiling_present {
+                present = true;
+            }
+            if nonempty == false {
+                if let Some(x) = spawn.get("ring_ceiling") {
+                    value_is_non_empty(x, &mut nonempty);
+                }
+            }
+            let mut ceiling = String::new();
+            json_str(spawn, "ring_ceiling", &mut ceiling);
+            if is_rank == false {
+                is_rank_name(&ceiling, &mut is_rank);
+            }
+        }
+    }
+    if present || rank_key || nonempty || is_rank {
+        AdmitWall::close_into(
+            WALL_TRUST_RING_RANK,
+            "presence of trust_ring is Deny; who-may is agent_may",
+            wall,
+        );
         return;
     }
-    let mut rank = false;
-    is_rank_name(&ring, &mut rank);
-    AdmitWall::close_into(
-        WALL_TRUST_RING_RANK,
-        "presence of trust_ring is Deny; who-may is agent_may",
-        wall,
-    );
+    AdmitWall::open_into(WALL_TRUST_RING_RANK, wall);
 }
 
 
@@ -828,6 +892,7 @@ mod tests_more {
         assert_eq ! (body.contains("oneOf"), true);
         assert_eq ! (body.contains("load-time"), true);
         assert_eq ! (body.contains("Presence of trust_ring is Deny"), true);
+        assert_eq ! (body.contains("Every non-empty rank value is Deny"), true);
         assert_eq ! (body.contains("covenants"), true);
         assert_eq ! (body.contains("scanners"), true);
         assert_eq ! (body.contains("v1.3"), true);
@@ -849,10 +914,75 @@ mod tests_more {
     fn schema_v13_json_presence_is_deny() {
         let body = include_str ! ("schema_v13.body");
         assert_eq ! (body.contains("Presence of trust_ring is Deny"), true);
+        assert_eq ! (body.contains("Every non-empty rank value is Deny"), true);
+        assert_eq ! (body.contains("Presence of this field on a live GAP document is Deny"), true);
         assert_eq ! (body.contains("documentary"), false);
         assert_eq ! (body.contains("Not a live Admit floor"), false);
         assert_eq ! (body.contains("unused at Admit"), false);
+        assert_eq ! (body.contains("\"enum\": [\"sandbox\", \"user\", \"system\", \"enterprise\"]"), false);
         assert_eq ! (body.contains("agent_may"), true);
+    }
+
+    fn yaml_trust_ring(value: &str) -> String {
+        let mut s = String::from("address:\n  domain: com.example.old\n  id: rank-doc\npattern: old pattern\naction:\n  type: template\n  content: hello\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n  trust_ring: ");
+        s.push_str(value);
+        s.push('\n');
+        s
+    }
+
+    fn json_meta_extra(extra: &str) -> String {
+        let mut s = String::from("{\"address\":{\"domain\":\"com.example.old\",\"id\":\"rank-doc\"},\"pattern\":\"p\",\"action\":{\"type\":\"template\",\"content\":\"c\"},\"weight\":1.0,\"composition\":{\"type\":\"atomic\"},\"metadata\":{\"provenance\":\"system.seed\",\"version\":\"1.0.0\",\"stability\":\"experimental\"");
+        s.push_str(extra);
+        s.push_str("}}");
+        s
+    }
+
+    fn assert_rank_wall_closed(src: &str) {
+        let mut doc = Value::Null;
+        let mut err = String::new();
+        parse_gap_source(src, &mut doc, &mut err);
+        assert_eq ! (err.as_str(), "");
+        let mut wall = AdmitWall { id: String::new(), closed: false, reason: String::new() };
+        compile_trust_ring_rank_wall(&doc, &mut wall);
+        assert_eq ! (wall.closed, true);
+        assert_eq ! (wall.id.as_str(), WALL_TRUST_RING_RANK);
+        let mut result = AdmitResult { allow: true, closed: Vec::new() };
+        live_admit_gap_profile(src, &LiveAdmitRequest::default(), &mut result, &mut err);
+        assert_eq ! (err.as_str(), "");
+        assert_eq ! (result.allow, false);
+        let mut hit = false;
+        let mut i = 0usize;
+        while i < result.closed.len() {
+            if result.closed[i].id == WALL_TRUST_RING_RANK && result.closed[i].closed {
+                hit = true;
+            }
+            i += 1;
+        }
+        assert_eq ! (hit, true);
+    }
+
+    #[test]
+    fn every_non_empty_rank_value_keeps_compiled_wall_deny() {
+        assert_rank_wall_closed(&yaml_trust_ring(RANK_SANDBOX));
+        assert_rank_wall_closed(&yaml_trust_ring(RANK_USER));
+        assert_rank_wall_closed(&yaml_trust_ring(RANK_SYSTEM));
+        assert_rank_wall_closed(&yaml_trust_ring(RANK_ENTERPRISE));
+        assert_rank_wall_closed(&yaml_trust_ring("other"));
+    }
+
+    #[test]
+    fn presence_of_trust_ring_on_live_document_is_deny() {
+        assert_rank_wall_closed(&json_meta_extra(",\"trust_ring\":\"\""));
+        assert_rank_wall_closed(&json_meta_extra(",\"trust_ring\":null"));
+        assert_rank_wall_closed(&json_meta_extra(",\"trust_ring\":1"));
+        assert_rank_wall_closed(&json_meta_extra(",\"rank\":\"user\""));
+    }
+
+    #[test]
+    fn presence_of_ring_ceiling_rank_keeps_compiled_wall_deny() {
+        let src = String::from("address:\n  domain: com.example.old\n  id: rank-doc\npattern: old pattern\naction:\n  type: template\n  content: hello\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n  fleet:\n    spawn:\n      ring_ceiling: user\n");
+        assert_rank_wall_closed(&src);
+        assert_rank_wall_closed(&yaml_trust_ring(RANK_SANDBOX));
     }
 
     #[test]
