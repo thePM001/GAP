@@ -901,8 +901,8 @@ mod tests_more {
 
     #[test]
     fn classic_v1_and_v12_keep_covenants_and_scanners() {
-        let v1 = include_str ! ("../../GAP meta schema v1.json");
-        let v12 = include_str ! ("../../GAP meta schema v1.2.json");
+        let v1 = include_str ! ("../../../GAP meta schema v1.json");
+        let v12 = include_str ! ("../../../GAP meta schema v1.2.json");
         assert_eq ! (v1.contains("\"covenants\""), true);
         assert_eq ! (v1.contains("\"scanners\""), true);
         assert_eq ! (v12.contains("\"covenants\""), true);
