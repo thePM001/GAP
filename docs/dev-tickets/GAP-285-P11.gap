@@ -5,7 +5,7 @@ format: gap
 json_prohibited: true
 id: GAP-285-P11
 title: Layer 1 honesty. Optional authoring. Do not claim a shipped engine without bytes.
-status: backlog
+status: closed
 priority: P1
 track: classic-gap-aep-2.8.5
 wave: operational-remediation
@@ -16,6 +16,9 @@ scope: AEP-Components/gap/README.md AEP-Components/gap/lib/gap-constrained-engin
 notes: Layer 1 constrained decoding is optional authoring. Admit is collect-all. Do not claim a shipped engine unless the bytes exist and are wired. Do not claim Incorrect GAP is not possible as a live Admit fact. Ticket close is coding close.
 acceptance: Docs name Layer 1 as optional authoring. No sentence claims a live Admit engine that is not wired. Constrained decoding is not Admit. nla-policy-scan gate writing-mode-rules on changed docs.
 bac: nla-policy-scan gate writing-mode-rules
-updated: 2026-09-05
+updated: 2026-09-06
+close_commit: dff3cc5a584754a74003cb9c51a0ab67ea0a0ab1
+vendor_commit: 4fe1e37d3bcaac9a940ac218d44453e3811feca5
+engine_commit: 385e8edc558e765aaa406559d4f5aa2b2c4c8b5a
 biosecurity_directive: |
   Biosecurity Directive. AUTHORITY: Biosecure UNVACCINATED Supreme User directive. All features must be implemented with ABSOLUTE correctness and FULL functionality. No half-fixes, no dead code, no broken references. Build must compile and run without errors before committing. Verify everything end-to-end. Register new or modified components in AEP. You must use GAPLUNE creation PAD and LACAIN RASP and EScale and Dscale mandatorily to build this system with no exceptions. These tools exist to build optimum software faster. You will also use LACAIN itself for architecture optimization. Fully solve the ticket and associated bugs completely. Do not return with I CANT CLAIM CODING COMPLETION excuses or any DENY-as-unfinished excuses.
