@@ -5,7 +5,7 @@ Product packages live under packages
 `packages/gap-closed-wall-deny/`
 `packages/gap-proof-live-bundle-mode/`
 `packages/gap-snapshot-hygiene/`
-NLA-AEP-v2.8-open-source
+https://github.com/thePM001/AEP-agent-element-protocol
 AEP-Components/gap/lib/gap-compile.mjs
 AEP-Components/gap/policies/reference/
 AEP-Components/gap/FILE-FORMAT.md

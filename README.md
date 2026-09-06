@@ -10,8 +10,8 @@ Classic GAP on this repository is the public language surface for schema files, 
 
 - Schema files sit at repo root: `GAP meta schema v1.json`, `GAP meta schema v1.2.json` and `GAP meta schema v1.3.json`.
 - Product packages live under packages. Live package folders include `packages/gap-schema-profile-v13/`, `packages/gap-closed-wall-deny/`, `packages/gap-proof-live-bundle-mode/` and `packages/gap-snapshot-hygiene/`.
-- Compile scripts live on the AEP vendor tree at NLA-AEP-v2.8-open-source path AEP-Components/gap/lib/gap-compile.mjs
-- Reference instructions live on the AEP vendor tree at NLA-AEP-v2.8-open-source path AEP-Components/gap/policies/reference/
+- Compile scripts live on the AEP vendor tree at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/lib/gap-compile.mjs
+- Reference instructions live on the AEP vendor tree at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/policies/reference/
 - GAP policies here declare what agents must do.
 - GAP authors instructions and CAW enforces the host sandbox so they are not two policy stacks.
 - Operators edit `.gap` and run the vendor compile script then `aep-caw session create --profile <name>`.
@@ -21,7 +21,7 @@ Classic GAP on this repository is the public language surface for schema files, 
 - The base policy is `default` with agent_may grants and the LLM proxy enabled.
 - Use `agent-sandbox` for untrusted code and `compiled-runtime` when the LLM proxy must stay off.
 - UCB is optional. Foreign ingest needs a task manifest that is caller-provided, stored or from an explicitly configured synthesis tier.
-- File format notes live at NLA-AEP-v2.8-open-source path AEP-Components/gap/FILE-FORMAT.md
+- File format notes live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/FILE-FORMAT.md
 
 ## Three-layer enforcement
 
@@ -104,7 +104,7 @@ Pulse hold is the wait after a sealed capsule is opened. Base Node freezes the c
 
 Keep `.gap` as GAP source because collect-all Admit collects by capsule hash and live hash bundle mode on that path is sha256-structure.
 
-- File format notes also live at NLA-AEP-v2.8-open-source path AEP-Components/gap/FILE-FORMAT.md
+- File format notes also live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/FILE-FORMAT.md
 - Extension: `.gap`
 - Encoding: UTF-8
 - Syntax: YAML 1.2 source. Live kernel policies may be JSON-encoded GAP instructions. YAML remains valid GAP source. The kernel reads the instruction object not the skin.
@@ -277,7 +277,7 @@ Classic GAP source lives on this repository and `.gap` files stay GAP source.
 - Who-may is agent_may.
 - Presence of trust_ring is Deny.
 - Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure.
-- Compile CAW profiles with the vendor compile script at NLA-AEP-v2.8-open-source path AEP-Components/gap/lib/gap-compile.mjs
+- Compile CAW profiles with the vendor compile script at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/lib/gap-compile.mjs
 - The live classic GAP binary gap-schema-profile-v13 lives in packages/gap-schema-profile-v13/.
 - This snapshot does not ship `gapc` and there is no `structural` CLI here.
 
@@ -309,11 +309,10 @@ This OSS snapshot does not include `GAP v1 spec sheet.md` or `BIOSECURITY.md` be
 - `README.md` is this file. It teaches live evaluation plus optional Layer 1 authoring.
 - Schema files sit at repo root: `GAP meta schema v1.json`, `GAP meta schema v1.2.json` and `GAP meta schema v1.3.json`.
 - Product packages live under packages. Named package folders include `packages/gap-schema-profile-v13/` and `packages/gap-snapshot-hygiene/`.
-- File format notes live at NLA-AEP-v2.8-open-source path AEP-Components/gap/FILE-FORMAT.md
-- Compile scripts live at NLA-AEP-v2.8-open-source path AEP-Components/gap/lib/gap-compile.mjs
-- Reference instructions live at NLA-AEP-v2.8-open-source path AEP-Components/gap/policies/reference/
+- File format notes live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/FILE-FORMAT.md
+- Compile scripts live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/lib/gap-compile.mjs
+- Reference instructions live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/policies/reference/
 - Fit analysis of classic GAP against AEP 2.8.5 evaluation is at docs/CLASSIC-GAP-VS-AEP-2.8.5.md
-- Product tickets live as `.gap` source under docs/dev-tickets/.
 
 ## Comparison: GAP vs dottxt
 
