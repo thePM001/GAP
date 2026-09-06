@@ -5,6 +5,4 @@ resolver = "2"
 members = [
   "gap-schema-profile-v13",
   "gap-closed-wall-deny",
-  "gap-proof-live-bundle-mode",
-  "gap-snapshot-hygiene",
 ]

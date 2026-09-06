@@ -9,7 +9,7 @@ Live evaluation follows AEP 2.8.5: seal a lattice-channel capsule, freeze the cl
 Classic GAP on this repository is the public language surface for schema files, product packages and this README.
 
 - Schema files sit at repo root: `GAP meta schema v1.json`, `GAP meta schema v1.2.json` and `GAP meta schema v1.3.json`.
-- Product packages live under packages. Live package folders include `packages/gap-schema-profile-v13/`, `packages/gap-closed-wall-deny/`, `packages/gap-proof-live-bundle-mode/` and `packages/gap-snapshot-hygiene/`.
+- Product packages live under packages. Live package folders include `packages/gap-schema-profile-v13/` and `packages/gap-closed-wall-deny/`.
 - Compile scripts live on the AEP vendor tree at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/lib/gap-compile.mjs
 - Reference instructions live on the AEP vendor tree at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/policies/reference/
 - GAP policies here declare what agents must do.
@@ -278,7 +278,7 @@ Classic GAP source lives on this repository and `.gap` files stay GAP source.
 - Presence of trust_ring is Deny.
 - Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure.
 - Compile CAW profiles with the vendor compile script at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/lib/gap-compile.mjs
-- The live classic GAP binary gap-schema-profile-v13 lives in packages/gap-schema-profile-v13/.
+- The live classic GAP binaries live in packages/gap-schema-profile-v13/ and packages/gap-closed-wall-deny/.
 - This snapshot does not ship `gapc` and there is no `structural` CLI here.
 
 ## GAP commands
@@ -286,8 +286,6 @@ Classic GAP source lives on this repository and `.gap` files stay GAP source.
 > ```
 > cargo run --manifest-path packages/gap-schema-profile-v13/Cargo.toml --bin gap-schema-profile-v13
 > cargo run --manifest-path packages/gap-closed-wall-deny/Cargo.toml --bin gap-closed-wall-deny
-> cargo run --manifest-path packages/gap-proof-live-bundle-mode/Cargo.toml --bin gap-proof-live-bundle-mode
-> cargo run --manifest-path packages/gap-snapshot-hygiene/Cargo.toml --bin gap-snapshot-hygiene
 > aep-caw wrap --profile coding-agent
 > ```
 
@@ -308,7 +306,7 @@ This OSS snapshot does not include `GAP v1 spec sheet.md` or `BIOSECURITY.md` be
 
 - `README.md` is this file. It teaches live evaluation plus optional Layer 1 authoring.
 - Schema files sit at repo root: `GAP meta schema v1.json`, `GAP meta schema v1.2.json` and `GAP meta schema v1.3.json`.
-- Product packages live under packages. Named package folders include `packages/gap-schema-profile-v13/` and `packages/gap-snapshot-hygiene/`.
+- Product packages live under packages. Named package folders include `packages/gap-schema-profile-v13/` and `packages/gap-closed-wall-deny/`.
 - File format notes live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/FILE-FORMAT.md
 - Compile scripts live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/lib/gap-compile.mjs
 - Reference instructions live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/policies/reference/
