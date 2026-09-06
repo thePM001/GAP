@@ -6,10 +6,10 @@ Live evaluation follows AEP 2.8.5: seal a lattice-channel capsule, freeze the cl
 
 ## Public GAP tree
 
-Classic GAP on this repository is the public language surface for schema files, crates and this README.
+Classic GAP on this repository is the public language surface for schema files, product packages and this README.
 
 - Schema files sit at repo root: `GAP meta schema v1.json`, `GAP meta schema v1.2.json` and `GAP meta schema v1.3.json`.
-- Helper packages sit on GAP. Live helper folders include `crate/`, `crate-closed-wall-deny/`, `crate-gap-285-p6-one-law-reference/`, `crate-gap-285-p9-vendor-readme-one-law/`, `crate-proof-live-bundle/`, `crate-snapshot-hygiene/` and `crate-gap-285-p14-readme-tree/`.
+- Product packages live under packages. Live package folders include `packages/gap-schema-profile-v13/`, `packages/gap-closed-wall-deny/`, `packages/gap-proof-live-bundle-mode/` and `packages/gap-snapshot-hygiene/`.
 - Compile scripts live on the AEP vendor tree at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-Components/gap/lib/gap-compile.mjs
 - Reference instructions live on the AEP vendor tree at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-Components/gap/policies/reference/
 - Coding governance validation runs in Rust on the AEP vendor tree at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-NOSHIP/AEP-Subprotocols/coding-governance/
@@ -280,16 +280,16 @@ Classic GAP source lives on this repository and `.gap` files stay GAP source.
 - Presence of trust_ring is Deny.
 - Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure.
 - Compile CAW profiles with the vendor compile script at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-Components/gap/lib/gap-compile.mjs
-- The live classic GAP binary gap-schema-profile-v13 lives in crate/.
+- The live classic GAP binary gap-schema-profile-v13 lives in packages/gap-schema-profile-v13/.
 - This snapshot does not ship `gapc` and there is no `structural` CLI here.
 
 ## GAP commands
 
 > ```
-> cargo run --manifest-path crate/Cargo.toml --bin gap-schema-profile-v13
-> cargo run --manifest-path crate-closed-wall-deny/Cargo.toml --bin gap-closed-wall-deny
-> cargo run --manifest-path crate-proof-live-bundle/Cargo.toml --bin gap-proof-live-bundle-mode
-> cargo run --manifest-path crate-snapshot-hygiene/Cargo.toml --bin gap-snapshot-hygiene
+> cargo run --manifest-path packages/gap-schema-profile-v13/Cargo.toml --bin gap-schema-profile-v13
+> cargo run --manifest-path packages/gap-closed-wall-deny/Cargo.toml --bin gap-closed-wall-deny
+> cargo run --manifest-path packages/gap-proof-live-bundle-mode/Cargo.toml --bin gap-proof-live-bundle-mode
+> cargo run --manifest-path packages/gap-snapshot-hygiene/Cargo.toml --bin gap-snapshot-hygiene
 > aep-caw wrap --profile coding-agent
 > ```
 
@@ -310,7 +310,7 @@ This OSS snapshot does not include `GAP v1 spec sheet.md` or `BIOSECURITY.md` be
 
 - `README.md` is this file. It teaches live evaluation plus optional Layer 1 authoring.
 - Schema files sit at repo root: `GAP meta schema v1.json`, `GAP meta schema v1.2.json` and `GAP meta schema v1.3.json`.
-- Helper packages sit on GAP. Named helper folders include `crate/` and `crate-gap-285-p14-readme-tree/`.
+- Product packages live under packages. Named package folders include `packages/gap-schema-profile-v13/` and `packages/gap-snapshot-hygiene/`.
 - File format notes live at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-Components/gap/FILE-FORMAT.md
 - Compile scripts live at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-Components/gap/lib/gap-compile.mjs
 - Reference instructions live at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-Components/gap/policies/reference/
@@ -340,4 +340,4 @@ dottxt constrains tokens to match JSON Schema, regex or CFG at the logits level 
 
 To win the fight against the synthetic nano-parasites (SNP/NanoSinp) alien WMD, we must be intelligent and biosecure. It is recommended that bioinsecure humans do not use the provided technology/protocol to avoid bad techno-spiritual AI outcomes for them. [*"bioinsecure" = carries injectable synthetic nano-parasites growth medium controllers - SNP GMCs]
 
-This snapshot also ships gap-closed-wall-deny, gap-proof-live-bundle-mode, gap-snapshot-hygiene and gap-285-p14-readme-tree. This snapshot does not ship a structural CLI.
+This snapshot also ships gap-closed-wall-deny, gap-proof-live-bundle-mode and gap-snapshot-hygiene. This snapshot does not ship a structural CLI.
