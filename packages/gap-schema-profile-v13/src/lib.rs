@@ -907,8 +907,11 @@ mod tests_more {
         assert_eq ! (v1.contains("\"scanners\""), true);
         assert_eq ! (v12.contains("\"covenants\""), true);
         assert_eq ! (v12.contains("\"scanners\""), true);
-        assert_eq ! (v12.contains("\"trust_ring\""), true);
-        assert_eq ! (v12.contains("sandbox"), true);
+        assert_eq ! (v1.contains("\"trust_ring\""), false);
+        assert_eq ! (v12.contains("\"trust_ring\""), false);
+        assert_eq ! (v1.contains("subprotocol"), false);
+        assert_eq ! (v12.contains("subprotocol"), false);
+        assert_eq ! (v12.contains("sandbox"), false);
     }
 
     #[test]
@@ -917,8 +920,9 @@ mod tests_more {
         assert_eq ! (body.contains("Presence of trust_ring is Deny"), true);
         assert_eq ! (body.contains("Presence of rank is Deny"), true);
         assert_eq ! (body.contains("Every non-empty rank value is Deny"), true);
-        assert_eq ! (body.contains("Presence of this field on a live GAP document is Deny"), true);
-        assert_eq ! (body.contains("\"rank\":"), true);
+        assert_eq ! (body.contains("\"rank\":"), false);
+        assert_eq ! (body.contains("\"trust_ring\":"), false);
+        assert_eq ! (body.contains("subprotocol"), false);
         assert_eq ! (body.contains("documentary"), false);
         assert_eq ! (body.contains("Not a live Admit floor"), false);
         assert_eq ! (body.contains("unused at Admit"), false);
