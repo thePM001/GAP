@@ -11,9 +11,7 @@ This tree vendors classic GAP into `AEP-Components/gap/` from github.com/thePM00
 - `schemas/` holds GAP meta-schema v1 and v1.2 as Layer 1 authoring constraint masks.
 - `policies/reference/` holds reference `.gap` instructions for coding governance, CAW sandbox profiles, task manifests and implementation plans.
 - `lib/gap-compile.mjs` compiles GAP profiles to CAW mount_profiles and per-mount policies for local use.
-- Coding governance validation runs in `AEP-Subprotocols/coding-governance/` in Rust.
 - GAP policies here declare what agents must do.
-- The subprotocol enforces domain actions propose, siee_check and solidify.
 - GAP authors instructions and CAW enforces the host sandbox so they are not two policy stacks.
 - Operators edit `.gap` and run `gap-compile.mjs` then `aep-caw session create --profile <name>`.
 - `caw-coding-agent.gap` at `dev.aep.caw/coding-agent.v1` is the default profile for a governed coding agent.
