@@ -13,7 +13,6 @@ Classic GAP on this repository is the public language surface for schema files, 
 - Compile scripts live on the AEP vendor tree at NLA-AEP-v2.8-open-source path AEP-Components/gap/lib/gap-compile.mjs
 - Reference instructions live on the AEP vendor tree at NLA-AEP-v2.8-open-source path AEP-Components/gap/policies/reference/
 - GAP policies here declare what agents must do.
-- The subprotocol enforces domain actions propose, siee_check and solidify.
 - GAP authors instructions and CAW enforces the host sandbox so they are not two policy stacks.
 - Operators edit `.gap` and run the vendor compile script then `aep-caw session create --profile <name>`.
 - `caw-coding-agent.gap` at `dev.aep.caw/coding-agent.v1` is the default profile for a governed coding agent.
