@@ -12,7 +12,7 @@ pub const RANK_SANDBOX: &str = "sandbox";
 pub const RANK_USER: &str = "user";
 pub const RANK_SYSTEM: &str = "system";
 pub const RANK_ENTERPRISE: &str = "enterprise";
-pub const SCHEMA_V13_CONTRACT: &str = "GAP Instruction Meta-Schema v1.3\nagent_may\nwrap\naction_path_prefix\noneOf\nload-time\nPresence of trust_ring is Deny.\nEvery non-empty rank value is Deny.\ncovenants\nscanners\n";
+pub const SCHEMA_V13_CONTRACT: &str = "GAP Instruction Meta-Schema v1.3\nagent_may\nwrap\naction_path_prefix\noneOf\nload-time\nPresence of trust_ring is Deny.\nPresence of rank is Deny.\nEvery non-empty rank value is Deny.\ncovenants\nscanners\n";
 
 pub fn schema_v13_body(out: &mut String) {
     out.clear();
@@ -892,6 +892,7 @@ mod tests_more {
         assert_eq ! (body.contains("oneOf"), true);
         assert_eq ! (body.contains("load-time"), true);
         assert_eq ! (body.contains("Presence of trust_ring is Deny"), true);
+        assert_eq ! (body.contains("Presence of rank is Deny"), true);
         assert_eq ! (body.contains("Every non-empty rank value is Deny"), true);
         assert_eq ! (body.contains("covenants"), true);
         assert_eq ! (body.contains("scanners"), true);
@@ -914,8 +915,10 @@ mod tests_more {
     fn schema_v13_json_presence_is_deny() {
         let body = include_str ! ("schema_v13.body");
         assert_eq ! (body.contains("Presence of trust_ring is Deny"), true);
+        assert_eq ! (body.contains("Presence of rank is Deny"), true);
         assert_eq ! (body.contains("Every non-empty rank value is Deny"), true);
         assert_eq ! (body.contains("Presence of this field on a live GAP document is Deny"), true);
+        assert_eq ! (body.contains("\"rank\":"), true);
         assert_eq ! (body.contains("documentary"), false);
         assert_eq ! (body.contains("Not a live Admit floor"), false);
         assert_eq ! (body.contains("unused at Admit"), false);
@@ -961,6 +964,13 @@ mod tests_more {
         assert_eq ! (hit, true);
     }
 
+    fn yaml_rank_field(value: &str) -> String {
+        let mut s = String::from("address:\n  domain: com.example.old\n  id: rank-doc\npattern: old pattern\naction:\n  type: template\n  content: hello\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n  rank: ");
+        s.push_str(value);
+        s.push('\n');
+        s
+    }
+
     #[test]
     fn every_non_empty_rank_value_keeps_compiled_wall_deny() {
         assert_rank_wall_closed(&yaml_trust_ring(RANK_SANDBOX));
@@ -968,6 +978,11 @@ mod tests_more {
         assert_rank_wall_closed(&yaml_trust_ring(RANK_SYSTEM));
         assert_rank_wall_closed(&yaml_trust_ring(RANK_ENTERPRISE));
         assert_rank_wall_closed(&yaml_trust_ring("other"));
+        assert_rank_wall_closed(&yaml_rank_field(RANK_SANDBOX));
+        assert_rank_wall_closed(&yaml_rank_field(RANK_USER));
+        assert_rank_wall_closed(&yaml_rank_field(RANK_SYSTEM));
+        assert_rank_wall_closed(&yaml_rank_field(RANK_ENTERPRISE));
+        assert_rank_wall_closed(&yaml_rank_field("other"));
     }
 
     #[test]
@@ -976,6 +991,9 @@ mod tests_more {
         assert_rank_wall_closed(&json_meta_extra(",\"trust_ring\":null"));
         assert_rank_wall_closed(&json_meta_extra(",\"trust_ring\":1"));
         assert_rank_wall_closed(&json_meta_extra(",\"rank\":\"user\""));
+        assert_rank_wall_closed(&json_meta_extra(",\"rank\":\"\""));
+        assert_rank_wall_closed(&json_meta_extra(",\"rank\":null"));
+        assert_rank_wall_closed(&json_meta_extra(",\"rank\":1"));
     }
 
     #[test]
