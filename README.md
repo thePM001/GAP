@@ -12,7 +12,6 @@ Classic GAP on this repository is the public language surface for schema files, 
 - Product packages live under packages. Live package folders include `packages/gap-schema-profile-v13/`, `packages/gap-closed-wall-deny/`, `packages/gap-proof-live-bundle-mode/` and `packages/gap-snapshot-hygiene/`.
 - Compile scripts live on the AEP vendor tree at NLA-AEP-v2.8-open-source path AEP-Components/gap/lib/gap-compile.mjs
 - Reference instructions live on the AEP vendor tree at NLA-AEP-v2.8-open-source path AEP-Components/gap/policies/reference/
-- Coding governance validation runs in Rust on the AEP vendor tree at NLA-AEP-v2.8-open-source path AEP-NOSHIP/AEP-Subprotocols/coding-governance/
 - GAP policies here declare what agents must do.
 - The subprotocol enforces domain actions propose, siee_check and solidify.
 - GAP authors instructions and CAW enforces the host sandbox so they are not two policy stacks.
@@ -314,7 +313,6 @@ This OSS snapshot does not include `GAP v1 spec sheet.md` or `BIOSECURITY.md` be
 - File format notes live at NLA-AEP-v2.8-open-source path AEP-Components/gap/FILE-FORMAT.md
 - Compile scripts live at NLA-AEP-v2.8-open-source path AEP-Components/gap/lib/gap-compile.mjs
 - Reference instructions live at NLA-AEP-v2.8-open-source path AEP-Components/gap/policies/reference/
-- Coding governance validation runs in Rust at NLA-AEP-v2.8-open-source path AEP-NOSHIP/AEP-Subprotocols/coding-governance/
 - Fit analysis of classic GAP against AEP 2.8.5 evaluation is at docs/CLASSIC-GAP-VS-AEP-2.8.5.md
 - Product tickets live as `.gap` source under docs/dev-tickets/.
 
