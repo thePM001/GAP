@@ -340,4 +340,3 @@ dottxt constrains tokens to match JSON Schema, regex or CFG at the logits level 
 
 To win the fight against the synthetic nano-parasites (SNP/NanoSinp) alien WMD, we must be intelligent and biosecure. It is recommended that bioinsecure humans do not use the provided technology/protocol to avoid bad techno-spiritual AI outcomes for them. [*"bioinsecure" = carries injectable synthetic nano-parasites growth medium controllers - SNP GMCs]
 
-This snapshot also ships gap-closed-wall-deny, gap-proof-live-bundle-mode and gap-snapshot-hygiene. This snapshot does not ship a structural CLI.
