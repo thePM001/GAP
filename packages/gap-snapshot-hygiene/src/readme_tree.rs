@@ -1,12 +1,13 @@
 // @PAD: gap-285-p14-readme-tree
 // @GCDE: gaplune.policy.v1
 // package: gap-readme-tree
-// GAP-285-P14 GAP README tree truth.
+// GAP-285-P14 GAP README tree truth. Private locators are Deny.
 
 pub const TICKET: &str = "GAP-285-P14";
 pub const WALL_VENDOR_FOLDER: &str = "gap:readme:vendor-folder-as-gap";
 pub const WALL_ROOT_SCHEMA: &str = "gap:readme:missing-root-schema";
-pub const WALL_VENDOR_URL: &str = "gap:readme:missing-vendor-url";
+pub const WALL_VENDOR_URL: &str = "gap:readme:missing-vendor-path";
+pub const WALL_PRIVATE_LOCATOR: &str = "gap:readme:private-locator";
 pub const WALL_HELPER: &str = "gap:readme:missing-helper-package";
 pub const WALL_EMPTY: &str = "gap:readme:empty";
 
@@ -15,13 +16,15 @@ pub const SCHEMA_V12: &str = "GAP meta schema v1.2.json";
 pub const SCHEMA_V13: &str = "GAP meta schema v1.3.json";
 pub const HELPER_SENTENCE: &str = "Product packages live under packages";
 pub const HELPER_PROFILE: &str = "`packages/gap-schema-profile-v13/`";
+pub const HELPER_CLOSED: &str = "`packages/gap-closed-wall-deny/`";
+pub const HELPER_PROOF: &str = "`packages/gap-proof-live-bundle-mode/`";
 pub const HELPER_SNAPSHOT: &str = "`packages/gap-snapshot-hygiene/`";
 pub const VENDOR_HOST: &str = "NLA-AEP-v2.8-open-source";
-pub const COMPILE_URL: &str = concat ! ("http://100.118.184.18:3003/thePM001/", "NLA-AEP-v2.8-open-source", "/src/branch/main/AEP-Components/gap/lib/gap-compile.mjs");
-pub const REFERENCE_URL: &str = concat ! ("http://100.118.184.18:3003/thePM001/", "NLA-AEP-v2.8-open-source", "/src/branch/main/AEP-Components/gap/policies/reference/");
-
-pub const CODING_GOV_URL: &str = concat ! ("http://100.118.184.18:3003/thePM001/", "NLA-AEP-v2.8-open-source", "/src/branch/main/AEP-NOSHIP/AEP-Subprotocols/coding-governance/");
-pub const FILE_FORMAT_URL: &str = concat ! ("http://100.118.184.18:3003/thePM001/", "NLA-AEP-v2.8-open-source", "/src/branch/main/AEP-Components/gap/FILE-FORMAT.md");
+pub const COMPILE_PATH: &str = "AEP-Components/gap/lib/gap-compile.mjs";
+pub const REFERENCE_PATH: &str = "AEP-Components/gap/policies/reference/";
+pub const CODING_GOV_PATH: &str = "AEP-NOSHIP/AEP-Subprotocols/coding-governance/";
+pub const FILE_FORMAT_PATH: &str = "AEP-Components/gap/FILE-FORMAT.md";
+pub const PRIVATE_PORT: &str = ":3003/";
 
 const VENDOR_LOCAL: [&str; 8] = [
     "`schemas/`",
@@ -73,14 +76,23 @@ pub fn names_root_schemas(src: &str) -> bool {
 }
 
 pub fn names_helper_packages(src: &str) -> bool {
-    src.contains(HELPER_SENTENCE) && src.contains(HELPER_PROFILE) && src.contains("`packages/gap-closed-wall-deny/`") && src.contains("`packages/gap-proof-live-bundle-mode/`") && src.contains(HELPER_SNAPSHOT)
+    src.contains(HELPER_SENTENCE)
+        && src.contains(HELPER_PROFILE)
+        && src.contains(HELPER_CLOSED)
+        && src.contains(HELPER_PROOF)
+        && src.contains(HELPER_SNAPSHOT)
 }
 
-pub fn names_vendor_urls(src: &str) -> bool {
-    src.contains(COMPILE_URL)
-        && src.contains(REFERENCE_URL)
-        && src.contains(CODING_GOV_URL)
-        && src.contains(FILE_FORMAT_URL)
+pub fn names_vendor_paths(src: &str) -> bool {
+    src.contains(VENDOR_HOST)
+        && src.contains(COMPILE_PATH)
+        && src.contains(REFERENCE_PATH)
+        && src.contains(CODING_GOV_PATH)
+        && src.contains(FILE_FORMAT_PATH)
+}
+
+pub fn has_private_locator(src: &str) -> bool {
+    src.contains(PRIVATE_PORT)
 }
 
 pub fn collect_readme_tree_walls(src: &str) -> Vec<String> {
@@ -92,12 +104,14 @@ pub fn collect_readme_tree_walls(src: &str) -> Vec<String> {
     if vendor_as_gap(src) {
         push_unique(&mut rows, WALL_VENDOR_FOLDER);
     }
-
     if names_root_schemas(src) == false {
         push_unique(&mut rows, WALL_ROOT_SCHEMA);
     }
-    if names_vendor_urls(src) == false {
+    if names_vendor_paths(src) == false {
         push_unique(&mut rows, WALL_VENDOR_URL);
+    }
+    if has_private_locator(src) {
+        push_unique(&mut rows, WALL_PRIVATE_LOCATOR);
     }
     if names_helper_packages(src) == false {
         push_unique(&mut rows, WALL_HELPER);
@@ -112,7 +126,6 @@ pub fn scan_readme_tree_text(src: &str) -> Result<String, String> {
     }
     let mut out = String::new();
     let mut i = 0usize;
-
     while i < rows.len() {
         if 0 < i {
             out.push(char::from(10));
@@ -188,9 +201,9 @@ pub mod vendor_url_named {
             }
         }
 
-        /// Require full Gitea http URLs for vendor compile reference coding-gov and FILE-FORMAT
+        /// Require vendor tree paths without a private locator
         pub fn process(&mut self) {
-            self.named = super::names_vendor_urls(&self.src);
+            self.named = super::names_vendor_paths(&self.src) && super::has_private_locator(&self.src) == false;
         }
     }
 }
@@ -208,7 +221,7 @@ pub mod helper_package_named {
             }
         }
 
-        /// Require Helper packages sit on GAP plus crate and p14 helper folders
+        /// Require helper package folders named on GAP
         pub fn process(&mut self) {
             self.named = super::names_helper_packages(&self.src);
         }
@@ -267,22 +280,36 @@ mod tests {
         s.push_str(" ");
         s.push_str(SCHEMA_V13);
         s.push(char::from(10));
-
         s.push_str(HELPER_SENTENCE);
         s.push(char::from(10));
-        s.push_str(HELPER_CRATE);
+        s.push_str(HELPER_PROFILE);
         s.push(char::from(10));
-        s.push_str(HELPER_P14);
+        s.push_str(HELPER_CLOSED);
         s.push(char::from(10));
-        s.push_str(COMPILE_URL);
+        s.push_str(HELPER_PROOF);
         s.push(char::from(10));
+        s.push_str(HELPER_SNAPSHOT);
+        s.push(char::from(10));
+        s.push_str(VENDOR_HOST);
+        s.push(char::from(10));
+        s.push_str(COMPILE_PATH);
+        s.push(char::from(10));
+        s.push_str(REFERENCE_PATH);
+        s.push(char::from(10));
+        s.push_str(CODING_GOV_PATH);
+        s.push(char::from(10));
+        s.push_str(FILE_FORMAT_PATH);
+        s.push(char::from(10));
+        s
+    }
 
-        s.push_str(REFERENCE_URL);
-        s.push(char::from(10));
-        s.push_str(CODING_GOV_URL);
-        s.push(char::from(10));
-        s.push_str(FILE_FORMAT_URL);
-        s.push(char::from(10));
+    fn locator_doc() -> String {
+        let mut s = ok_doc();
+        s.push_str("http://example.invalid");
+        s.push_str(PRIVATE_PORT);
+        s.push_str("thePM001/");
+        s.push_str(VENDOR_HOST);
+        s.push_str("/src/branch/main/x\n");
         s
     }
 
@@ -306,14 +333,31 @@ mod tests {
         if vendor_as_gap(&ok_doc()) {
             fail();
         }
+        if has_private_locator(&ok_doc()) {
+            fail();
+        }
         match scan_readme_tree_text(&ok_doc()) {
             Ok(v) => {
                 if v.contains("ok GAP README tree truth") == false {
                     fail();
                 }
             }
-
             Err(_) => fail(),
+        }
+    }
+
+    #[test]
+    fn private_locator_denied() {
+        if has_private_locator(&locator_doc()) == false {
+            fail();
+        }
+        match scan_readme_tree_text(&locator_doc()) {
+            Ok(_) => fail(),
+            Err(e) => {
+                if e.contains(WALL_PRIVATE_LOCATOR) == false {
+                    fail();
+                }
+            }
         }
     }
 
@@ -352,6 +396,9 @@ mod tests {
         if vendor_as_gap(src) {
             fail();
         }
+        if has_private_locator(src) {
+            fail();
+        }
     }
 
     #[test]
@@ -367,7 +414,6 @@ mod tests {
         if joined.contains(WALL_ROOT_SCHEMA) == false {
             fail();
         }
-
         if joined.contains(WALL_VENDOR_URL) == false {
             fail();
         }
@@ -390,7 +436,6 @@ mod tests {
         if s.allow == false {
             fail();
         }
-
         let mut h = helper_package_named::HelperPackageNamed::new();
         h.src = ok_doc();
         h.process();
@@ -400,6 +445,17 @@ mod tests {
         s.readme = hole_doc();
         s.process();
         if s.allow {
+            fail();
+        }
+        let mut u = vendor_url_named::VendorUrlNamed::new();
+        u.src = ok_doc();
+        u.process();
+        if u.named == false {
+            fail();
+        }
+        u.src = locator_doc();
+        u.process();
+        if u.named {
             fail();
         }
     }
