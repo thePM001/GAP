@@ -13,7 +13,7 @@ plan: GAP-285-OPERATIONAL-REMEDIATION-IMPLEMENTATION-PLAN
 repo: GAP
 depends_on: 
 scope: README.md
-notes: The public GAP readme still lists vendor-tree folders as if they sit on the GAP repository. Rewrite Public GAP tree and Repository files so they name files that exist on GAP. Schema files sit at repo root. Helper packages sit on GAP. Compile scripts and reference instructions that live on the AEP vendor tree must be named there with a full Gitea http URL. Do not claim a compile script lives on GAP if it does not. Ticket close is coding close.
+notes: The public GAP readme must name files that exist on this repository. Schema files sit at repo root. Helper packages sit on GAP. Compile scripts and reference instructions that live on the AEP vendor tree must be named as vendor paths (repo plus path). A private locator on this public tree is Deny. Do not claim a compile script lives on GAP if it does not. Ticket close is coding close.
 acceptance: Every folder named as on this repository exists on GAP. Vendor-only folders are not claimed as GAP repo files. nla-policy-scan gate writing-mode-rules on README.md.
 bac: nla-policy-scan gate writing-mode-rules
 updated: 2026-09-06
