@@ -1,0 +1,13 @@
+# @PAD: gap-285-p9-vendor-readme-one-law
+# @GCDE: gaplune.policy.v1
+[package]
+name = "gap-285-p9-vendor-readme-one-law"
+version = "0.1.0"
+edition = "2021"
+description = "GAP-285-P9 vendor README one-law. Presence of trust_ring is Deny. Who-may is agent_may. Live path names seal freeze-at-seal 1000 ms collect-all Admit Apply agent_may and sha256-structure."
+license = "UNLICENSED"
+publish = false
+
+[[bin]]
+name = "gap-285-p9-vendor-readme-one-law"
+path = "src/main.rs"
