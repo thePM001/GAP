@@ -8,14 +8,15 @@ Live evaluation follows AEP 2.8.5: seal a lattice-channel capsule, freeze the cl
 
 Classic GAP on this repository is the public language surface for schema files, crates and this README.
 
-- `schemas/` holds GAP meta-schema v1 and v1.2 as optional Layer 1 authoring constraint masks.
-- `policies/reference/` holds reference `.gap` instructions for coding governance, CAW sandbox profiles, task manifests and implementation plans.
-- `lib/gap-compile.mjs` compiles GAP profiles to CAW mount_profiles and per-mount policies for local use.
-- Coding governance validation runs in `AEP-Subprotocols/coding-governance/` in Rust.
+- Schema files sit at repo root: `GAP meta schema v1.json`, `GAP meta schema v1.2.json` and `GAP meta schema v1.3.json`.
+- Helper packages sit on GAP. Live helper folders include `crate/`, `crate-closed-wall-deny/`, `crate-gap-285-p6-one-law-reference/`, `crate-gap-285-p9-vendor-readme-one-law/`, `crate-proof-live-bundle/`, `crate-snapshot-hygiene/` and `crate-gap-285-p14-readme-tree/`.
+- Compile scripts live on the AEP vendor tree at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-Components/gap/lib/gap-compile.mjs
+- Reference instructions live on the AEP vendor tree at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-Components/gap/policies/reference/
+- Coding governance validation runs in Rust on the AEP vendor tree at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-NOSHIP/AEP-Subprotocols/coding-governance/
 - GAP policies here declare what agents must do.
 - The subprotocol enforces domain actions propose, siee_check and solidify.
 - GAP authors instructions and CAW enforces the host sandbox so they are not two policy stacks.
-- Operators edit `.gap` and run `gap-compile.mjs` then `aep-caw session create --profile <name>`.
+- Operators edit `.gap` and run the vendor compile script then `aep-caw session create --profile <name>`.
 - `caw-coding-agent.gap` at `dev.aep.caw/coding-agent.v1` is the default profile for a governed coding agent.
 - `${PROJECT_ROOT}` is read-write.
 - `${AEP_AGENT_CONFIG_DIR}`, `${HOME}/.config/agent` and `${HOME}/.local/share/agent` are read-only.
@@ -278,15 +279,17 @@ Classic GAP source lives on this repository and `.gap` files stay GAP source.
 - Who-may is agent_may.
 - Presence of trust_ring is Deny.
 - Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure.
-- Compile CAW profiles with `lib/gap-compile.mjs`.
+- Compile CAW profiles with the vendor compile script at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-Components/gap/lib/gap-compile.mjs
 - The live classic GAP binary gap-schema-profile-v13 lives in crate/.
 - This snapshot does not ship `gapc` and there is no `structural` CLI here.
 
 ## GAP commands
 
 > ```
-> node lib/gap-compile.mjs --list-profiles
-> node lib/gap-compile.mjs --materialize /data/aep
+> cargo run --manifest-path crate/Cargo.toml --bin gap-schema-profile-v13
+> cargo run --manifest-path crate-closed-wall-deny/Cargo.toml --bin gap-closed-wall-deny
+> cargo run --manifest-path crate-proof-live-bundle/Cargo.toml --bin gap-proof-live-bundle-mode
+> cargo run --manifest-path crate-snapshot-hygiene/Cargo.toml --bin gap-snapshot-hygiene
 > aep-caw wrap --profile coding-agent
 > ```
 
@@ -306,11 +309,12 @@ Migrate incrementally because each rung adds governance without rewriting existi
 This OSS snapshot does not include `GAP v1 spec sheet.md` or `BIOSECURITY.md` because those files live in the GAPLUNE tree and are not copied here.
 
 - `README.md` is this file. It teaches live evaluation plus optional Layer 1 authoring.
-- `FILE-FORMAT.md` holds file format notes. Keep `.gap` as GAP source. Collect-all Admit collects by capsule hash. Live hash bundle mode is sha256-structure. Presence of trust_ring is Deny. Who-may is agent_may.
-- `schemas/gap-meta-schema-v1.json` is the JSON Schema 2020-12 optional Layer 1 authoring constraint mask artifact.
-- `schemas/gap-meta-schema-v1.2.json` is the updated meta schema with v1.1 additions.
-- `policies/reference/` holds reference `.gap` instructions for CAW profiles and coding governance.
-- `lib/gap-compile.mjs` compiles GAP profiles to CAW mount_profiles.
+- Schema files sit at repo root: `GAP meta schema v1.json`, `GAP meta schema v1.2.json` and `GAP meta schema v1.3.json`.
+- Helper packages sit on GAP. Named helper folders include `crate/` and `crate-gap-285-p14-readme-tree/`.
+- File format notes live at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-Components/gap/FILE-FORMAT.md
+- Compile scripts live at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-Components/gap/lib/gap-compile.mjs
+- Reference instructions live at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-Components/gap/policies/reference/
+- Coding governance validation runs in Rust at http://100.118.184.18:3003/thePM001/NLA-AEP-v2.8-open-source/src/branch/main/AEP-NOSHIP/AEP-Subprotocols/coding-governance/
 - Fit analysis of classic GAP against AEP 2.8.5 evaluation is at http://100.118.184.18:3003/thePM001/GAP/src/branch/main/docs/CLASSIC-GAP-VS-AEP-2.8.5.md
 - Product tickets live as `.gap` source under docs/dev-tickets/.
 
@@ -336,4 +340,4 @@ dottxt constrains tokens to match JSON Schema, regex or CFG at the logits level 
 
 To win the fight against the synthetic nano-parasites (SNP/NanoSinp) alien WMD, we must be intelligent and biosecure. It is recommended that bioinsecure humans do not use the provided technology/protocol to avoid bad techno-spiritual AI outcomes for them. [*"bioinsecure" = carries injectable synthetic nano-parasites growth medium controllers - SNP GMCs]
 
-This snapshot also ships gap-closed-wall-deny, gap-proof-live-bundle-mode and gap-snapshot-hygiene. This snapshot does not ship a structural CLI.
+This snapshot also ships gap-closed-wall-deny, gap-proof-live-bundle-mode, gap-snapshot-hygiene and gap-285-p14-readme-tree. This snapshot does not ship a structural CLI.
