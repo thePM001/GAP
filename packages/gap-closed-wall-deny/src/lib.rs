@@ -3,6 +3,8 @@
 // @GCDE: gaplune.policy.v1
 // HVVCAS: closed_wall_collect domain:admit type:service
 // GAP-285-P3. Classic GAP closed-wall Deny. enabled is load-time. Retry reseals.
+use sha2::{Digest, Sha256};
+
 
 pub const TICKET: &str = "GAP-285-P3";
 pub const WALL_SCENE: &str = "gap:unbound:scene";
@@ -16,6 +18,8 @@ pub const REPAIR_TIME: &str = "bind timestamp at seal then reseal";
 pub const REPAIR_SEQUENCE: &str = "bind sequence on the sealed capsule then reseal";
 pub const REPAIR_WRITING: &str = "repair writing then reseal a new capsule";
 pub const ENABLED_CONTRACT: &str = "Load-time flag. When false the instruction is still loaded. Live Admit still evaluates walls.";
+pub const DIGEST_MODE: &str = "sha256-structure";
+pub const DIGEST_HEX_LEN: usize = 64;
 
 pub fn gap_285_p3_probe() {}
 
@@ -100,32 +104,15 @@ pub struct CapsuleSeal {
     pub sealed: String,
 }
 
-fn fnv1a64(data: &[u8], seed: u64) -> u64 {
-    let mut h = seed;
-    let mut i = 0usize;
-    while i < data.len() {
-        h ^= data[i] as u64;
-        h = h.wrapping_mul(1099511628211);
-        i += 1;
-    }
-    h
-}
-
 pub fn structure_digest(data: &[u8], out: &mut String) {
     out.clear();
-    let a = fnv1a64(data, 0xcbf29ce484222325);
-    let b = fnv1a64(data, 0x00000100000001b3);
-    let parts: [u64; 2] = [a, b];
-    let mut p = 0usize;
-    while p < 2 {
-        let bytes = parts[p].to_be_bytes();
-        let mut i = 0usize;
-        while i < 8 {
-            out.push(hex_nibble(bytes[i] / 16));
-            out.push(hex_nibble(bytes[i] & 15));
-            i += 1;
-        }
-        p += 1;
+    let hash = Sha256::digest(data);
+    let bytes = hash.as_slice();
+    let mut i = 0usize;
+    while i < bytes.len() {
+        out.push(hex_nibble(bytes[i] / 16));
+        out.push(hex_nibble(bytes[i] & 15));
+        i += 1;
     }
 }
 
