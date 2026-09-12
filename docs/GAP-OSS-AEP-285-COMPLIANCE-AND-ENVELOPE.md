@@ -6,7 +6,7 @@ That teaching is real yet it is not a complete operational match with the live A
 
 ## Trees compared
 
-Public GAP is the Apache-2.0 language snapshot on https://github.com/thePM001/GAP . It holds schema v1, v1.2 and v1.3, the README and two packages under packages and last movement on that snapshot is 2026-09-06 so it is not the hangar language tree.
+Public GAP is the Apache-2.0 language snapshot on https://github.com/thePM001/GAP . It holds schema v1, v1.2 and v1.3, the README and two packages under packages and last movement on that snapshot is 2026-09-12 so it is not the hangar language tree.
 
 AEP 2.8.5 is the public protocol library on https://github.com/thePM001/AEP-agent-element-protocol . It holds Base Node envelope admit, the envelope combinator, one-live-evaluation, live-entry freeze, the policy-system admit loader and the vendor GAP tree. Movement on that library is 2026-09-12. Product names stay GAP and AEP 2.8.5.
 
@@ -80,54 +80,12 @@ flowchart TB
   CWD -.->|teaching subset| COLLECT
   PROF -.->|leftover rank wall| PROF2
 ```
-
-```mermaid
-flowchart TB
-  subgraph GAPOSS[public GAP teaching tree]
-    README[README collect-all teaching]
-    SCH[schema v1.3]
-    PROF[v1.3 profile package]
-    CWD[closed-wall teaching envelope]
-  end
-  subgraph AEPLIB[AEP 2.8.5 live library]
-    VEND[vendor GAP]
-    PROF2[vendored v1.3 profile]
-    ENV[envelope admit]
-    OLE[one-live-evaluation]
-    LE[live-entry freeze]
-    BN[Base Node envelope admit]
-  end
-  subgraph LIVE[live evaluation]
-    SEAL[seal capsule]
-    FREEZE[freeze-at-seal]
-    WAIT[wait 1000 ms]
-    COLLECT[collect-all Admit]
-    APPLY[Apply]
-  end
-  README --> SCH
-  SCH --> PROF
-  PROF --> CWD
-  VEND --> PROF2
-  PROF2 --> ENV
-  ENV --> OLE
-  OLE --> LE
-  LE --> BN
-  BN --> SEAL
-  SEAL --> FREEZE
-  FREEZE --> WAIT
-  WAIT --> COLLECT
-  COLLECT --> APPLY
-  CWD -.->|teaching subset| COLLECT
-  PROF -.->|leftover rank wall| PROF2
-```
-
-
 ## One-law freeze for the public tree
 
 Live GAP documents must not set trust_ring. Live GAP documents must not set rank. Agent permission is agent_permission. Empty permission lists DENY on miss when an agent action is judged. wrap plus action_path_prefix bind walls that are not always-on. Writing and security stay always-on. Constrained decoding is not Admit.
 
 ## Remaining public-tree work
 
-This pass repaired leftover rank wall id gap:leftover_rank_field with presence Deny, closed-wall sha256-structure digest and Apache-2.0 package license files. Remaining work is the teaching-envelope subset versus the live action-and-snapshot machine, a simplified open-source constrained decoding engine as optional Layer 1 authoring and a simplified minimal GAP open-source runtime that runs the teaching envelope and instruction walls with freeze-at-seal and collect-all then Apply.
+This pass repaired leftover rank wall id gap:leftover_rank_field with presence Deny, closed-wall sha256-structure digest and Apache-2.0 package license files. Remaining work is a simplified open-source constrained decoding engine as optional Layer 1 authoring.
 
-Do not dump the hangar language tree into public GAP and do not copy live-entry UI element minting or the hangar decoder product or reopen the closed language-contract work. Crate build waits until the operator approves the hangar plans for those two additions.
+Do not dump the hangar language tree into public GAP and do not copy live-entry UI element minting or the hangar decoder product or reopen the closed language-contract work. Crate build for constrained decode waits until the operator approves that hangar plan.
