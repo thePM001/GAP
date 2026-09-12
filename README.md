@@ -96,7 +96,7 @@ Pulse hold is the wait after a sealed capsule is opened. Base Node freezes the c
 - Collect-all Admit collects by capsule hash on that same path.
 - Presence of trust_ring is Deny.
 - Presence of trust_ring on a live GAP document is Deny.
-- Closed wall gap:trust_ring:rank.
+- Closed wall gap:leftover_rank_field.
 - Agent permission is agent_permission.
 - Do not set trust_ring on live documents.
 
@@ -231,7 +231,7 @@ AEP 2.8.5 reference policies are JSON objects with pattern.guard and the same in
 - Empty grants close an agent action when the grant list is empty.
 - Presence of trust_ring is Deny.
 - Presence of trust_ring on a live GAP document is Deny.
-- Closed wall gap:trust_ring:rank.
+- Closed wall gap:leftover_rank_field.
 - Agent permission is agent_permission.
 - Do not set trust_ring on live documents.
 - `enabled` is load-time: when false the instruction is still loaded and live Admit still evaluates walls.
