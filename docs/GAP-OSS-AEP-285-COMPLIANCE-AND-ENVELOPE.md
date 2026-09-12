@@ -2,7 +2,7 @@
 
 Public GAP already teaches the live AEP 2.8.5 evaluation story. An instruction is the atomic unit. Agents, workflows, validators, compositions and governance rules are all instructions that generate further instructions. A lattice-channel capsule is sealed, the clock freezes at seal, the kernel waits 1000 ms, every applicable check runs together and the allowed action is Applied only after Admit. Presence of trust_ring is Deny. Walls that are not always-on bind wrap or prefix. enabled is a load-time flag and a disabled instruction is still loaded and still judged. Layer 1 constrained decoding stays optional authoring and is not Admit. YAML 1.2 source remains valid GAP and the kernel reads the instruction object rather than the skin.
 
-That teaching is real yet it is not a complete operational match with the live AEP 2.8.5 envelope. Live AEP 2.8.5 renamed who-may to agent_permission, renamed the leftover rank wall to gap:leftover_rank_field and runs one envelope combinator on Base Node docks. Public GAP still names agent_may and gap:trust_ring:rank. Its teaching envelope is a small subset of the live action-and-snapshot machine. Capsule digest in the closed-wall package is not sha256-structure. The fit document at https://github.com/thePM001/GAP/blob/main/docs/CLASSIC-GAP-VS-AEP-2.8.5.md says no holes remain in this set and that claim is too strong.
+That teaching is real yet it is not a complete operational match with the live AEP 2.8.5 envelope. Live AEP 2.8.5 names agent permission as agent_permission, names leftover rank wall id gap:leftover_rank_field and runs one envelope combinator on Base Node docks. Public GAP names agent_permission and still names leftover rank wall id gap:trust_ring:rank. Its teaching envelope is a small subset of the live action-and-snapshot machine. Capsule digest in the closed-wall package is not sha256-structure. The fit document at https://github.com/thePM001/GAP/blob/main/docs/CLASSIC-GAP-VS-AEP-2.8.5.md says no holes remain in this set and that claim is too strong.
 
 ## Trees compared
 
@@ -14,15 +14,15 @@ AEP 2.8.5 is the public protocol library on https://github.com/thePM001/AEP-agen
 
 Live evaluation teaching on public GAP matches live AEP 2.8.5 on the evaluation story itself. After the wait the client collects by capsule hash. Live trust bundle mode is sha256-structure. Presence of rank is Deny. Skip is not a live verb. Writing and security are always-on stems. Other GAP walls bind wrap or action_path_prefix. A closed-wall close names closed walls, reasons and a prescribed repair. A retry must seal a new capsule. Fifteen named rows are a derived ledger rather than a live sequential combinator. Keep `.gap` as GAP source. Live kernel policies may be JSON-encoded GAP objects. One instruction per document and multi-instruction families use YAML multi-document separators.
 
-Instruction object shape matches on the shared fields address, pattern, action, weight, composition, metadata, wrap, action_path_prefix, covenants, scanners, budget, proof, fleet, knowledge, tools, aspect and pattern.guard as a string or a structured object. The public profile package compiles leftover rank presence, who-may grants, wrap or prefix bind and pattern.guard together. The closed-wall package compiles unbound scene, dock, timestamp, sequence and writing together, still evaluates when enabled is false, does not let attractors omit Admit and keeps grant lists off repair text. That is the public GAP instruction contract for collect-all.
+Instruction object shape matches on the shared fields address, pattern, action, weight, composition, metadata, wrap, action_path_prefix, covenants, scanners, budget, proof, fleet, knowledge, tools, aspect and pattern.guard as a string or a structured object. The public profile package compiles leftover rank presence, agent_permission grants, wrap or prefix bind and pattern.guard together. The closed-wall package compiles unbound scene, dock, timestamp, sequence and writing together, still evaluates when enabled is false, does not let attractors omit Admit and keeps grant lists off repair text. That is the public GAP instruction contract for collect-all.
 
 ## Instructions: what drifted after the last language-contract close
 
 Live AEP 2.8.5 vendor GAP and the kernel envelope now say agent permission is agent_permission. The live action object has no rank field. Closed leftover rank wall id is gap:leftover_rank_field. The vendored profile package on the AEP 2.8.5 library reads metadata.agent_permission.
 
-Public GAP still says who-may is agent_may. Schema v1.3 on https://github.com/thePM001/GAP defines metadata.agent_may. The public profile package wall id is gap:agent_may and leftover rank wall id is gap:trust_ring:rank.
+Public GAP names agent_permission. Schema v1.3 on https://github.com/thePM001/GAP defines metadata.agent_permission. The public profile package wall id is gap:agent_permission and leftover rank wall id is still gap:trust_ring:rank.
 
-A live AEP 2.8.5 instruction object that is legal on the vendor tree is therefore not the object the public GAP profile package compiles and a public GAP document that uses agent_may is not the object live envelope walls compile. AEP 2.8.5 still has its own doc lag because CHANGELOG and the top library README still write agent_may in places and vendor GAP README, schema v1.3 and the envelope already write agent_permission. Public GAP should track the live kernel field rather than the stale library README.
+A live AEP 2.8.5 instruction object that is legal on the vendor tree is therefore not the object the public GAP profile package compiles because leftover rank wall id still does not match the live leftover rank field. AEP 2.8.5 still has its own doc lag because CHANGELOG and the top library README still write agent_may in places and vendor GAP README, schema v1.3 and the envelope already write agent_permission. Public GAP now tracks the live kernel permission field.
 
 Other instruction holes on the public snapshot are package license files that say UNLICENSED and the repository LICENSE is Apache-2.0, a closed-wall capsule digest that is FNV-1a and teaching says sha256-structure, the over-strong fit document named above and an AEP Base Node registry component named gap that still lists only meta-schema v1 and v1.2.
 
@@ -78,7 +78,7 @@ flowchart TB
   WAIT --> COLLECT
   COLLECT --> APPLY
   CWD -.->|teaching subset| COLLECT
-  PROF -.->|agent_may drift| PROF2
+  PROF -.->|leftover rank wall| PROF2
 ```
 
 ```mermaid
@@ -118,7 +118,7 @@ flowchart TB
   WAIT --> COLLECT
   COLLECT --> APPLY
   CWD -.->|teaching subset| COLLECT
-  PROF -.->|agent_may drift| PROF2
+  PROF -.->|leftover rank wall| PROF2
 ```
 
 
@@ -128,6 +128,6 @@ Live GAP documents must not set trust_ring. Live GAP documents must not set rank
 
 ## Remaining public-tree work
 
-Rename the public instruction who-may field and wall id to agent_permission and gap:agent_permission so public GAP compiles the same object live AEP 2.8.5 compiles. Rename leftover rank wall id to gap:leftover_rank_field and keep presence Deny. Rewrite the fit document so it names remaining holes rather than claiming none remain. Replace FNV capsule digest with sha256-structure. Put Apache-2.0 on package license files. Add a simplified open-source constrained decoding engine as optional Layer 1 authoring. Add a simplified minimal GAP open-source runtime that runs the teaching envelope and instruction walls with freeze-at-seal and collect-all then Apply.
+Rename leftover rank wall id to gap:leftover_rank_field and keep presence Deny. Rewrite the fit document so it names remaining holes rather than claiming none remain. Replace FNV capsule digest with sha256-structure. Put Apache-2.0 on package license files. Add a simplified open-source constrained decoding engine as optional Layer 1 authoring. Add a simplified minimal GAP open-source runtime that runs the teaching envelope and instruction walls with freeze-at-seal and collect-all then Apply.
 
 Do not dump the hangar language tree into public GAP. Do not copy live-entry UI element minting. Do not copy the hangar decoder product. Do not reopen the closed language-contract work. Crate build waits until the operator approves the hangar plans for those two additions.
