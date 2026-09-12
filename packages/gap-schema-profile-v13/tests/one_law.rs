@@ -1,9 +1,9 @@
 // @PAD: gap-285-p6-one-law-reference
 // @GCDE: gaplune.policy.v1
-// GAP-285-P6 one-law reference crate. Presence of trust_ring is Deny. Who-may is agent_may.
+// GAP-285-P6 one-law reference crate. Presence of trust_ring is Deny. Agent permission is agent_permission.
 
 pub const TICKET: &str = "GAP-285-P6";
-pub const ONE_LAW: &str = "Presence of trust_ring is Deny. Who-may is agent_may.";
+pub const ONE_LAW: &str = "Presence of trust_ring is Deny. Agent permission is agent_permission.";
 pub const WALL_TRUST_RING_RANK: &str = "gap:trust_ring:rank";
 pub const ALWAYS_ON: [&str; 2] = ["writing.gap", "security.gap"];
 
@@ -16,8 +16,8 @@ fn has_trust_ring_key(src: &str, out: &mut bool) {
     *out = src.contains("\"trust_ring\"");
 }
 
-fn has_agent_may_key(src: &str, out: &mut bool) {
-    *out = src.contains("\"agent_may\"");
+fn has_agent_permission_key(src: &str, out: &mut bool) {
+    *out = src.contains("\"agent_permission\"");
 }
 
 fn metadata_wrap_present(src: &str, out: &mut bool) {
@@ -33,7 +33,7 @@ mod tests {
         let mut body = String::new();
         one_law_body(&mut body);
         assert_eq ! (body.contains("Presence of trust_ring is Deny"), true);
-        assert_eq ! (body.contains("Who-may is agent_may"), true);
+        assert_eq ! (body.contains("Agent permission is agent_permission"), true);
         assert_eq ! (body.contains("documentary"), false);
         assert_eq ! (body.contains("unused at Admit"), false);
     }
@@ -44,7 +44,7 @@ mod tests {
         let mut ring = true;
         let mut may = false;
         has_trust_ring_key(src, &mut ring);
-        has_agent_may_key(src, &mut may);
+        has_agent_permission_key(src, &mut may);
         assert_eq ! (ring, false);
         assert_eq ! (may, true);
         assert_eq ! (src.contains("\"guard\": \"true\""), true);
@@ -57,7 +57,7 @@ mod tests {
         let mut ring = true;
         let mut may = false;
         has_trust_ring_key(src, &mut ring);
-        has_agent_may_key(src, &mut may);
+        has_agent_permission_key(src, &mut may);
         assert_eq ! (ring, false);
         assert_eq ! (may, true);
         assert_eq ! (src.contains("\"guard\": \"true\""), true);
@@ -70,7 +70,7 @@ mod tests {
         let mut ring = true;
         let mut may = false;
         has_trust_ring_key(src, &mut ring);
-        has_agent_may_key(src, &mut may);
+        has_agent_permission_key(src, &mut may);
         assert_eq ! (ring, false);
         assert_eq ! (may, true);
         assert_eq ! (src.contains("\"wrap\": \"deployment\""), true);
@@ -84,7 +84,7 @@ mod tests {
         let mut may = false;
         let mut wrap = false;
         has_trust_ring_key(src, &mut ring);
-        has_agent_may_key(src, &mut may);
+        has_agent_permission_key(src, &mut may);
         metadata_wrap_present(src, &mut wrap);
         assert_eq ! (ring, false);
         assert_eq ! (may, true);
