@@ -143,7 +143,7 @@ pub fn attractor_omits_admit(out: &mut bool) {
 
 pub fn repair_has_grants(repair: &str, out: &mut bool) {
     let r = repair.to_ascii_lowercase();
-    *out = r.contains("grant") || r.contains("agent_may") || r.contains("who-may");
+    *out = r.contains("grant") || r.contains("agent_permission") || r.contains("agent_may") || r.contains("who-may");
 }
 
 fn close_if_unbound(id: &str, value: &str, reason: &str, repair: &str, wall: &mut ClosedWall) {
