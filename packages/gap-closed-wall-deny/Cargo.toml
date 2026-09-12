@@ -5,9 +5,12 @@ name = "gap-closed-wall-deny"
 version = "0.1.0"
 edition = "2021"
 description = "GAP-285-P3. Classic GAP closed-wall Deny. enabled is load-time. Retry reseals."
-license = "UNLICENSED"
+license = "Apache-2.0"
 publish = false
 
 [[bin]]
 name = "gap-closed-wall-deny"
 path = "src/main.rs"
+
+[dependencies]
+sha2 = "0.10"
