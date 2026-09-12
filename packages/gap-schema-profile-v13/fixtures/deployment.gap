@@ -81,7 +81,7 @@
     "version": "1.1.0",
     "stability": "stable",
     "aspect": "procedural",
-    "agent_may": [
+    "agent_permission": [
       "*"
     ],
     "aep_version": "2.8.5",
