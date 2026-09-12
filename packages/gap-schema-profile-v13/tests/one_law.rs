@@ -4,7 +4,7 @@
 
 pub const TICKET: &str = "GAP-285-P6";
 pub const ONE_LAW: &str = "Presence of trust_ring is Deny. Agent permission is agent_permission.";
-pub const WALL_TRUST_RING_RANK: &str = "gap:trust_ring:rank";
+pub const WALL_LEFTOVER_RANK_FIELD: &str = "gap:leftover_rank_field";
 pub const ALWAYS_ON: [&str; 2] = ["writing.gap", "security.gap"];
 
 pub fn one_law_body(out: &mut String) {
