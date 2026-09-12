@@ -18,10 +18,8 @@ Fifteen named rows stay a derived ledger rather than a live sequential combinato
 
 ## Remaining holes after this pass
 
-This pass repaired leftover rank wall id, sha256-structure digest and Apache-2.0 package license files. Remaining holes are still live:
+This pass repaired leftover rank wall id, sha256-structure digest and Apache-2.0 package license files. Remaining hole is still live:
 
-- Teaching-envelope subset versus the live action-and-snapshot machine. Live sealed action still carries action_path, agent_id, payload, tool, dest_dock, scene_id, agent_ts_ms, sequence_number and anomaly_score. Live freeze-at-seal snapshot still carries lattice nodes, satisfied actions, pulse drift 50 ms, pulse age 5000 ms, docks, rate, tools and scanners.
 - Missing optional authoring engine. Layer 1 constrained decoding stays optional authoring and is not Admit so the public tree still does not ship that engine.
-- Missing simplified teaching runtime that loads, seals, freezes, waits, collect-all then Apply.
 
-Do not scaffold gap-constrained-decode or gap-envelope-min or gap-runtime-min until those hangar plans are approved. Do not dump the hangar language tree into public GAP.
+Do not scaffold gap-constrained-decode until that hangar plan is approved. Do not dump the hangar language tree into public GAP.
