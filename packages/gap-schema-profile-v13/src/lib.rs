@@ -4,7 +4,7 @@ use serde_json::{Map, Value};
 
 pub const TICKET: &str = "GAP-285-P1";
 pub const PROFILE: &str = "v1.3";
-pub const WALL_TRUST_RING_RANK: &str = "gap:trust_ring:rank";
+pub const WALL_LEFTOVER_RANK_FIELD: &str = "gap:leftover_rank_field";
 pub const WALL_AGENT_PERMISSION: &str = "gap:agent_permission";
 pub const WALL_WRAP_BIND: &str = "gap:wrap:bind";
 pub const WALL_PATTERN_GUARD: &str = "gap:pattern:guard";
@@ -12,7 +12,7 @@ pub const RANK_SANDBOX: &str = "sandbox";
 pub const RANK_USER: &str = "user";
 pub const RANK_SYSTEM: &str = "system";
 pub const RANK_ENTERPRISE: &str = "enterprise";
-pub const SCHEMA_V13_CONTRACT: &str = "GAP Instruction Meta-Schema v1.3\nagent_permission\nwrap\naction_path_prefix\noneOf\nload-time\nPresence of trust_ring is Deny.\nPresence of rank is Deny.\nEvery non-empty rank value is Deny.\ncovenants\nscanners\n";
+pub const SCHEMA_V13_CONTRACT: &str = "GAP Instruction Meta-Schema v1.3\nagent_permission\nwrap\naction_path_prefix\noneOf\nload-time\nPresence of trust_ring is Deny.\nPresence of rank is Deny.\nEvery non-empty rank value is Deny.\nLeftover rank wall id is gap:leftover_rank_field.\ncovenants\nscanners\n";
 
 pub fn schema_v13_body(out: &mut String) {
     out.clear();
@@ -201,13 +201,13 @@ pub fn compile_trust_ring_rank_wall(doc: &Value, wall: &mut AdmitWall) {
     }
     if present || rank_key || nonempty || is_rank {
         AdmitWall::close_into(
-            WALL_TRUST_RING_RANK,
+            WALL_LEFTOVER_RANK_FIELD,
             "presence of trust_ring is Deny; agent permission is agent_permission",
             wall,
         );
         return;
     }
-    AdmitWall::open_into(WALL_TRUST_RING_RANK, wall);
+    AdmitWall::open_into(WALL_LEFTOVER_RANK_FIELD, wall);
 }
 
 
@@ -805,7 +805,7 @@ mod tests {
         let mut hit = false;
         let mut i = 0usize;
         while i < result.closed.len() {
-            if result.closed[i].id == WALL_TRUST_RING_RANK {
+            if result.closed[i].id == WALL_LEFTOVER_RANK_FIELD {
                 hit = true;
             }
             i += 1;
@@ -894,6 +894,7 @@ mod tests_more {
         assert_eq ! (body.contains("Presence of trust_ring is Deny"), true);
         assert_eq ! (body.contains("Presence of rank is Deny"), true);
         assert_eq ! (body.contains("Every non-empty rank value is Deny"), true);
+        assert_eq ! (body.contains("Leftover rank wall id is gap:leftover_rank_field"), true);
         assert_eq ! (body.contains("covenants"), true);
         assert_eq ! (body.contains("scanners"), true);
         assert_eq ! (body.contains("v1.3"), true);
@@ -952,7 +953,7 @@ mod tests_more {
         let mut wall = AdmitWall { id: String::new(), closed: false, reason: String::new() };
         compile_trust_ring_rank_wall(&doc, &mut wall);
         assert_eq ! (wall.closed, true);
-        assert_eq ! (wall.id.as_str(), WALL_TRUST_RING_RANK);
+        assert_eq ! (wall.id.as_str(), WALL_LEFTOVER_RANK_FIELD);
         let mut result = AdmitResult { allow: true, closed: Vec::new() };
         live_admit_gap_profile(src, &LiveAdmitRequest::default(), &mut result, &mut err);
         assert_eq ! (err.as_str(), "");
@@ -960,7 +961,7 @@ mod tests_more {
         let mut hit = false;
         let mut i = 0usize;
         while i < result.closed.len() {
-            if result.closed[i].id == WALL_TRUST_RING_RANK && result.closed[i].closed {
+            if result.closed[i].id == WALL_LEFTOVER_RANK_FIELD && result.closed[i].closed {
                 hit = true;
             }
             i += 1;
@@ -1040,6 +1041,44 @@ mod tests_more {
         let mut load = false;
         enabled_is_load_time(&mut load);
         assert_eq ! (load, true);
+    }
+
+    #[test]
+    fn leftover_rank_wall_id_is_gap_leftover_rank_field() {
+        assert_eq ! (WALL_LEFTOVER_RANK_FIELD, "gap:leftover_rank_field");
+        assert_eq ! (WALL_LEFTOVER_RANK_FIELD.contains("trust_ring:rank"), false);
+    }
+
+    #[test]
+    fn document_that_sets_leftover_rank_field_closes() {
+        assert_rank_wall_closed(&yaml_rank_field(RANK_USER));
+        assert_rank_wall_closed(&json_meta_extra(",\"rank\":\"user\""));
+        assert_rank_wall_closed(&json_meta_extra(",\"trust_ring\":\"user\""));
+    }
+
+    #[test]
+    fn document_that_omits_leftover_rank_field_does_not_close_on_that_wall() {
+        let src = profile();
+        let mut doc = Value::Null;
+        let mut err = String::new();
+        parse_gap_source(&src, &mut doc, &mut err);
+        assert_eq ! (err.as_str(), "");
+        let mut wall = AdmitWall { id: String::new(), closed: false, reason: String::new() };
+        compile_trust_ring_rank_wall(&doc, &mut wall);
+        assert_eq ! (wall.closed, false);
+        assert_eq ! (wall.id.as_str(), WALL_LEFTOVER_RANK_FIELD);
+        let mut result = AdmitResult { allow: true, closed: Vec::new() };
+        live_admit_gap_profile(&src, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::from("finance"), action_path: String::from("finance/pay") }, &mut result, &mut err);
+        assert_eq ! (err.as_str(), "");
+        let mut hit = false;
+        let mut i = 0usize;
+        while i < result.closed.len() {
+            if result.closed[i].id == WALL_LEFTOVER_RANK_FIELD {
+                hit = true;
+            }
+            i += 1;
+        }
+        assert_eq ! (hit, false);
     }
 }
 
