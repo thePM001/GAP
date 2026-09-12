@@ -4,7 +4,7 @@
 name = "gap-schema-profile-v13"
 version = "0.1.0"
 edition = "2021"
-description = "GAP-285-P1. Classic GAP v1.3 live Admit profile. Who-may is agent_may. Presence of trust_ring is Deny. enabled is load-time."
+description = "Classic GAP v1.3 live Admit profile. Agent permission is agent_permission. Presence of trust_ring is Deny. enabled is load-time."
 license = "UNLICENSED"
 publish = false
 
