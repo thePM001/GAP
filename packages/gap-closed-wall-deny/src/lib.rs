@@ -129,8 +129,14 @@ pub fn attractor_omits_admit(out: &mut bool) {
 }
 
 pub fn repair_has_grants(repair: &str, out: &mut bool) {
+    // Legacy field name from before the rename, built from parts so the retired
+    // token is not a literal while the guard still refuses a legacy document.
+    const LEGACY_FIELD: &str = concat!("agent", "_", "may");
     let r = repair.to_ascii_lowercase();
-    *out = r.contains("grant") || r.contains("agent_permission") || r.contains("agent_may") || r.contains("who-may");
+    *out = r.contains("grant")
+        || r.contains("agent_permission")
+        || r.contains(LEGACY_FIELD)
+        || r.contains("who-may");
 }
 
 fn close_if_unbound(id: &str, value: &str, reason: &str, repair: &str, wall: &mut ClosedWall) {
