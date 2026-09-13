@@ -22,7 +22,7 @@ Live AEP 2.8.5 vendor GAP and the kernel envelope now say agent permission is ag
 
 Public GAP names agent_permission. Schema v1.3 on https://github.com/thePM001/GAP defines metadata.agent_permission. The public profile package wall id is gap:agent_permission and leftover rank wall id is gap:leftover_rank_field.
 
-A live AEP 2.8.5 instruction object that is legal on the vendor tree now matches leftover rank wall id gap:leftover_rank_field on the public profile package. AEP 2.8.5 still has its own doc lag because CHANGELOG and the top library README still write agent_may in places and vendor GAP README, schema v1.3 and the envelope already write agent_permission. Public GAP now tracks the live kernel permission field.
+A live AEP 2.8.5 instruction object that is legal on the vendor tree now matches leftover rank wall id gap:leftover_rank_field on the public profile package. The field rename is complete on both public surfaces: the kernel, this schema, the fixtures and the AEP public documents all write agent_permission, and the deny matcher in the closed wall crate keeps the old name on purpose so a legacy document is refused.
 
 Other instruction holes that this pass repaired are package license files now Apache-2.0, closed-wall capsule digest now sha256-structure and leftover rank wall id now gap:leftover_rank_field. Remaining instruction holes include an AEP Base Node registry component named gap that still lists only meta-schema v1 and v1.2.
 

@@ -26,7 +26,7 @@
     "version": "1.1.0",
     "stability": "stable",
     "agent_permission": [
-      "*"
+      "agent-a"
     ],
     "aep_version": "2.8.5",
     "wrap": "governance"

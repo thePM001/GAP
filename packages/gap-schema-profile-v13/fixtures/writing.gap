@@ -96,7 +96,7 @@
     "stability": "stable",
     "aspect": "objective",
     "agent_permission": [
-      "*"
+      "agent-a"
     ],
     "aep_version": "2.8.5"
   }
