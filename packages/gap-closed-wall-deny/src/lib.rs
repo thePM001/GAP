@@ -248,7 +248,7 @@ pub fn live_admit(env: &AdmitEnvelope, out: &mut ClosedWallDeny) {
     compile_time_wall(env, &mut time);
     compile_sequence_wall(env, &mut seq);
     compile_writing_wall(env, &mut writing);
-    if omit == false {
+    if !omit {
         walls.push(scene);
         walls.push(dock);
         walls.push(time);
@@ -287,6 +287,12 @@ pub mod closed_wall_collect {
         pub envelope: AdmitEnvelope,
         pub result: ClosedWallDeny,
     }
+    impl Default for ClosedWallCollect {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl ClosedWallCollect {
         pub fn new() -> Self {
             Self {
@@ -313,6 +319,12 @@ pub mod load_time_enabled {
         pub load_time: bool,
         pub omits: bool,
     }
+    impl Default for LoadTimeEnabled {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl LoadTimeEnabled {
         pub fn new() -> Self {
             Self {
@@ -336,6 +348,12 @@ pub mod capsule_reseal {
         pub retry: CapsuleSeal,
         pub replay: bool,
     }
+    impl Default for CapsuleReseal {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl CapsuleReseal {
         pub fn new() -> Self {
             Self {
@@ -359,6 +377,12 @@ pub mod forensic_attractor {
         pub forensic: bool,
         pub omits: bool,
     }
+    impl Default for ForensicAttractor {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl ForensicAttractor {
         pub fn new() -> Self {
             Self {
@@ -391,7 +415,7 @@ mod tests {
     }
 
     fn require(ok: bool) {
-        if ok == false {
+        if !ok {
             std::process::exit(1);
         }
     }
@@ -406,7 +430,7 @@ mod tests {
             closed: Vec::new(),
         };
         live_admit(&env, &mut deny);
-        require(deny.allow == false);
+        require(!deny.allow);
         let mut hit = false;
         let mut i = 0usize;
         while i < deny.closed.len() {
@@ -414,14 +438,14 @@ mod tests {
                 hit = true;
                 let mut grants = true;
                 repair_has_grants(&deny.closed[i].repair, &mut grants);
-                require(grants == false);
+                require(!grants);
             }
             i += 1;
         }
         require(hit);
         let mut omit = true;
         enabled_omits_admit(false, &mut omit);
-        require(omit == false);
+        require(!omit);
         let mut load = false;
         enabled_is_load_time(&mut load);
         require(load);
@@ -438,7 +462,7 @@ mod tests {
             closed: Vec::new(),
         };
         live_admit(&env, &mut deny);
-        require(deny.allow == false);
+        require(!deny.allow);
         let mut scene = false;
         let mut dock = false;
         let mut i = 0usize;
@@ -464,7 +488,7 @@ mod tests {
         };
         live_admit(&env, &mut deny);
         require(deny.allow);
-        require(deny.closed.len() == 0usize);
+        require(deny.closed.is_empty());
     }
 
     #[test]
@@ -480,7 +504,7 @@ mod tests {
         while i < repairs.len() {
             let mut grants = true;
             repair_has_grants(repairs[i], &mut grants);
-            require(grants == false);
+            require(!grants);
             i += 1;
         }
     }
@@ -508,14 +532,14 @@ mod tests {
         require(first.digest != second.digest);
         let mut replay = true;
         is_replay(&first, &second.sealed, &mut replay);
-        require(replay == false);
+        require(!replay);
     }
 
     #[test]
     fn attractor_does_not_omit_admit() {
         let mut omit = true;
         attractor_omits_admit(&mut omit);
-        require(omit == false);
+        require(!omit);
         let mut env = bound_env();
         env.scene = String::new();
         let mut deny = ClosedWallDeny {
@@ -523,12 +547,12 @@ mod tests {
             closed: Vec::new(),
         };
         live_admit(&env, &mut deny);
-        require(deny.allow == false);
+        require(!deny.allow);
         let mut fa = forensic_attractor::ForensicAttractor::new();
         fa.attractor = String::from("basin-1");
         fa.process();
         require(fa.forensic);
-        require(fa.omits == false);
+        require(!fa.omits);
     }
 
     #[test]
@@ -536,7 +560,7 @@ mod tests {
         require(ENABLED_CONTRACT.contains("Load-time"));
         require(ENABLED_CONTRACT.contains("still loaded"));
         require(ENABLED_CONTRACT.contains("still evaluates"));
-        require(ENABLED_CONTRACT.contains("never evaluated") == false);
+        require(!ENABLED_CONTRACT.contains("never evaluated"));
     }
 
     #[test]
@@ -545,7 +569,7 @@ mod tests {
         c.envelope = bound_env();
         c.envelope.timestamp = String::new();
         c.process();
-        require(c.result.allow == false);
+        require(!c.result.allow);
         require(c.deny.contains(WALL_TIME));
     }
 }

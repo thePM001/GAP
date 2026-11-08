@@ -82,7 +82,7 @@ fn main() {
         emit("\n");
         i += 1;
     }
-    if input.is_empty() == false {
+    if !input.is_empty() {
         let mut first = CapsuleSeal::default();
         let mut second = CapsuleSeal::default();
         seal_capsule(&input, "0", &mut first);

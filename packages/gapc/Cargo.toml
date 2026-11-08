@@ -1,0 +1,24 @@
+# @PAD: gap-gapc-compiler
+# @GCDE: gaplune.policy.v1
+[package]
+name = "gapc"
+version = "0.1.0"
+edition = "2021"
+description = "GAP compiler. Checks .gap sources against the GAP meta schema v1.3 and the live profile walls and compiles them to JSON-encoded GAP instructions."
+license = "Apache-2.0"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "gapc"
+path = "src/main.rs"
+
+[dependencies]
+gap-schema-profile-v13 = { path = "../gap-schema-profile-v13" }
+jsonschema = { version = "0.61", default-features = false }
+serde_json = "1"
+
+[lints.rust]
+unsafe_code = "deny"

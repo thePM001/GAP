@@ -32,10 +32,10 @@ mod tests {
     fn one_law_text_is_presence_deny() {
         let mut body = String::new();
         one_law_body(&mut body);
-        assert_eq!(body.contains("Presence of trust_ring is Deny"), true);
-        assert_eq!(body.contains("Agent permission is agent_permission"), true);
-        assert_eq!(body.contains("documentary"), false);
-        assert_eq!(body.contains("unused at Admit"), false);
+        assert!(body.contains("Presence of trust_ring is Deny"));
+        assert!(body.contains("Agent permission is agent_permission"));
+        assert!(!body.contains("documentary"));
+        assert!(!body.contains("unused at Admit"));
     }
 
     #[test]
@@ -45,10 +45,10 @@ mod tests {
         let mut may = false;
         has_trust_ring_key(src, &mut ring);
         has_agent_permission_key(src, &mut may);
-        assert_eq!(ring, false);
-        assert_eq!(may, true);
-        assert_eq!(src.contains("\"guard\": \"true\""), true);
-        assert_eq!(src.contains("\"wrap\""), false);
+        assert!(!ring);
+        assert!(may);
+        assert!(src.contains("\"guard\": \"true\""));
+        assert!(!src.contains("\"wrap\""));
     }
 
     #[test]
@@ -58,10 +58,10 @@ mod tests {
         let mut may = false;
         has_trust_ring_key(src, &mut ring);
         has_agent_permission_key(src, &mut may);
-        assert_eq!(ring, false);
-        assert_eq!(may, true);
-        assert_eq!(src.contains("\"guard\": \"true\""), true);
-        assert_eq!(src.contains("\"wrap\""), false);
+        assert!(!ring);
+        assert!(may);
+        assert!(src.contains("\"guard\": \"true\""));
+        assert!(!src.contains("\"wrap\""));
     }
 
     #[test]
@@ -71,10 +71,10 @@ mod tests {
         let mut may = false;
         has_trust_ring_key(src, &mut ring);
         has_agent_permission_key(src, &mut may);
-        assert_eq!(ring, false);
-        assert_eq!(may, true);
-        assert_eq!(src.contains("\"wrap\": \"deployment\""), true);
-        assert_eq!(src.contains("\"action_path_prefix\": \"ops:\""), true);
+        assert!(!ring);
+        assert!(may);
+        assert!(src.contains("\"wrap\": \"deployment\""));
+        assert!(src.contains("\"action_path_prefix\": \"ops:\""));
     }
 
     #[test]
@@ -86,9 +86,9 @@ mod tests {
         has_trust_ring_key(src, &mut ring);
         has_agent_permission_key(src, &mut may);
         metadata_wrap_present(src, &mut wrap);
-        assert_eq!(ring, false);
-        assert_eq!(may, true);
-        assert_eq!(wrap, true);
-        assert_eq!(src.contains("\"wrap\": \"governance\""), true);
+        assert!(!ring);
+        assert!(may);
+        assert!(wrap);
+        assert!(src.contains("\"wrap\": \"governance\""));
     }
 }

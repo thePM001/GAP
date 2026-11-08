@@ -1,13 +1,7 @@
-// @PAD: gap-285-p1-schema-profile-v13-cli
 // GAP-285-P1 CLI. source= then agent_id= action= wrap= action_path=. Collect-all live Admit.
 
 use gap_schema_profile_v13::{live_admit_gap_profile, AdmitResult, LiveAdmitRequest};
-use std::io::{self, Read, Write};
-
-fn emit(s: &str) {
-    let mut o = io::stdout();
-    let _ = o.write_all(s.as_bytes());
-}
+use std::io::{self, Read};
 
 fn main() {
     let mut buf = String::new();
@@ -40,31 +34,29 @@ fn main() {
             continue;
         }
     }
-    let mut result = AdmitResult {
-        allow: true,
-        closed: Vec::new(),
-    };
+    // one AdmitResult constructor for every caller.
+    let mut result = AdmitResult::new(Vec::new(), Vec::new());
     let mut err = String::new();
     live_admit_gap_profile(&source, &req, &mut result, &mut err);
-    if err.is_empty() == false {
-        emit("allow=false\nerror=");
-        emit(&err);
-        emit("\n");
+    if !err.is_empty() {
+        print!("allow=false\nerror=");
+        print!("{}", err);
+        println!();
         return;
     }
-    emit("allow=");
+    print!("allow=");
     if result.allow {
-        emit("true\n");
+        println!("true");
     } else {
-        emit("false\n");
+        println!("false");
     }
     let mut i = 0usize;
     while i < result.closed.len() {
-        emit("closed=");
-        emit(&result.closed[i].id);
-        emit("|");
-        emit(&result.closed[i].reason);
-        emit("\n");
+        print!("closed=");
+        print!("{}", result.closed[i].id);
+        print!("|");
+        print!("{}", result.closed[i].reason);
+        println!();
         i += 1;
     }
 }

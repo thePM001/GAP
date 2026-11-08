@@ -5,7 +5,6 @@
   },
   "pattern": {
     "guard": "true",
-    "wrap": "governance",
     "constraints": [
       "hard: no grep, search_files or read_file on source code",
       "hard: browser ops through isolated sandbox Firecracker microVM",
@@ -15,7 +14,7 @@
   },
   "action": {
     "type": "template",
-    "content": "Enforce AEP 2.8.5 governance policy."
+    "content": "Enforce AEP 2.9.0 governance policy."
   },
   "weight": 1.0,
   "composition": {
@@ -26,9 +25,12 @@
     "version": "1.1.0",
     "stability": "stable",
     "agent_permission": [
-      "agent-a"
+      {
+        "agent_id": "agent-a",
+        "action": "*"
+      }
     ],
-    "aep_version": "2.8.5",
+    "aep_version": "2.9.0",
     "wrap": "governance"
   }
 }

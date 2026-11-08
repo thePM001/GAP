@@ -6,7 +6,7 @@ use gap_closed_wall_deny::{
 };
 
 fn require(ok: bool) {
-    if ok == false {
+    if !ok {
         std::process::exit(1);
     }
 }
@@ -54,9 +54,9 @@ fn zero_fnv_live_digest_on_this_package() {
     let src = include_str!("../src/lib.rs");
     let mut needle = String::from("fnv");
     needle.push_str("1a64");
-    require(src.contains(&needle) == false);
-    require(src.contains("1099511628211") == false);
-    require(src.contains("0xcbf29ce484222325") == false);
+    require(!src.contains(&needle));
+    require(!src.contains("1099511628211"));
+    require(!src.contains("0xcbf29ce484222325"));
     require(src.contains("sha256-structure"));
     require(DIGEST_MODE == "sha256-structure");
 }

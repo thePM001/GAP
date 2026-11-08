@@ -1,11 +1,18 @@
 // crate: gap-schema-profile-v13
 // GAP-285-P1 classic GAP v1.3 live Admit profile. GAP-285-P8 one-law: presence of trust_ring is Deny.
-use serde_json::{Map, Value};
+// GAP-OPEN-SOURCE is the one source of this crate. AEP holds a byte pinned copy of src.
+// This file depends on serde_json only so the pinned copy builds in any workspace.
+use serde_json::{Map, Number, Value};
+use yaml_rust2::{Yaml, YamlLoader};
 
 pub const TICKET: &str = "GAP-285-P1";
 pub const PROFILE: &str = "v1.3";
+/// This crate version. VERSIONING.md in GAP-OPEN-SOURCE links it to the schema and AEP versions.
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub const WALL_LEFTOVER_RANK_FIELD: &str = "gap:leftover_rank_field";
 pub const WALL_AGENT_PERMISSION: &str = "gap:agent_permission";
+/// Exact Deny text when the agent permission wall closes.
+pub const DENY_NO_PERMISSION: &str = "this agent does not have permission for this action";
 pub const WALL_WRAP_BIND: &str = "gap:wrap:bind";
 pub const WALL_PATTERN_GUARD: &str = "gap:pattern:guard";
 pub const RANK_SANDBOX: &str = "sandbox";
@@ -13,12 +20,10 @@ pub const RANK_USER: &str = "user";
 pub const RANK_SYSTEM: &str = "system";
 pub const RANK_ENTERPRISE: &str = "enterprise";
 pub const SCHEMA_V13_CONTRACT: &str = "GAP Instruction Meta-Schema v1.3\nagent_permission\nwrap\naction_path_prefix\noneOf\nload-time\nPresence of trust_ring is Deny.\nPresence of rank is Deny.\nEvery non-empty rank value is Deny.\nLeftover rank wall id is gap:leftover_rank_field.\ncovenants\nscanners\n";
+/// The canonical GAP meta schema v1.3 JSON. Byte copy of schemas/gap-meta-schema-v1.3.json.
+pub const SCHEMA_V13_JSON: &str = include_str!("schema_v13.body");
 
-pub fn schema_v13_body(out: &mut String) {
-    out.clear();
-    out.push_str(SCHEMA_V13_CONTRACT);
-}
-
+/// One Admit wall. A wall that did not close is open.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AdmitWall {
     pub id: String,
@@ -27,48 +32,59 @@ pub struct AdmitWall {
 }
 
 impl AdmitWall {
-    pub fn open_into(id: &str, wall: &mut AdmitWall) {
-        wall.id = String::from(id);
-        wall.closed = false;
-        wall.reason = String::new();
+    pub fn open(id: impl Into<String>) -> Self {
+        Self {
+            id: id.into(),
+            closed: false,
+            reason: String::new(),
+        }
     }
-    pub fn close_into(id: &str, reason: &str, wall: &mut AdmitWall) {
-        wall.id = String::from(id);
-        wall.closed = true;
-        wall.reason = String::from(reason);
+
+    pub fn close(id: impl Into<String>, reason: impl Into<String>) -> Self {
+        Self {
+            id: id.into(),
+            closed: true,
+            reason: reason.into(),
+        }
     }
 }
 
+/// Collect-all Admit result. allow is true only when no wall closed.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AdmitResult {
     pub allow: bool,
     pub closed: Vec<AdmitWall>,
+    pub open: Vec<AdmitWall>,
 }
 
 impl AdmitResult {
-    pub fn closed_set_key(self_ref: &AdmitResult, out: &mut String) {
-        out.clear();
-        let mut rows: Vec<String> = Vec::new();
-        let mut i = 0usize;
-        while i < self_ref.closed.len() {
-            let w = &self_ref.closed[i];
-            let mut s = w.id.clone();
-            s.push(char::from(31));
-            s.push_str(&w.reason);
-            rows.push(s);
-            i += 1;
-        }
-        rows.sort();
-        rows.dedup();
-        let mut j = 0usize;
-        while j < rows.len() {
-            if 0 < j {
-                out.push(char::from(10));
-            }
-            out.push_str(&rows[j]);
-            j += 1;
+    pub fn new(closed: Vec<AdmitWall>, open: Vec<AdmitWall>) -> Self {
+        Self {
+            allow: closed.is_empty(),
+            closed,
+            open,
         }
     }
+}
+
+/// One agent permission record. Agent A may X. Not a rank.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AgentPermission {
+    pub agent_id: String,
+    pub action: String,
+}
+
+pub fn open_into(id: &str, wall: &mut AdmitWall) {
+    *wall = AdmitWall::open(id);
+}
+
+pub fn close_into(id: &str, reason: &str, wall: &mut AdmitWall) {
+    *wall = AdmitWall::close(id, reason);
+}
+
+pub fn schema_v13_body(out: &mut String) {
+    out.clear();
+    out.push_str(SCHEMA_V13_CONTRACT);
 }
 
 pub fn admit_collect_all(walls: &[AdmitWall], out: &mut AdmitResult) {
@@ -82,14 +98,8 @@ pub fn admit_collect_all(walls: &[AdmitWall], out: &mut AdmitResult) {
     }
     closed.sort_by(|a, b| a.id.cmp(&b.id).then(a.reason.cmp(&b.reason)));
     closed.dedup_by(|a, b| a.id == b.id && a.reason == b.reason);
-    out.allow = closed.is_empty();
-    out.closed = closed;
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct AgentPermissionGrant {
-    pub agent_id: String,
-    pub action: String,
+    let open: Vec<AdmitWall> = walls.iter().filter(|w| !w.closed).cloned().collect();
+    *out = AdmitResult::new(closed, open);
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -145,21 +155,31 @@ fn value_is_non_empty(v: &Value, out: &mut bool) {
             *out = true;
         }
         Value::String(s) => {
-            *out = s.trim().is_empty() == false;
+            *out = !s.trim().is_empty();
         }
         Value::Array(a) => {
-            *out = a.is_empty() == false;
+            *out = !a.is_empty();
         }
         Value::Object(o) => {
-            *out = o.is_empty() == false;
+            *out = !o.is_empty();
         }
     }
 }
 
-pub fn compile_trust_ring_rank_wall(doc: &Value, wall: &mut AdmitWall) {
+pub fn compile_leftover_rank_field_wall(doc: &Value, wall: &mut AdmitWall) {
     let meta = meta_of(doc);
     let mut present = false;
     field_present(meta, "trust_ring", &mut present);
+    let mut score_present = false;
+    field_present(meta, "trust_score", &mut score_present);
+    let mut tier_present = false;
+    field_present(meta, "trust_tier", &mut tier_present);
+    if score_present {
+        present = true;
+    }
+    if tier_present {
+        present = true;
+    }
     let mut rank_key = false;
     field_present(meta, "rank", &mut rank_key);
     let mut ring = String::new();
@@ -168,14 +188,14 @@ pub fn compile_trust_ring_rank_wall(doc: &Value, wall: &mut AdmitWall) {
     json_str(meta, "rank", &mut rank_val);
     let mut is_rank = false;
     is_rank_name(&ring, &mut is_rank);
-    if is_rank == false {
+    if !is_rank {
         is_rank_name(&rank_val, &mut is_rank);
     }
     let mut nonempty = false;
     if let Some(x) = meta.get("trust_ring") {
         value_is_non_empty(x, &mut nonempty);
     }
-    if nonempty == false {
+    if !nonempty {
         if let Some(x) = meta.get("rank") {
             value_is_non_empty(x, &mut nonempty);
         }
@@ -187,30 +207,30 @@ pub fn compile_trust_ring_rank_wall(doc: &Value, wall: &mut AdmitWall) {
             if ceiling_present {
                 present = true;
             }
-            if nonempty == false {
+            if !nonempty {
                 if let Some(x) = spawn.get("ring_ceiling") {
                     value_is_non_empty(x, &mut nonempty);
                 }
             }
             let mut ceiling = String::new();
             json_str(spawn, "ring_ceiling", &mut ceiling);
-            if is_rank == false {
+            if !is_rank {
                 is_rank_name(&ceiling, &mut is_rank);
             }
         }
     }
     if present || rank_key || nonempty || is_rank {
-        AdmitWall::close_into(
+        close_into(
             WALL_LEFTOVER_RANK_FIELD,
-            "presence of trust_ring is Deny; agent permission is agent_permission",
+            "leftover rank field is Deny; agent permission is agent_permission",
             wall,
         );
         return;
     }
-    AdmitWall::open_into(WALL_LEFTOVER_RANK_FIELD, wall);
+    open_into(WALL_LEFTOVER_RANK_FIELD, wall);
 }
 
-fn grant_from_value(v: &Value, out: &mut AgentPermissionGrant, ok: &mut bool) {
+fn permission_from_value(v: &Value, out: &mut AgentPermission, ok: &mut bool) {
     *ok = false;
     if let Some(s) = v.as_str() {
         let s = s.trim();
@@ -220,7 +240,7 @@ fn grant_from_value(v: &Value, out: &mut AgentPermissionGrant, ok: &mut bool) {
         if let Some((a, act)) = s.split_once(char::from(47)) {
             let agent_id = a.trim();
             let action = act.trim();
-            if agent_id.is_empty() == false && action.is_empty() == false {
+            if !agent_id.is_empty() && !action.is_empty() {
                 out.agent_id = String::from(agent_id);
                 out.action = String::from(action);
                 *ok = true;
@@ -246,18 +266,18 @@ fn grant_from_value(v: &Value, out: &mut AgentPermissionGrant, ok: &mut bool) {
     }
 }
 
-pub fn grants_from_doc(doc: &Value, out: &mut Vec<AgentPermissionGrant>) {
+pub fn permissions_from_doc(doc: &Value, out: &mut Vec<AgentPermission>) {
     out.clear();
     let meta = meta_of(doc);
     if let Some(arr) = meta.get("agent_permission").and_then(|x| x.as_array()) {
         let mut i = 0usize;
         while i < arr.len() {
-            let mut g = AgentPermissionGrant {
+            let mut g = AgentPermission {
                 agent_id: String::new(),
                 action: String::new(),
             };
             let mut ok = false;
-            grant_from_value(&arr[i], &mut g, &mut ok);
+            permission_from_value(&arr[i], &mut g, &mut ok);
             if ok {
                 out.push(g);
             }
@@ -266,26 +286,26 @@ pub fn grants_from_doc(doc: &Value, out: &mut Vec<AgentPermissionGrant>) {
     }
 }
 
-fn grant_matches(grant: &AgentPermissionGrant, agent_id: &str, action: &str, out: &mut bool) {
-    let star = grant.agent_id == "*" && agent_id.is_empty() == false;
-    let named = agent_id.is_empty() == false && grant.agent_id == agent_id;
-    let unbound = grant.agent_id == "unbound" && agent_id.is_empty();
+fn permission_matches(record: &AgentPermission, agent_id: &str, action: &str, out: &mut bool) {
+    let star = record.agent_id == "*" && !agent_id.is_empty();
+    let named = !agent_id.is_empty() && record.agent_id == agent_id;
+    let unbound = record.agent_id == "unbound" && agent_id.is_empty();
     let agent_ok = star || named || unbound;
-    let action_ok = grant.action == "*" || grant.action == action;
+    let action_ok = record.action == "*" || record.action == action;
     *out = agent_ok && action_ok;
 }
 
-pub fn agent_is_granted(
+pub fn agent_has_permission(
     agent_id: &str,
     action: &str,
-    grants: &[AgentPermissionGrant],
+    records: &[AgentPermission],
     out: &mut bool,
 ) {
     *out = false;
     let mut i = 0usize;
-    while i < grants.len() {
+    while i < records.len() {
         let mut hit = false;
-        grant_matches(&grants[i], agent_id, action, &mut hit);
+        permission_matches(&records[i], agent_id, action, &mut hit);
         if hit {
             *out = true;
             return;
@@ -315,36 +335,31 @@ pub fn compile_agent_permission_profile_wall(
     let agent_id = req.agent_id.trim();
     let action = req.action.trim();
     if agent_id.is_empty() && action.is_empty() {
-        AdmitWall::open_into(WALL_AGENT_PERMISSION, wall);
+        open_into(WALL_AGENT_PERMISSION, wall);
         return;
     }
-    let mut grants: Vec<AgentPermissionGrant> = Vec::new();
-    grants_from_doc(doc, &mut grants);
+    let meta = meta_of(doc);
+    let mut declared = false;
+    field_present(meta, "agent_permission", &mut declared);
+    if !declared {
+        open_into(WALL_AGENT_PERMISSION, wall);
+        return;
+    }
+    let mut records: Vec<AgentPermission> = Vec::new();
+    permissions_from_doc(doc, &mut records);
     let mut id = String::new();
     agent_permission_wall_id(agent_id, action, &mut id);
-    if grants.is_empty() {
-        AdmitWall::close_into(
-            &id,
-            "GAP dimension agent_permission closed: empty grants DENY on miss when an agent action is judged",
-            wall,
-        );
+    if records.is_empty() {
+        close_into(&id, DENY_NO_PERMISSION, wall);
         return;
     }
-    let mut granted = false;
-    agent_is_granted(agent_id, action, &grants, &mut granted);
-    if granted {
-        AdmitWall::open_into(&id, wall);
+    let mut allowed = false;
+    agent_has_permission(agent_id, action, &records, &mut allowed);
+    if allowed {
+        open_into(&id, wall);
         return;
     }
-    let mut reason = String::from("GAP dimension agent_permission closed: agent ");
-    if agent_id.is_empty() {
-        reason.push_str("unbound");
-    } else {
-        reason.push_str(agent_id);
-    }
-    reason.push_str(" may not ");
-    reason.push_str(action);
-    AdmitWall::close_into(&id, &reason, wall);
+    close_into(&id, DENY_NO_PERMISSION, wall);
 }
 
 pub fn action_path_matches_prefix(action_path: &str, prefix: &str, out: &mut bool) {
@@ -358,7 +373,7 @@ pub fn action_path_matches_prefix(action_path: &str, prefix: &str, out: &mut boo
         *out = true;
         return;
     }
-    if a.starts_with(p) == false {
+    if !a.starts_with(p) {
         return;
     }
     let last = p.as_bytes()[p.len() - 1];
@@ -380,12 +395,12 @@ pub fn wrap_or_prefix_binds(
     *out = false;
     let w = gap_wrap.trim();
     let nw = node_wrap.trim();
-    if w.is_empty() == false && w == nw {
+    if !w.is_empty() && w == nw {
         *out = true;
         return;
     }
     let pref = gap_prefix.trim();
-    if pref.is_empty() == false {
+    if !pref.is_empty() {
         action_path_matches_prefix(action_path, pref, out);
     }
 }
@@ -397,15 +412,15 @@ pub fn compile_wrap_prefix_bind(doc: &Value, req: &LiveAdmitRequest, wall: &mut 
     json_str(meta, "wrap", &mut wrap);
     json_str(meta, "action_path_prefix", &mut prefix);
     if wrap.is_empty() && prefix.is_empty() {
-        AdmitWall::open_into(WALL_WRAP_BIND, wall);
+        open_into(WALL_WRAP_BIND, wall);
         return;
     }
     let mut binds = false;
     wrap_or_prefix_binds(&wrap, &prefix, &req.wrap, &req.action_path, &mut binds);
     if binds {
-        AdmitWall::open_into(WALL_WRAP_BIND, wall);
+        open_into(WALL_WRAP_BIND, wall);
     } else {
-        AdmitWall::close_into(
+        close_into(
             WALL_WRAP_BIND,
             "wrap or action_path_prefix does not bind this action_path",
             wall,
@@ -416,247 +431,109 @@ pub fn compile_wrap_prefix_bind(doc: &Value, req: &LiveAdmitRequest, wall: &mut 
 pub fn compile_guard_wall(doc: &Value, wall: &mut AdmitWall) {
     let p = doc.get("pattern");
     if p.is_none() {
-        AdmitWall::open_into(WALL_PATTERN_GUARD, wall);
+        open_into(WALL_PATTERN_GUARD, wall);
         return;
     }
     let p = p.unwrap();
     if p.is_string() {
-        AdmitWall::open_into(WALL_PATTERN_GUARD, wall);
+        open_into(WALL_PATTERN_GUARD, wall);
         return;
     }
     let g = p.get("guard");
     if g.is_none() {
-        AdmitWall::open_into(WALL_PATTERN_GUARD, wall);
+        open_into(WALL_PATTERN_GUARD, wall);
         return;
     }
     let g = g.unwrap();
     if g.is_string() {
-        AdmitWall::open_into(WALL_PATTERN_GUARD, wall);
+        open_into(WALL_PATTERN_GUARD, wall);
         return;
     }
     if g.is_object() {
         let expr = g.get("expr").and_then(|x| x.as_str()).unwrap_or("").trim();
         if expr.is_empty() {
-            AdmitWall::close_into(
+            close_into(
                 WALL_PATTERN_GUARD,
                 "structured pattern.guard requires expr",
                 wall,
             );
         } else {
-            AdmitWall::open_into(WALL_PATTERN_GUARD, wall);
+            open_into(WALL_PATTERN_GUARD, wall);
         }
         return;
     }
-    AdmitWall::close_into(
+    close_into(
         WALL_PATTERN_GUARD,
         "pattern.guard must be a string or a structured object",
         wall,
     );
 }
 
-fn parse_scalar(raw: &str, out: &mut Value) {
-    let s = raw.trim();
-    if s == "true" {
-        *out = Value::Bool(true);
-        return;
-    }
-    if s == "false" {
-        *out = Value::Bool(false);
-        return;
-    }
-    if s == "null" || s == "~" {
-        *out = Value::Null;
-        return;
-    }
-    if let Ok(n) = s.parse::<i64>() {
-        *out = Value::Number(n.into());
-        return;
-    }
-    let bytes = s.as_bytes();
-    if 1 < s.len() && bytes[0] == 34 && bytes[s.len() - 1] == 34 {
-        *out = Value::String(s[1..s.len() - 1].to_string());
-        return;
-    }
-    *out = Value::String(String::from(s));
-}
-
-struct YamlLine {
-    indent: usize,
-    text: String,
-}
-
-fn yaml_lines(src: &str, out: &mut Vec<YamlLine>) {
-    out.clear();
-    for raw in src.lines() {
-        let mut indent = 0usize;
-        let bytes = raw.as_bytes();
-        while indent < bytes.len() && bytes[indent] == 32 {
-            indent += 1;
-        }
-        let text = raw[indent..].trim_end().to_string();
-        if text.is_empty() || text.starts_with("#") {
-            continue;
-        }
-        out.push(YamlLine { indent, text });
-    }
-}
-
-fn parse_yaml_block(
-    lines: &[YamlLine],
-    start: usize,
-    parent_indent: usize,
-    out: &mut Value,
-    next_i: &mut usize,
-) {
-    if lines.len() <= start {
-        *out = Value::Null;
-        *next_i = start;
-        return;
-    }
-    let is_list = lines[start].text.starts_with("- ");
-    if is_list {
-        let mut arr: Vec<Value> = Vec::new();
-        let mut i = start;
-        while i < lines.len() {
-            if lines[i].indent < parent_indent {
-                break;
-            }
-            if lines[i].indent == parent_indent && lines[i].text.starts_with("- ") == false {
-                break;
-            }
-            if lines[i].indent != parent_indent || lines[i].text.starts_with("- ") == false {
-                break;
-            }
-            let item = lines[i].text[2..].trim();
-            if item.is_empty() {
-                let mut child = Value::Null;
-                let mut n = 0usize;
-                parse_yaml_block(lines, i + 1, parent_indent + 2, &mut child, &mut n);
-                arr.push(child);
-                i = n;
-                continue;
-            }
-            if let Some((k, v)) = item.split_once(char::from(58)) {
-                let key = k.trim();
-                let rest = v.trim();
-                let mut map = Map::new();
-                if rest.is_empty() {
-                    let mut child = Value::Null;
-                    let mut n = 0usize;
-                    parse_yaml_block(lines, i + 1, lines[i].indent + 2, &mut child, &mut n);
-                    map.insert(key.to_string(), child);
-                    i = n;
-                } else {
-                    let mut sc = Value::Null;
-                    parse_scalar(rest, &mut sc);
-                    map.insert(key.to_string(), sc);
-                    i += 1;
-                }
-                while i < lines.len()
-                    && parent_indent < lines[i].indent
-                    && lines[i].text.starts_with("- ") == false
-                {
-                    if let Some((k2, v2)) = lines[i].text.split_once(char::from(58)) {
-                        let key2 = k2.trim();
-                        let rest2 = v2.trim();
-                        if rest2.is_empty() {
-                            let mut child = Value::Null;
-                            let mut n = 0usize;
-                            parse_yaml_block(lines, i + 1, lines[i].indent + 2, &mut child, &mut n);
-                            map.insert(key2.to_string(), child);
-                            i = n;
-                        } else {
-                            let mut sc = Value::Null;
-                            parse_scalar(rest2, &mut sc);
-                            map.insert(key2.to_string(), sc);
-                            i += 1;
-                        }
-                    } else {
-                        i += 1;
-                    }
-                }
-                arr.push(Value::Object(map));
-                continue;
-            }
-            let mut sc = Value::Null;
-            parse_scalar(item, &mut sc);
-            arr.push(sc);
-            i += 1;
-        }
-        *out = Value::Array(arr);
-        *next_i = i;
-        return;
-    }
-    let mut map = Map::new();
-    let mut i = start;
-    while i < lines.len() {
-        if lines[i].indent < parent_indent {
-            break;
-        }
-        if lines[i].indent == parent_indent && lines[i].text.starts_with("- ") {
-            break;
-        }
-        if lines[i].indent != parent_indent {
-            break;
-        }
-        if let Some((k, v)) = lines[i].text.split_once(char::from(58)) {
-            let key = k.trim();
-            let rest = v.trim();
-            if rest.is_empty() {
-                if i + 1 < lines.len() && parent_indent < lines[i + 1].indent {
-                    let next_indent = lines[i + 1].indent;
-                    let mut child = Value::Null;
-                    let mut n = 0usize;
-                    parse_yaml_block(lines, i + 1, next_indent, &mut child, &mut n);
-                    map.insert(key.to_string(), child);
-                    i = n;
-                } else {
-                    map.insert(key.to_string(), Value::Null);
-                    i += 1;
-                }
-            } else {
-                let mut sc = Value::Null;
-                parse_scalar(rest, &mut sc);
-                map.insert(key.to_string(), sc);
-                i += 1;
-            }
-        } else {
-            i += 1;
-        }
-    }
-    *out = Value::Object(map);
-    *next_i = i;
-}
-
-pub fn parse_yaml_gap(src: &str, out: &mut Value, err: &mut String) {
+/// Convert one YAML node to the JSON instruction value. Mapping keys must be strings.
+pub fn yaml_to_json(node: &Yaml, out: &mut Value, err: &mut String) {
     err.clear();
-    let mut lines: Vec<YamlLine> = Vec::new();
-    yaml_lines(src, &mut lines);
-    if lines.is_empty() {
-        err.push_str("empty GAP source");
-        return;
-    }
-    let indent = lines[0].indent;
-    let mut next_i = 0usize;
-    parse_yaml_block(&lines, 0, indent, out, &mut next_i);
-    if out.is_null() {
-        err.push_str("YAML GAP source parsed empty");
+    match node {
+        Yaml::Null => *out = Value::Null,
+        Yaml::Boolean(b) => *out = Value::Bool(*b),
+        Yaml::Integer(i) => *out = Value::Number((*i).into()),
+        Yaml::Real(raw) => match raw.parse::<f64>().ok().and_then(Number::from_f64) {
+            Some(n) => *out = Value::Number(n),
+            None => {
+                err.push_str("number ");
+                err.push_str(raw);
+                err.push_str(" is not a finite real");
+            }
+        },
+        Yaml::String(s) => *out = Value::String(s.clone()),
+        Yaml::Array(items) => {
+            let mut arr = Vec::with_capacity(items.len());
+            for item in items {
+                let mut v = Value::Null;
+                yaml_to_json(item, &mut v, err);
+                if !err.is_empty() {
+                    return;
+                }
+                arr.push(v);
+            }
+            *out = Value::Array(arr);
+        }
+        Yaml::Hash(map) => {
+            let mut obj = Map::new();
+            for (k, v) in map {
+                let key = match k {
+                    Yaml::String(s) => s.clone(),
+                    _ => {
+                        err.push_str("mapping key is not a string");
+                        return;
+                    }
+                };
+                let mut x = Value::Null;
+                yaml_to_json(v, &mut x, err);
+                if !err.is_empty() {
+                    return;
+                }
+                obj.insert(key, x);
+            }
+            *out = Value::Object(obj);
+        }
+        Yaml::Alias(_) => err.push_str("YAML alias does not resolve to an anchor"),
+        Yaml::BadValue => err.push_str("YAML value could not be read"),
     }
 }
 
-pub fn parse_gap_source(src: &str, out: &mut Value, err: &mut String) {
+/// Read every document of a GAP source. JSON-encoded GAP is one document. YAML 1.2 GAP
+/// source may hold several documents separated by `---`. Empty documents are dropped.
+pub fn read_gap_documents(src: &str, out: &mut Vec<Value>, err: &mut String) {
+    out.clear();
     err.clear();
     let t = src.trim();
     if t.is_empty() {
         err.push_str("empty GAP source");
         return;
     }
-    let bytes = t.as_bytes();
-    if bytes[0] == 123 {
+    if t.starts_with('{') {
         match serde_json::from_str(t) {
-            Ok(v) => {
-                *out = v;
-            }
+            Ok(v) => out.push(v),
             Err(e) => {
                 err.push_str("JSON GAP source parse failed: ");
                 err.push_str(&e.to_string());
@@ -664,7 +541,62 @@ pub fn parse_gap_source(src: &str, out: &mut Value, err: &mut String) {
         }
         return;
     }
-    parse_yaml_gap(t, out, err);
+    let docs = match YamlLoader::load_from_str(src) {
+        Ok(d) => d,
+        Err(e) => {
+            err.push_str("YAML GAP source parse failed: ");
+            err.push_str(&e.to_string());
+            return;
+        }
+    };
+    for (i, doc) in docs.iter().enumerate() {
+        let mut v = Value::Null;
+        yaml_to_json(doc, &mut v, err);
+        if !err.is_empty() {
+            let detail = std::mem::take(err);
+            err.push_str("YAML GAP source document ");
+            err.push_str(&i.to_string());
+            err.push_str(": ");
+            err.push_str(&detail);
+            out.clear();
+            return;
+        }
+        if !v.is_null() {
+            out.push(v);
+        }
+    }
+    if out.is_empty() {
+        err.push_str("YAML GAP source parsed empty");
+    }
+}
+
+/// Read a YAML GAP source that holds exactly one instruction document.
+pub fn parse_yaml_gap(src: &str, out: &mut Value, err: &mut String) {
+    let mut docs = Vec::new();
+    read_gap_documents(src, &mut docs, err);
+    if !err.is_empty() {
+        return;
+    }
+    one_document(docs, out, err);
+}
+
+fn one_document(mut docs: Vec<Value>, out: &mut Value, err: &mut String) {
+    if docs.len() != 1 {
+        err.push_str("a GAP source judged at Admit holds one instruction document, found ");
+        err.push_str(&docs.len().to_string());
+        return;
+    }
+    *out = docs.remove(0);
+}
+
+/// Read the one instruction of a GAP source. The live kernel judges exactly this object.
+pub fn parse_gap_source(src: &str, out: &mut Value, err: &mut String) {
+    let mut docs = Vec::new();
+    read_gap_documents(src, &mut docs, err);
+    if !err.is_empty() {
+        return;
+    }
+    one_document(docs, out, err);
 }
 
 pub fn live_admit_gap_profile(
@@ -676,19 +608,16 @@ pub fn live_admit_gap_profile(
     err.clear();
     let mut doc = Value::Null;
     parse_gap_source(source, &mut doc, err);
-    if err.is_empty() == false {
+    if !err.is_empty() {
         return;
     }
     let mut walls: Vec<AdmitWall> = Vec::new();
-    let mut w1 = AdmitWall {
-        id: String::new(),
-        closed: false,
-        reason: String::new(),
-    };
+    // the wall row is the public AdmitWall row.
+    let mut w1 = AdmitWall::open("");
     let mut w2 = w1.clone();
     let mut w3 = w1.clone();
     let mut w4 = w1.clone();
-    compile_trust_ring_rank_wall(&doc, &mut w1);
+    compile_leftover_rank_field_wall(&doc, &mut w1);
     compile_agent_permission_profile_wall(&doc, req, &mut w2);
     compile_wrap_prefix_bind(&doc, req, &mut w3);
     compile_guard_wall(&doc, &mut w4);
@@ -706,6 +635,12 @@ pub mod parse_gap_source {
         pub result: Value,
         pub err: String,
     }
+    impl Default for ParseGapSource {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl ParseGapSource {
         pub fn new() -> Self {
             Self {
@@ -728,15 +663,18 @@ pub mod live_admit_gap_profile {
         pub result: AdmitResult,
         pub err: String,
     }
+    impl Default for LiveAdmitGapProfile {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl LiveAdmitGapProfile {
         pub fn new() -> Self {
             Self {
                 source: String::new(),
                 request: LiveAdmitRequest::default(),
-                result: AdmitResult {
-                    allow: true,
-                    closed: Vec::new(),
-                },
+                result: AdmitResult::new(Vec::new(), Vec::new()),
                 err: String::new(),
             }
         }
@@ -756,6 +694,12 @@ pub mod enabled_is_load_time {
         pub source: String,
         pub result: bool,
     }
+    impl Default for EnabledIsLoadTime {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl EnabledIsLoadTime {
         pub fn new() -> Self {
             Self {
@@ -812,15 +756,11 @@ mod tests {
         let mut err = String::new();
         parse_gap_source(&sample_yaml_profile(), &mut doc, &mut err);
         assert_eq!(err.as_str(), "");
-        let mut wall = AdmitWall {
-            id: String::new(),
-            closed: false,
-            reason: String::new(),
-        };
+        let mut wall = AdmitWall::open("");
         compile_guard_wall(&doc, &mut wall);
-        assert_eq!(wall.closed, false);
+        assert!(!wall.closed);
         let g = doc["pattern"]["guard"]["expr"].as_str().unwrap_or("");
-        assert_eq!(g.contains("finance"), true);
+        assert!(g.contains("finance"));
     }
 
     #[test]
@@ -837,14 +777,11 @@ mod tests {
     #[test]
     fn trust_ring_user_fails_live_admit() {
         let req = LiveAdmitRequest::default();
-        let mut result = AdmitResult {
-            allow: true,
-            closed: Vec::new(),
-        };
+        let mut result = AdmitResult::new(Vec::new(), Vec::new());
         let mut err = String::new();
         live_admit_gap_profile(&sample_yaml_rank(), &req, &mut result, &mut err);
         assert_eq!(err.as_str(), "");
-        assert_eq!(result.allow, false);
+        assert!(!result.allow);
         let mut hit = false;
         let mut i = 0usize;
         while i < result.closed.len() {
@@ -853,7 +790,7 @@ mod tests {
             }
             i += 1;
         }
-        assert_eq!(hit, true);
+        assert!(hit);
     }
 }
 
@@ -873,14 +810,11 @@ mod tests_more {
             wrap: String::from("finance"),
             action_path: String::from("finance/pay"),
         };
-        let mut result = AdmitResult {
-            allow: true,
-            closed: Vec::new(),
-        };
+        let mut result = AdmitResult::new(Vec::new(), Vec::new());
         let mut err = String::new();
         live_admit_gap_profile(&profile(), &req, &mut result, &mut err);
         assert_eq!(err.as_str(), "");
-        assert_eq!(result.allow, false);
+        assert!(!result.allow);
         let mut may_id = String::new();
         agent_permission_wall_id("agent-b", "write", &mut may_id);
         let mut hit = false;
@@ -891,13 +825,13 @@ mod tests_more {
             }
             i += 1;
         }
-        assert_eq!(hit, true);
+        assert!(hit);
         let mut skip = true;
         enabled_skips_admit(&Value::Bool(false), &mut skip);
-        assert_eq!(skip, false);
+        assert!(!skip);
         let mut load = false;
         enabled_is_load_time(&mut load);
-        assert_eq!(load, true);
+        assert!(load);
     }
 
     #[test]
@@ -906,11 +840,7 @@ mod tests_more {
         let mut err = String::new();
         parse_gap_source(&profile(), &mut doc, &mut err);
         assert_eq!(err.as_str(), "");
-        let mut a = AdmitWall {
-            id: String::new(),
-            closed: false,
-            reason: String::new(),
-        };
+        let mut a = AdmitWall::open("");
         let mut b = a.clone();
         compile_agent_permission_profile_wall(
             &doc,
@@ -932,8 +862,8 @@ mod tests_more {
             },
             &mut b,
         );
-        assert_eq!(a.closed, false);
-        assert_eq!(b.closed, true);
+        assert!(!a.closed);
+        assert!(b.closed);
     }
 
     #[test]
@@ -942,11 +872,7 @@ mod tests_more {
         let mut err = String::new();
         parse_gap_source(&profile(), &mut doc, &mut err);
         assert_eq!(err.as_str(), "");
-        let mut okw = AdmitWall {
-            id: String::new(),
-            closed: false,
-            reason: String::new(),
-        };
+        let mut okw = AdmitWall::open("");
         let mut bad = okw.clone();
         compile_wrap_prefix_bind(
             &doc,
@@ -968,63 +894,60 @@ mod tests_more {
             },
             &mut bad,
         );
-        assert_eq!(okw.closed, false);
-        assert_eq!(bad.closed, true);
+        assert!(!okw.closed);
+        assert!(bad.closed);
     }
 
     #[test]
     fn schema_v13_body_contains_required_fields() {
         let mut body = String::new();
         schema_v13_body(&mut body);
-        assert_eq!(body.contains("agent_permission"), true);
-        assert_eq!(body.contains("action_path_prefix"), true);
-        assert_eq!(body.contains("wrap"), true);
-        assert_eq!(body.contains("oneOf"), true);
-        assert_eq!(body.contains("load-time"), true);
-        assert_eq!(body.contains("Presence of trust_ring is Deny"), true);
-        assert_eq!(body.contains("Presence of rank is Deny"), true);
-        assert_eq!(body.contains("Every non-empty rank value is Deny"), true);
-        assert_eq!(
-            body.contains("Leftover rank wall id is gap:leftover_rank_field"),
-            true
-        );
-        assert_eq!(body.contains("covenants"), true);
-        assert_eq!(body.contains("scanners"), true);
-        assert_eq!(body.contains("v1.3"), true);
+        assert!(body.contains("agent_permission"));
+        assert!(body.contains("action_path_prefix"));
+        assert!(body.contains("wrap"));
+        assert!(body.contains("oneOf"));
+        assert!(body.contains("load-time"));
+        assert!(body.contains("Presence of trust_ring is Deny"));
+        assert!(body.contains("Presence of rank is Deny"));
+        assert!(body.contains("Every non-empty rank value is Deny"));
+        assert!(body.contains("Leftover rank wall id is gap:leftover_rank_field"));
+        assert!(body.contains("covenants"));
+        assert!(body.contains("scanners"));
+        assert!(body.contains("v1.3"));
     }
 
     #[test]
-    fn classic_v1_and_v12_keep_covenants_and_scanners() {
-        let v1 = include_str!("../../../GAP meta schema v1.json");
-        let v12 = include_str!("../../../GAP meta schema v1.2.json");
-        assert_eq!(v1.contains("\"covenants\""), true);
-        assert_eq!(v1.contains("\"scanners\""), true);
-        assert_eq!(v12.contains("\"covenants\""), true);
-        assert_eq!(v12.contains("\"scanners\""), true);
-        assert_eq!(v1.contains("\"trust_ring\""), false);
-        assert_eq!(v12.contains("\"trust_ring\""), false);
-        assert_eq!(v1.contains("subprotocol"), false);
-        assert_eq!(v12.contains("subprotocol"), false);
-        assert_eq!(v12.contains("sandbox"), false);
+    fn schema_v13_json_is_the_v13_meta_schema() {
+        let schema: Value = serde_json::from_str(SCHEMA_V13_JSON).unwrap_or(Value::Null);
+        let mut id = String::new();
+        json_str(&schema, "$id", &mut id);
+        assert_eq!(
+            id.as_str(),
+            "https://gap-lang.aep.dev/schemas/gap-meta-schema-v1.3.json"
+        );
+        let meta = &schema["$defs"]["Metadata"];
+        assert_eq!(meta["additionalProperties"], Value::Bool(false));
+        assert!(meta["properties"].get("agent_permission").is_some());
+        assert!(meta["properties"].get("aep_version").is_some());
+        assert!(meta["properties"].get("trust_ring").is_none());
+        assert!(meta["properties"].get("rank").is_none());
     }
 
     #[test]
     fn schema_v13_json_presence_is_deny() {
         let body = include_str!("schema_v13.body");
-        assert_eq!(body.contains("Presence of trust_ring is Deny"), true);
-        assert_eq!(body.contains("Presence of rank is Deny"), true);
-        assert_eq!(body.contains("Every non-empty rank value is Deny"), true);
-        assert_eq!(body.contains("\"rank\":"), false);
-        assert_eq!(body.contains("\"trust_ring\":"), false);
-        assert_eq!(body.contains("subprotocol"), false);
-        assert_eq!(body.contains("documentary"), false);
-        assert_eq!(body.contains("Not a live Admit floor"), false);
-        assert_eq!(body.contains("unused at Admit"), false);
-        assert_eq!(
-            body.contains("\"enum\": [\"sandbox\", \"user\", \"system\", \"enterprise\"]"),
-            false
-        );
-        assert_eq!(body.contains("agent_permission"), true);
+        assert!(body.contains("Presence of trust_ring is Deny"));
+        assert!(body.contains("Presence of rank is Deny"));
+        assert!(body.contains("Every non-empty rank value is Deny"));
+        assert!(!body.contains("\"rank\":"));
+        assert!(!body.contains("\"trust_ring\":"));
+        assert!(!body.contains("subprotocol"));
+        assert_eq!(body, SCHEMA_V13_JSON);
+        assert!(!body.contains("documentary"));
+        assert!(!body.contains("Not a live Admit floor"));
+        assert!(!body.contains("unused at Admit"));
+        assert!(!body.contains("\"enum\": [\"sandbox\", \"user\", \"system\", \"enterprise\"]"));
+        assert!(body.contains("agent_permission"));
     }
 
     fn yaml_trust_ring(value: &str) -> String {
@@ -1046,21 +969,14 @@ mod tests_more {
         let mut err = String::new();
         parse_gap_source(src, &mut doc, &mut err);
         assert_eq!(err.as_str(), "");
-        let mut wall = AdmitWall {
-            id: String::new(),
-            closed: false,
-            reason: String::new(),
-        };
-        compile_trust_ring_rank_wall(&doc, &mut wall);
-        assert_eq!(wall.closed, true);
+        let mut wall = AdmitWall::open("");
+        compile_leftover_rank_field_wall(&doc, &mut wall);
+        assert!(wall.closed);
         assert_eq!(wall.id.as_str(), WALL_LEFTOVER_RANK_FIELD);
-        let mut result = AdmitResult {
-            allow: true,
-            closed: Vec::new(),
-        };
+        let mut result = AdmitResult::new(Vec::new(), Vec::new());
         live_admit_gap_profile(src, &LiveAdmitRequest::default(), &mut result, &mut err);
         assert_eq!(err.as_str(), "");
-        assert_eq!(result.allow, false);
+        assert!(!result.allow);
         let mut hit = false;
         let mut i = 0usize;
         while i < result.closed.len() {
@@ -1069,7 +985,7 @@ mod tests_more {
             }
             i += 1;
         }
-        assert_eq!(hit, true);
+        assert!(hit);
     }
 
     fn yaml_rank_field(value: &str) -> String {
@@ -1077,6 +993,13 @@ mod tests_more {
         s.push_str(value);
         s.push('\n');
         s
+    }
+
+    #[test]
+    fn document_that_sets_leftover_rank_field_closes() {
+        assert_rank_wall_closed(&yaml_rank_field(RANK_USER));
+        assert_rank_wall_closed(&json_meta_extra(",\"rank\":\"user\""));
+        assert_rank_wall_closed(&json_meta_extra(",\"trust_ring\":\"user\""));
     }
 
     #[test]
@@ -1105,6 +1028,12 @@ mod tests_more {
     }
 
     #[test]
+    fn leftover_score_and_tier_fields_close() {
+        assert_rank_wall_closed(&json_meta_extra(",\"trust_score\":1"));
+        assert_rank_wall_closed(&json_meta_extra(",\"trust_tier\":\"high\""));
+    }
+
+    #[test]
     fn presence_of_ring_ceiling_rank_keeps_compiled_wall_deny() {
         let src = String::from("address:\n  domain: com.example.old\n  id: rank-doc\npattern: old pattern\naction:\n  type: template\n  content: hello\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n  fleet:\n    spawn:\n      ring_ceiling: user\n");
         assert_rank_wall_closed(&src);
@@ -1112,12 +1041,11 @@ mod tests_more {
     }
 
     #[test]
-    fn empty_grants_deny_on_miss_for_agent_action() {
-        let src = String::from("address:\n  domain: com.example.live\n  id: empty-grants\npattern: p\naction:\n  type: template\n  content: c\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n");
-        let mut result = AdmitResult {
-            allow: true,
-            closed: Vec::new(),
-        };
+    fn empty_list_refuses_on_miss_for_agent_action() {
+        // A declared but empty agent_permission list refuses on miss. An
+        // undeclared list keeps the wall open, see compile_agent_permission_profile_wall.
+        let src = String::from("address:\n  domain: com.example.live\n  id: empty-list\npattern: p\naction:\n  type: template\n  content: c\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n  agent_permission: []\n");
+        let mut result = AdmitResult::new(Vec::new(), Vec::new());
         let mut err = String::new();
         live_admit_gap_profile(
             &src,
@@ -1131,7 +1059,7 @@ mod tests_more {
             &mut err,
         );
         assert_eq!(err.as_str(), "");
-        assert_eq!(result.allow, false);
+        assert!(!result.allow);
         let mut hit = false;
         let mut i = 0usize;
         while i < result.closed.len() {
@@ -1140,36 +1068,13 @@ mod tests_more {
             }
             i += 1;
         }
-        assert_eq!(hit, true);
-    }
-
-    #[test]
-    fn hvvc_as_process_live_admit() {
-        let mut svc = live_admit_gap_profile::LiveAdmitGapProfile::new();
-        svc.source = profile();
-        svc.request.agent_id = String::from("agent-a");
-        svc.request.action = String::from("write");
-        svc.request.wrap = String::from("finance");
-        svc.request.action_path = String::from("finance/pay");
-        svc.process();
-        assert_eq!(svc.err.as_str(), "");
-        assert_eq!(svc.result.allow, true);
-        let mut load = false;
-        enabled_is_load_time(&mut load);
-        assert_eq!(load, true);
+        assert!(hit);
     }
 
     #[test]
     fn leftover_rank_wall_id_is_gap_leftover_rank_field() {
         assert_eq!(WALL_LEFTOVER_RANK_FIELD, "gap:leftover_rank_field");
-        assert_eq!(WALL_LEFTOVER_RANK_FIELD.contains("trust_ring:rank"), false);
-    }
-
-    #[test]
-    fn document_that_sets_leftover_rank_field_closes() {
-        assert_rank_wall_closed(&yaml_rank_field(RANK_USER));
-        assert_rank_wall_closed(&json_meta_extra(",\"rank\":\"user\""));
-        assert_rank_wall_closed(&json_meta_extra(",\"trust_ring\":\"user\""));
+        assert!(!WALL_LEFTOVER_RANK_FIELD.contains("trust_ring:rank"));
     }
 
     #[test]
@@ -1179,18 +1084,11 @@ mod tests_more {
         let mut err = String::new();
         parse_gap_source(&src, &mut doc, &mut err);
         assert_eq!(err.as_str(), "");
-        let mut wall = AdmitWall {
-            id: String::new(),
-            closed: false,
-            reason: String::new(),
-        };
-        compile_trust_ring_rank_wall(&doc, &mut wall);
-        assert_eq!(wall.closed, false);
+        let mut wall = AdmitWall::close("", "unset");
+        compile_leftover_rank_field_wall(&doc, &mut wall);
+        assert!(!wall.closed);
         assert_eq!(wall.id.as_str(), WALL_LEFTOVER_RANK_FIELD);
-        let mut result = AdmitResult {
-            allow: true,
-            closed: Vec::new(),
-        };
+        let mut result = AdmitResult::new(Vec::new(), Vec::new());
         live_admit_gap_profile(
             &src,
             &LiveAdmitRequest {
@@ -1203,14 +1101,108 @@ mod tests_more {
             &mut err,
         );
         assert_eq!(err.as_str(), "");
-        let mut hit = false;
-        let mut i = 0usize;
-        while i < result.closed.len() {
-            if result.closed[i].id == WALL_LEFTOVER_RANK_FIELD {
-                hit = true;
-            }
-            i += 1;
-        }
-        assert_eq!(hit, false);
+        assert!(!result
+            .closed
+            .iter()
+            .any(|w| w.id == WALL_LEFTOVER_RANK_FIELD));
+    }
+
+    #[test]
+    fn undeclared_agent_permission_keeps_the_wall_open() {
+        let src = String::from("address:\n  domain: com.example.live\n  id: no-list\npattern: p\naction:\n  type: template\n  content: c\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n");
+        let mut doc = Value::Null;
+        let mut err = String::new();
+        parse_gap_source(&src, &mut doc, &mut err);
+        assert_eq!(err.as_str(), "");
+        let mut wall = AdmitWall::close("", "unset");
+        compile_agent_permission_profile_wall(
+            &doc,
+            &LiveAdmitRequest {
+                agent_id: String::from("agent-a"),
+                action: String::from("write"),
+                wrap: String::new(),
+                action_path: String::new(),
+            },
+            &mut wall,
+        );
+        assert!(!wall.closed);
+        assert_eq!(wall.id.as_str(), WALL_AGENT_PERMISSION);
+    }
+
+    #[test]
+    fn yaml_reals_and_single_quotes_read_as_yaml() {
+        let src = "address:\n  domain: com.example.live\n  id: scalars\npattern: 'it''s'\naction:\n  type: template\n  content: c\nweight: 0.75\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n  grade: 8\n";
+        let mut doc = Value::Null;
+        let mut err = String::new();
+        parse_gap_source(src, &mut doc, &mut err);
+        assert_eq!(err.as_str(), "");
+        assert_eq!(doc["weight"].as_f64(), Some(0.75));
+        assert_eq!(doc["metadata"]["grade"].as_i64(), Some(8));
+        assert_eq!(doc["pattern"].as_str(), Some("it's"));
+        assert_eq!(doc["metadata"]["version"].as_str(), Some("1.0.0"));
+    }
+
+    #[test]
+    fn block_scalar_does_not_hide_the_metadata_below_it() {
+        // A block scalar above metadata once stopped the reader, so trust_ring below it
+        // never reached the leftover rank wall and the document passed Admit.
+        let src = "address:\n  domain: com.example.old\n  id: hidden-rank\npattern: |\n  Review pull requests.\n  Name file and line.\naction:\n  type: template\n  content: >\n    folded\n    text\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n  trust_ring: user\n  agent_permission: [agent-a/write]\n";
+        let mut doc = Value::Null;
+        let mut err = String::new();
+        parse_gap_source(src, &mut doc, &mut err);
+        assert_eq!(err.as_str(), "");
+        assert_eq!(
+            doc["pattern"].as_str(),
+            Some("Review pull requests.\nName file and line.\n")
+        );
+        assert_eq!(doc["action"]["content"].as_str(), Some("folded text\n"));
+        let mut records = Vec::new();
+        permissions_from_doc(&doc, &mut records);
+        assert_eq!(records.len(), 1);
+        assert_eq!(records[0].agent_id.as_str(), "agent-a");
+        let mut result = AdmitResult::new(Vec::new(), Vec::new());
+        live_admit_gap_profile(src, &LiveAdmitRequest::default(), &mut result, &mut err);
+        assert_eq!(err.as_str(), "");
+        assert!(!result.allow);
+        assert!(result
+            .closed
+            .iter()
+            .any(|w| w.id == WALL_LEFTOVER_RANK_FIELD));
+    }
+
+    #[test]
+    fn admit_source_holds_one_instruction() {
+        let one = "address:\n  domain: a.b\n  id: x\n";
+        let two = format!("{one}---\n{one}");
+        let mut doc = Value::Null;
+        let mut err = String::new();
+        parse_gap_source(&two, &mut doc, &mut err);
+        assert!(err.contains("one instruction document, found 2"));
+        let mut docs = Vec::new();
+        read_gap_documents(&two, &mut docs, &mut err);
+        assert_eq!(err.as_str(), "");
+        assert_eq!(docs.len(), 2);
+        parse_gap_source("a: [1, 2\n", &mut doc, &mut err);
+        assert!(err.starts_with("YAML GAP source parse failed"));
+        parse_gap_source("{1: 2}", &mut doc, &mut err);
+        assert!(err.starts_with("JSON GAP source parse failed"));
+        parse_gap_source("? [a]\n: b\n", &mut doc, &mut err);
+        assert!(err.contains("mapping key is not a string"));
+    }
+
+    #[test]
+    fn hvvc_as_process_live_admit() {
+        let mut svc = live_admit_gap_profile::LiveAdmitGapProfile::new();
+        svc.source = profile();
+        svc.request.agent_id = String::from("agent-a");
+        svc.request.action = String::from("write");
+        svc.request.wrap = String::from("finance");
+        svc.request.action_path = String::from("finance/pay");
+        svc.process();
+        assert_eq!(svc.err.as_str(), "");
+        assert!(svc.result.allow);
+        let mut load = false;
+        enabled_is_load_time(&mut load);
+        assert!(load);
     }
 }

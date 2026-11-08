@@ -1,8 +1,10 @@
 # @PAD: gap-285-p1-schema-profile-v13
 # @GCDE: gaplune.policy.v1
+# GAP-OPEN-SOURCE is the one source of this crate. AEP holds a byte pinned copy of
+# this manifest, LICENSE and src. VERSIONING.md names the version rules.
 [package]
 name = "gap-schema-profile-v13"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "Classic GAP v1.3 live Admit profile. Agent permission is agent_permission. Presence of trust_ring is Deny. enabled is load-time."
 license = "Apache-2.0"
@@ -14,3 +16,7 @@ path = "src/main.rs"
 
 [dependencies]
 serde_json = "1"
+yaml-rust2 = "0.13"
+
+[lints.rust]
+unsafe_code = "deny"

@@ -2,19 +2,22 @@
 
 GAP is the native instructions language for governed agency in the Agent Element Protocol and an instruction is the atomic unit so agents, workflows, validators, compositions and governance rules are all instructions that generate further instructions.
 
-Live evaluation follows AEP 2.8.5: seal a lattice-channel capsule, freeze the clock at seal, wait 1000 ms, run every check together as collect-all Admit and then Apply the allowed action. After the wait the client collects by capsule hash and live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure. Presence of trust_ring is Deny. Agent permission is agent_permission.
+Live evaluation follows AEP 2.9.0: seal a lattice-channel capsule, freeze the clock at seal, wait 1000 ms, run every check together as collect-all Admit and then Apply the allowed action. After the wait the client collects by capsule hash and live AEP 2.9.0 EPSCOM trust bundle mode is sha256-structure. Presence of trust_ring is Deny. Agent permission is agent_permission.
 
 ## Public GAP tree
 
 Classic GAP on this repository is the public language surface for schema files, product packages and this README.
 
-- Schema files sit at repo root: `GAP meta schema v1.json`, `GAP meta schema v1.2.json` and `GAP meta schema v1.3.json`.
-- Product packages live under packages. Live package folders include `packages/gap-schema-profile-v13/` and `packages/gap-closed-wall-deny/`.
-- Compile scripts live on the AEP vendor tree at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/lib/gap-compile.mjs
+- Schema files live in schemas: `schemas/gap-meta-schema-v1.1.json`, `schemas/gap-meta-schema-v1.2.json` and `schemas/gap-meta-schema-v1.3.json`. The live schema is v1.3.
+- The old root names `GAP meta schema v1.json`, `GAP meta schema v1.2.json` and `GAP meta schema v1.3.json` are byte copies kept for one release. VERSIONING.md names the release that removes them.
+- Product packages live under packages. Live package folders include `packages/gap-schema-profile-v13/`, `packages/gap-closed-wall-deny/` and `packages/gapc/`.
+- `gapc` in `packages/gapc/` checks every `.gap` source against the live schema and the load time profile walls and compiles it to JSON-encoded GAP. GAP compiles its own fixtures with it.
+- CAW profile compile for AEP runtimes lives on the AEP vendor tree at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/lib/gap-compile.mjs
 - Reference instructions live on the AEP vendor tree at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/policies/reference/
 - GAP policies here declare what agents must do.
 - GAP authors instructions and CAW enforces the host sandbox so they are not two policy stacks.
 - Operators edit `.gap` and run the vendor compile script then `aep-caw session create --profile <name>`.
+- Run `gapc check` on every edited `.gap` file before the vendor compile script.
 - `caw-coding-agent.gap` at `dev.aep.caw/coding-agent.v1` is the default profile for a governed coding agent.
 - `${PROJECT_ROOT}` is read-write.
 - `${AEP_AGENT_CONFIG_DIR}`, `${HOME}/.config/agent` and `${HOME}/.local/share/agent` are read-only.
@@ -37,7 +40,7 @@ GAP uses three layers and no layer requires the LLM to have seen GAP during trai
 
 ## Live evaluation
 
-The AEP 2.8.5 live path seals a lattice-channel capsule, freezes the clock at seal and waits 1000 ms for the compiled Base Node kernel pulse. Every check then runs together as collect-all Admit and the allowed action is Applied.
+The AEP 2.9.0 live path seals a lattice-channel capsule, freezes the clock at seal and waits 1000 ms for the compiled Base Node kernel pulse. Every check then runs together as collect-all Admit and the allowed action is Applied.
 
 - `PULSE_MS` is a kernel constant rather than a dynAEP YAML key.
 - Putting a capsule on the dock is a transport step.
@@ -89,10 +92,10 @@ Pulse hold is the wait after a sealed capsule is opened. Base Node freezes the c
 
 ### Live trust bundle
 
-- Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure.
+- Live AEP 2.9.0 EPSCOM trust bundle mode is sha256-structure.
 - Optional proof algorithms may still name Ed25519 or ML-DSA-65.
 - The signatures loader denies an ML-DSA claim on sha256-structure.
-- Signed proof is not the default live AEP 2.8.5 attach.
+- Signed proof is not the default live AEP 2.9.0 attach.
 - Collect-all Admit collects by capsule hash on that same path.
 - Presence of trust_ring is Deny.
 - Presence of trust_ring on a live GAP document is Deny.
@@ -110,7 +113,7 @@ Keep `.gap` as GAP source because collect-all Admit collects by capsule hash and
 - Syntax: YAML 1.2 source. Live kernel policies may be JSON-encoded GAP instructions. YAML remains valid GAP source. The kernel reads the instruction object not the skin.
 - One instruction per document. Multi-instruction families use YAML multi-document syntax (`---` separators).
 - Keep `.gap` as GAP source.
-- Collect-all Admit collects by capsule hash. Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure.
+- Collect-all Admit collects by capsule hash. Live AEP 2.9.0 EPSCOM trust bundle mode is sha256-structure.
 - Writing and security are always-on stems and they evaluate on every action path.
 - Other GAP walls bind to a wrap or prefix.
 - A finance wrap GAP item does not close an inventory wrap ping.
@@ -124,7 +127,7 @@ Keep `.gap` as GAP source because collect-all Admit collects by capsule hash and
 >   domain: com.example.finance
 >   id: pay.v1
 > pattern:
->   guard: true
+>   guard: "true"
 > action:
 >   type: template
 >   content: pay
@@ -142,16 +145,16 @@ Keep `.gap` as GAP source because collect-all Admit collects by capsule hash and
 
 ### JSON-encoded kernel policy
 
-AEP 2.8.5 reference policies are JSON objects with pattern.guard and the same instruction fields. The source below is legal GAP because the kernel reads the instruction object not the skin.
+AEP 2.9.0 reference policies are JSON objects with pattern.guard and the same instruction fields. The source below is legal GAP because the kernel reads the instruction object not the skin.
 
 > ```json
 > {
 >   "address": {"domain": "aep.reference.writing", "id": "conventions.v1"},
 >   "pattern": {"guard": "true"},
->   "action": {"type": "reference"},
+>   "action": {"type": "template", "content": "Apply AEP 2.9.0 writing conventions."},
 >   "weight": 1.0,
 >   "composition": {"type": "atomic"},
->   "metadata": {"provenance": "AEP 2.8.5", "version": "1.0.0", "stability": "stable"}
+>   "metadata": {"provenance": "AEP 2.9.0", "version": "1.0.0", "stability": "stable"}
 > }
 > ```
 
@@ -226,9 +229,9 @@ AEP 2.8.5 reference policies are JSON objects with pattern.guard and the same in
 > ```
 
 - The proof.algorithm field names an optional proof algorithm.
-- Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure so Ed25519 and ML-DSA-65 stay optional rather than the default live bundle.
+- Live AEP 2.9.0 EPSCOM trust bundle mode is sha256-structure so Ed25519 and ML-DSA-65 stay optional rather than the default live bundle.
 - Agent permission is `agent_permission` so Agent A may X and Agent B may Y.
-- Empty grants close an agent action when the grant list is empty.
+- A declared empty agent_permission list closes every agent action. A document without agent_permission leaves agent permission to other walls.
 - Presence of trust_ring is Deny.
 - Presence of trust_ring on a live GAP document is Deny.
 - Closed wall gap:leftover_rank_field.
@@ -262,7 +265,7 @@ AEP 2.8.5 reference policies are JSON objects with pattern.guard and the same in
 - scanners: PII, Injection, Secrets, Jailbreak, Toxicity, URL, Data Profiler, Prediction, Brand, Regulatory and Temporal.
 - covenants: behavioural constraints with `[hard]` or `[soft]` severity.
 - budget: token and cost limits recorded on the derived ledger.
-- proof: live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure. Optional proof algorithms may name Ed25519.
+- proof: live AEP 2.9.0 EPSCOM trust bundle mode is sha256-structure. Optional proof algorithms may name Ed25519.
 - fleet: multi-instance governance with spawn policy.
 - knowledge: scoped knowledge base with anti-context-rot.
 - tools: allowed and forbidden tool lists.
@@ -276,10 +279,11 @@ Classic GAP source lives on this repository and `.gap` files stay GAP source.
 - Live Admit still waits for freeze-at-seal, the 1000 ms kernel pulse and collect-all walls.
 - Agent permission is agent_permission.
 - Presence of trust_ring is Deny.
-- Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure.
+- Live AEP 2.9.0 EPSCOM trust bundle mode is sha256-structure.
+- `gapc check <path>...` validates `.gap` sources and `gapc compile <file>` writes JSON-encoded GAP. Both read GAP source with the reader live Admit uses.
 - Compile CAW profiles with the vendor compile script at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/lib/gap-compile.mjs
-- The live classic GAP binaries live in packages/gap-schema-profile-v13/ and packages/gap-closed-wall-deny/.
-- This snapshot does not ship `gapc` and there is no `structural` CLI here.
+- The live classic GAP binaries live in packages/gap-schema-profile-v13/, packages/gap-closed-wall-deny/ and packages/gapc/.
+- `gapc` ships in packages/gapc/. There is no `structural` CLI here.
 
 ## GAP commands
 
@@ -287,6 +291,15 @@ Classic GAP source lives on this repository and `.gap` files stay GAP source.
 > cargo run --manifest-path packages/gap-schema-profile-v13/Cargo.toml --bin gap-schema-profile-v13
 > cargo run --manifest-path packages/gap-closed-wall-deny/Cargo.toml --bin gap-closed-wall-deny
 > aep-caw wrap --profile coding-agent
+> ```
+
+Build and run gapc from the packages workspace:
+
+> ```
+> cd packages
+> cargo build -p gapc
+> target/debug/gapc check .
+> target/debug/gapc compile gap-schema-profile-v13/fixtures/writing.gap
 > ```
 
 ## Adoption ladder
@@ -305,12 +318,14 @@ Migrate incrementally because each rung adds governance without rewriting existi
 This OSS snapshot does not include `GAP v1 spec sheet.md` or `BIOSECURITY.md` because those files live in the GAPLUNE tree and are not copied here.
 
 - `README.md` is this file. It teaches live evaluation plus optional Layer 1 authoring.
-- Schema files sit at repo root: `GAP meta schema v1.json`, `GAP meta schema v1.2.json` and `GAP meta schema v1.3.json`.
-- Product packages live under packages. Named package folders include `packages/gap-schema-profile-v13/` and `packages/gap-closed-wall-deny/`.
+- Schema files live in schemas: `schemas/gap-meta-schema-v1.1.json`, `schemas/gap-meta-schema-v1.2.json` and `schemas/gap-meta-schema-v1.3.json`. The live schema is v1.3.
+- The old root names `GAP meta schema v1.json`, `GAP meta schema v1.2.json` and `GAP meta schema v1.3.json` are byte copies kept for one release. VERSIONING.md names the release that removes them.
+- Product packages live under packages. Named package folders include `packages/gap-schema-profile-v13/`, `packages/gap-closed-wall-deny/` and `packages/gapc/`.
 - File format notes live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/FILE-FORMAT.md
-- Compile scripts live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/lib/gap-compile.mjs
+- `packages/gapc/` is the GAP compiler. CAW profile compile scripts live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/lib/gap-compile.mjs
+- `VERSIONING.md` links the language specification, schema, crate and AEP versions. `gap-versions.toml` holds the values.
 - Reference instructions live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/policies/reference/
-- Fit analysis of classic GAP against AEP 2.8.5 evaluation is at docs/CLASSIC-GAP-VS-AEP-2.8.5.md
+- A dated fit analysis of classic GAP written against the earlier 2.8.5 release is at docs/CLASSIC-GAP-VS-AEP-2.8.5.md
 
 ## Comparison: GAP vs dottxt
 
@@ -321,14 +336,15 @@ dottxt constrains tokens to match JSON Schema, regex or CFG at the logits level 
 - A derived fifteen-row ledger of that evaluation
 - agent_permission grants
 - Behavioural covenants
-- Live AEP 2.8.5 EPSCOM trust bundle mode is sha256-structure with optional proof algorithms
+- Live AEP 2.9.0 EPSCOM trust bundle mode is sha256-structure with optional proof algorithms
 - Self-generating instructions that evolve specialized variants
 - dottxt's structural constraint capability is equivalent to one action flag in GAP: `structured_generation: true`
 - GAP covers that authoring gate plus live collect-all Admit. Constrained decoding is not Admit. This snapshot does not ship a wired Layer 1 Admit engine
 
 ## License
 
-- License Apache-2.0. GAP is Governed Agentic Programming, language specification v1.1 aligned to AEP 2.8.5 live evaluation, part of the Agent Element Protocol ecosystem, author thePM_001.
+- VERSIONING.md links the language specification, schema, crate and AEP versions.
+- License Apache-2.0. GAP is Governed Agentic Programming, language specification v1.1 aligned to AEP 2.9.0 live evaluation, part of the Agent Element Protocol ecosystem, author thePM_001.
 
 ## AI-eligibility status
 

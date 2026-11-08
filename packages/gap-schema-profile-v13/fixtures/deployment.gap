@@ -5,8 +5,6 @@
   },
   "pattern": {
     "guard": "deployment_attempt",
-    "action_path_prefix": "ops:",
-    "prefix": "ops:",
     "constraints": [
       "human_approval_required",
       "no_silent_builds",
@@ -77,14 +75,17 @@
     "type": "atomic"
   },
   "metadata": {
-    "provenance": "AEP 2.8.5 Reference",
+    "provenance": "AEP 2.9.0 Reference",
     "version": "1.1.0",
     "stability": "stable",
     "aspect": "procedural",
     "agent_permission": [
-      "agent-a"
+      {
+        "agent_id": "agent-a",
+        "action": "*"
+      }
     ],
-    "aep_version": "2.8.5",
+    "aep_version": "2.9.0",
     "wrap": "deployment",
     "action_path_prefix": "ops:"
   }
