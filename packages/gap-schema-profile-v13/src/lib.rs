@@ -71,7 +71,6 @@ impl AdmitResult {
     }
 }
 
-
 pub fn admit_collect_all(walls: &[AdmitWall], out: &mut AdmitResult) {
     let mut closed: Vec<AdmitWall> = Vec::new();
     let mut i = 0usize;
@@ -127,7 +126,8 @@ pub fn enabled_skips_admit(_doc: &Value, out: &mut bool) {
 }
 
 fn is_rank_name(name: &str, out: &mut bool) {
-    *out = name == RANK_SANDBOX || name == RANK_USER || name == RANK_SYSTEM || name == RANK_ENTERPRISE;
+    *out =
+        name == RANK_SANDBOX || name == RANK_USER || name == RANK_SYSTEM || name == RANK_ENTERPRISE;
 }
 
 fn field_present(v: &Value, key: &str, out: &mut bool) {
@@ -210,7 +210,6 @@ pub fn compile_trust_ring_rank_wall(doc: &Value, wall: &mut AdmitWall) {
     AdmitWall::open_into(WALL_LEFTOVER_RANK_FIELD, wall);
 }
 
-
 fn grant_from_value(v: &Value, out: &mut AgentPermissionGrant, ok: &mut bool) {
     *ok = false;
     if let Some(s) = v.as_str() {
@@ -276,7 +275,12 @@ fn grant_matches(grant: &AgentPermissionGrant, agent_id: &str, action: &str, out
     *out = agent_ok && action_ok;
 }
 
-pub fn agent_is_granted(agent_id: &str, action: &str, grants: &[AgentPermissionGrant], out: &mut bool) {
+pub fn agent_is_granted(
+    agent_id: &str,
+    action: &str,
+    grants: &[AgentPermissionGrant],
+    out: &mut bool,
+) {
     *out = false;
     let mut i = 0usize;
     while i < grants.len() {
@@ -303,8 +307,11 @@ pub fn agent_permission_wall_id(agent: &str, action: &str, out: &mut String) {
     out.push_str(action);
 }
 
-
-pub fn compile_agent_permission_profile_wall(doc: &Value, req: &LiveAdmitRequest, wall: &mut AdmitWall) {
+pub fn compile_agent_permission_profile_wall(
+    doc: &Value,
+    req: &LiveAdmitRequest,
+    wall: &mut AdmitWall,
+) {
     let agent_id = req.agent_id.trim();
     let action = req.action.trim();
     if agent_id.is_empty() && action.is_empty() {
@@ -363,7 +370,13 @@ pub fn action_path_matches_prefix(action_path: &str, prefix: &str, out: &mut boo
     *out = rest.starts_with(":") || rest.starts_with("/");
 }
 
-pub fn wrap_or_prefix_binds(gap_wrap: &str, gap_prefix: &str, node_wrap: &str, action_path: &str, out: &mut bool) {
+pub fn wrap_or_prefix_binds(
+    gap_wrap: &str,
+    gap_prefix: &str,
+    node_wrap: &str,
+    action_path: &str,
+    out: &mut bool,
+) {
     *out = false;
     let w = gap_wrap.trim();
     let nw = node_wrap.trim();
@@ -400,7 +413,6 @@ pub fn compile_wrap_prefix_bind(doc: &Value, req: &LiveAdmitRequest, wall: &mut 
     }
 }
 
-
 pub fn compile_guard_wall(doc: &Value, wall: &mut AdmitWall) {
     let p = doc.get("pattern");
     if p.is_none() {
@@ -425,13 +437,21 @@ pub fn compile_guard_wall(doc: &Value, wall: &mut AdmitWall) {
     if g.is_object() {
         let expr = g.get("expr").and_then(|x| x.as_str()).unwrap_or("").trim();
         if expr.is_empty() {
-            AdmitWall::close_into(WALL_PATTERN_GUARD, "structured pattern.guard requires expr", wall);
+            AdmitWall::close_into(
+                WALL_PATTERN_GUARD,
+                "structured pattern.guard requires expr",
+                wall,
+            );
         } else {
             AdmitWall::open_into(WALL_PATTERN_GUARD, wall);
         }
         return;
     }
-    AdmitWall::close_into(WALL_PATTERN_GUARD, "pattern.guard must be a string or a structured object", wall);
+    AdmitWall::close_into(
+        WALL_PATTERN_GUARD,
+        "pattern.guard must be a string or a structured object",
+        wall,
+    );
 }
 
 fn parse_scalar(raw: &str, out: &mut Value) {
@@ -481,8 +501,13 @@ fn yaml_lines(src: &str, out: &mut Vec<YamlLine>) {
     }
 }
 
-
-fn parse_yaml_block(lines: &[YamlLine], start: usize, parent_indent: usize, out: &mut Value, next_i: &mut usize) {
+fn parse_yaml_block(
+    lines: &[YamlLine],
+    start: usize,
+    parent_indent: usize,
+    out: &mut Value,
+    next_i: &mut usize,
+) {
     if lines.len() <= start {
         *out = Value::Null;
         *next_i = start;
@@ -527,7 +552,10 @@ fn parse_yaml_block(lines: &[YamlLine], start: usize, parent_indent: usize, out:
                     map.insert(key.to_string(), sc);
                     i += 1;
                 }
-                while i < lines.len() && parent_indent < lines[i].indent && lines[i].text.starts_with("- ") == false {
+                while i < lines.len()
+                    && parent_indent < lines[i].indent
+                    && lines[i].text.starts_with("- ") == false
+                {
                     if let Some((k2, v2)) = lines[i].text.split_once(char::from(58)) {
                         let key2 = k2.trim();
                         let rest2 = v2.trim();
@@ -600,7 +628,6 @@ fn parse_yaml_block(lines: &[YamlLine], start: usize, parent_indent: usize, out:
     *next_i = i;
 }
 
-
 pub fn parse_yaml_gap(src: &str, out: &mut Value, err: &mut String) {
     err.clear();
     let mut lines: Vec<YamlLine> = Vec::new();
@@ -640,7 +667,12 @@ pub fn parse_gap_source(src: &str, out: &mut Value, err: &mut String) {
     parse_yaml_gap(t, out, err);
 }
 
-pub fn live_admit_gap_profile(source: &str, req: &LiveAdmitRequest, out: &mut AdmitResult, err: &mut String) {
+pub fn live_admit_gap_profile(
+    source: &str,
+    req: &LiveAdmitRequest,
+    out: &mut AdmitResult,
+    err: &mut String,
+) {
     err.clear();
     let mut doc = Value::Null;
     parse_gap_source(source, &mut doc, err);
@@ -709,7 +741,12 @@ pub mod live_admit_gap_profile {
             }
         }
         pub fn process(&mut self) {
-            super::live_admit_gap_profile(&self.source, &self.request, &mut self.result, &mut self.err);
+            super::live_admit_gap_profile(
+                &self.source,
+                &self.request,
+                &mut self.result,
+                &mut self.err,
+            );
         }
     }
 }
@@ -733,7 +770,6 @@ pub mod enabled_is_load_time {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -751,11 +787,11 @@ mod tests {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(&sample_yaml_profile(), &mut doc, &mut err);
-        assert_eq ! (err.as_str(), "");
+        assert_eq!(err.as_str(), "");
         let mut id = String::new();
         json_str(&doc["address"], "id", &mut id);
-        assert_eq ! (id.as_str(), "profile-doc");
-        assert_eq ! (doc.get("enabled").and_then(|v| v.as_bool()), Some(false));
+        assert_eq!(id.as_str(), "profile-doc");
+        assert_eq!(doc.get("enabled").and_then(|v| v.as_bool()), Some(false));
     }
 
     #[test]
@@ -764,10 +800,10 @@ mod tests {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(src, &mut doc, &mut err);
-        assert_eq ! (err.as_str(), "");
+        assert_eq!(err.as_str(), "");
         let mut id = String::new();
         json_str(&doc["address"], "id", &mut id);
-        assert_eq ! (id.as_str(), "json-doc");
+        assert_eq!(id.as_str(), "json-doc");
     }
 
     #[test]
@@ -775,12 +811,16 @@ mod tests {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(&sample_yaml_profile(), &mut doc, &mut err);
-        assert_eq ! (err.as_str(), "");
-        let mut wall = AdmitWall { id: String::new(), closed: false, reason: String::new() };
+        assert_eq!(err.as_str(), "");
+        let mut wall = AdmitWall {
+            id: String::new(),
+            closed: false,
+            reason: String::new(),
+        };
         compile_guard_wall(&doc, &mut wall);
-        assert_eq ! (wall.closed, false);
+        assert_eq!(wall.closed, false);
         let g = doc["pattern"]["guard"]["expr"].as_str().unwrap_or("");
-        assert_eq ! (g.contains("finance"), true);
+        assert_eq!(g.contains("finance"), true);
     }
 
     #[test]
@@ -788,20 +828,23 @@ mod tests {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(&sample_yaml_rank(), &mut doc, &mut err);
-        assert_eq ! (err.as_str(), "");
+        assert_eq!(err.as_str(), "");
         let mut ring = String::new();
         json_str(meta_of(&doc), "trust_ring", &mut ring);
-        assert_eq ! (ring.as_str(), "user");
+        assert_eq!(ring.as_str(), "user");
     }
 
     #[test]
     fn trust_ring_user_fails_live_admit() {
         let req = LiveAdmitRequest::default();
-        let mut result = AdmitResult { allow: true, closed: Vec::new() };
+        let mut result = AdmitResult {
+            allow: true,
+            closed: Vec::new(),
+        };
         let mut err = String::new();
         live_admit_gap_profile(&sample_yaml_rank(), &req, &mut result, &mut err);
-        assert_eq ! (err.as_str(), "");
-        assert_eq ! (result.allow, false);
+        assert_eq!(err.as_str(), "");
+        assert_eq!(result.allow, false);
         let mut hit = false;
         let mut i = 0usize;
         while i < result.closed.len() {
@@ -810,7 +853,7 @@ mod tests {
             }
             i += 1;
         }
-        assert_eq ! (hit, true);
+        assert_eq!(hit, true);
     }
 }
 
@@ -830,11 +873,14 @@ mod tests_more {
             wrap: String::from("finance"),
             action_path: String::from("finance/pay"),
         };
-        let mut result = AdmitResult { allow: true, closed: Vec::new() };
+        let mut result = AdmitResult {
+            allow: true,
+            closed: Vec::new(),
+        };
         let mut err = String::new();
         live_admit_gap_profile(&profile(), &req, &mut result, &mut err);
-        assert_eq ! (err.as_str(), "");
-        assert_eq ! (result.allow, false);
+        assert_eq!(err.as_str(), "");
+        assert_eq!(result.allow, false);
         let mut may_id = String::new();
         agent_permission_wall_id("agent-b", "write", &mut may_id);
         let mut hit = false;
@@ -845,13 +891,13 @@ mod tests_more {
             }
             i += 1;
         }
-        assert_eq ! (hit, true);
+        assert_eq!(hit, true);
         let mut skip = true;
         enabled_skips_admit(&Value::Bool(false), &mut skip);
-        assert_eq ! (skip, false);
+        assert_eq!(skip, false);
         let mut load = false;
         enabled_is_load_time(&mut load);
-        assert_eq ! (load, true);
+        assert_eq!(load, true);
     }
 
     #[test]
@@ -859,13 +905,35 @@ mod tests_more {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(&profile(), &mut doc, &mut err);
-        assert_eq ! (err.as_str(), "");
-        let mut a = AdmitWall { id: String::new(), closed: false, reason: String::new() };
+        assert_eq!(err.as_str(), "");
+        let mut a = AdmitWall {
+            id: String::new(),
+            closed: false,
+            reason: String::new(),
+        };
         let mut b = a.clone();
-        compile_agent_permission_profile_wall(&doc, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::from("finance"), action_path: String::from("finance/pay") }, &mut a);
-        compile_agent_permission_profile_wall(&doc, &LiveAdmitRequest { agent_id: String::from("agent-b"), action: String::from("write"), wrap: String::from("finance"), action_path: String::from("finance/pay") }, &mut b);
-        assert_eq ! (a.closed, false);
-        assert_eq ! (b.closed, true);
+        compile_agent_permission_profile_wall(
+            &doc,
+            &LiveAdmitRequest {
+                agent_id: String::from("agent-a"),
+                action: String::from("write"),
+                wrap: String::from("finance"),
+                action_path: String::from("finance/pay"),
+            },
+            &mut a,
+        );
+        compile_agent_permission_profile_wall(
+            &doc,
+            &LiveAdmitRequest {
+                agent_id: String::from("agent-b"),
+                action: String::from("write"),
+                wrap: String::from("finance"),
+                action_path: String::from("finance/pay"),
+            },
+            &mut b,
+        );
+        assert_eq!(a.closed, false);
+        assert_eq!(b.closed, true);
     }
 
     #[test]
@@ -873,62 +941,90 @@ mod tests_more {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(&profile(), &mut doc, &mut err);
-        assert_eq ! (err.as_str(), "");
-        let mut okw = AdmitWall { id: String::new(), closed: false, reason: String::new() };
+        assert_eq!(err.as_str(), "");
+        let mut okw = AdmitWall {
+            id: String::new(),
+            closed: false,
+            reason: String::new(),
+        };
         let mut bad = okw.clone();
-        compile_wrap_prefix_bind(&doc, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::from("finance"), action_path: String::from("finance/pay") }, &mut okw);
-        compile_wrap_prefix_bind(&doc, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::from("inventory"), action_path: String::from("inventory/stock") }, &mut bad);
-        assert_eq ! (okw.closed, false);
-        assert_eq ! (bad.closed, true);
+        compile_wrap_prefix_bind(
+            &doc,
+            &LiveAdmitRequest {
+                agent_id: String::from("agent-a"),
+                action: String::from("write"),
+                wrap: String::from("finance"),
+                action_path: String::from("finance/pay"),
+            },
+            &mut okw,
+        );
+        compile_wrap_prefix_bind(
+            &doc,
+            &LiveAdmitRequest {
+                agent_id: String::from("agent-a"),
+                action: String::from("write"),
+                wrap: String::from("inventory"),
+                action_path: String::from("inventory/stock"),
+            },
+            &mut bad,
+        );
+        assert_eq!(okw.closed, false);
+        assert_eq!(bad.closed, true);
     }
 
     #[test]
     fn schema_v13_body_contains_required_fields() {
         let mut body = String::new();
         schema_v13_body(&mut body);
-        assert_eq ! (body.contains("agent_permission"), true);
-        assert_eq ! (body.contains("action_path_prefix"), true);
-        assert_eq ! (body.contains("wrap"), true);
-        assert_eq ! (body.contains("oneOf"), true);
-        assert_eq ! (body.contains("load-time"), true);
-        assert_eq ! (body.contains("Presence of trust_ring is Deny"), true);
-        assert_eq ! (body.contains("Presence of rank is Deny"), true);
-        assert_eq ! (body.contains("Every non-empty rank value is Deny"), true);
-        assert_eq ! (body.contains("Leftover rank wall id is gap:leftover_rank_field"), true);
-        assert_eq ! (body.contains("covenants"), true);
-        assert_eq ! (body.contains("scanners"), true);
-        assert_eq ! (body.contains("v1.3"), true);
+        assert_eq!(body.contains("agent_permission"), true);
+        assert_eq!(body.contains("action_path_prefix"), true);
+        assert_eq!(body.contains("wrap"), true);
+        assert_eq!(body.contains("oneOf"), true);
+        assert_eq!(body.contains("load-time"), true);
+        assert_eq!(body.contains("Presence of trust_ring is Deny"), true);
+        assert_eq!(body.contains("Presence of rank is Deny"), true);
+        assert_eq!(body.contains("Every non-empty rank value is Deny"), true);
+        assert_eq!(
+            body.contains("Leftover rank wall id is gap:leftover_rank_field"),
+            true
+        );
+        assert_eq!(body.contains("covenants"), true);
+        assert_eq!(body.contains("scanners"), true);
+        assert_eq!(body.contains("v1.3"), true);
     }
 
     #[test]
     fn classic_v1_and_v12_keep_covenants_and_scanners() {
-        let v1 = include_str ! ("../../../GAP meta schema v1.json");
-        let v12 = include_str ! ("../../../GAP meta schema v1.2.json");
-        assert_eq ! (v1.contains("\"covenants\""), true);
-        assert_eq ! (v1.contains("\"scanners\""), true);
-        assert_eq ! (v12.contains("\"covenants\""), true);
-        assert_eq ! (v12.contains("\"scanners\""), true);
-        assert_eq ! (v1.contains("\"trust_ring\""), false);
-        assert_eq ! (v12.contains("\"trust_ring\""), false);
-        assert_eq ! (v1.contains("subprotocol"), false);
-        assert_eq ! (v12.contains("subprotocol"), false);
-        assert_eq ! (v12.contains("sandbox"), false);
+        let v1 = include_str!("../../../GAP meta schema v1.json");
+        let v12 = include_str!("../../../GAP meta schema v1.2.json");
+        assert_eq!(v1.contains("\"covenants\""), true);
+        assert_eq!(v1.contains("\"scanners\""), true);
+        assert_eq!(v12.contains("\"covenants\""), true);
+        assert_eq!(v12.contains("\"scanners\""), true);
+        assert_eq!(v1.contains("\"trust_ring\""), false);
+        assert_eq!(v12.contains("\"trust_ring\""), false);
+        assert_eq!(v1.contains("subprotocol"), false);
+        assert_eq!(v12.contains("subprotocol"), false);
+        assert_eq!(v12.contains("sandbox"), false);
     }
 
     #[test]
     fn schema_v13_json_presence_is_deny() {
-        let body = include_str ! ("schema_v13.body");
-        assert_eq ! (body.contains("Presence of trust_ring is Deny"), true);
-        assert_eq ! (body.contains("Presence of rank is Deny"), true);
-        assert_eq ! (body.contains("Every non-empty rank value is Deny"), true);
-        assert_eq ! (body.contains("\"rank\":"), false);
-        assert_eq ! (body.contains("\"trust_ring\":"), false);
-        assert_eq ! (body.contains("subprotocol"), false);
-        assert_eq ! (body.contains("documentary"), false);
-        assert_eq ! (body.contains("Not a live Admit floor"), false);
-        assert_eq ! (body.contains("unused at Admit"), false);
-        assert_eq ! (body.contains("\"enum\": [\"sandbox\", \"user\", \"system\", \"enterprise\"]"), false);
-        assert_eq ! (body.contains("agent_permission"), true);
+        let body = include_str!("schema_v13.body");
+        assert_eq!(body.contains("Presence of trust_ring is Deny"), true);
+        assert_eq!(body.contains("Presence of rank is Deny"), true);
+        assert_eq!(body.contains("Every non-empty rank value is Deny"), true);
+        assert_eq!(body.contains("\"rank\":"), false);
+        assert_eq!(body.contains("\"trust_ring\":"), false);
+        assert_eq!(body.contains("subprotocol"), false);
+        assert_eq!(body.contains("documentary"), false);
+        assert_eq!(body.contains("Not a live Admit floor"), false);
+        assert_eq!(body.contains("unused at Admit"), false);
+        assert_eq!(
+            body.contains("\"enum\": [\"sandbox\", \"user\", \"system\", \"enterprise\"]"),
+            false
+        );
+        assert_eq!(body.contains("agent_permission"), true);
     }
 
     fn yaml_trust_ring(value: &str) -> String {
@@ -949,15 +1045,22 @@ mod tests_more {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(src, &mut doc, &mut err);
-        assert_eq ! (err.as_str(), "");
-        let mut wall = AdmitWall { id: String::new(), closed: false, reason: String::new() };
+        assert_eq!(err.as_str(), "");
+        let mut wall = AdmitWall {
+            id: String::new(),
+            closed: false,
+            reason: String::new(),
+        };
         compile_trust_ring_rank_wall(&doc, &mut wall);
-        assert_eq ! (wall.closed, true);
-        assert_eq ! (wall.id.as_str(), WALL_LEFTOVER_RANK_FIELD);
-        let mut result = AdmitResult { allow: true, closed: Vec::new() };
+        assert_eq!(wall.closed, true);
+        assert_eq!(wall.id.as_str(), WALL_LEFTOVER_RANK_FIELD);
+        let mut result = AdmitResult {
+            allow: true,
+            closed: Vec::new(),
+        };
         live_admit_gap_profile(src, &LiveAdmitRequest::default(), &mut result, &mut err);
-        assert_eq ! (err.as_str(), "");
-        assert_eq ! (result.allow, false);
+        assert_eq!(err.as_str(), "");
+        assert_eq!(result.allow, false);
         let mut hit = false;
         let mut i = 0usize;
         while i < result.closed.len() {
@@ -966,7 +1069,7 @@ mod tests_more {
             }
             i += 1;
         }
-        assert_eq ! (hit, true);
+        assert_eq!(hit, true);
     }
 
     fn yaml_rank_field(value: &str) -> String {
@@ -1011,11 +1114,24 @@ mod tests_more {
     #[test]
     fn empty_grants_deny_on_miss_for_agent_action() {
         let src = String::from("address:\n  domain: com.example.live\n  id: empty-grants\npattern: p\naction:\n  type: template\n  content: c\nweight: 1.0\ncomposition:\n  type: atomic\nmetadata:\n  provenance: system.seed\n  version: 1.0.0\n  stability: experimental\n");
-        let mut result = AdmitResult { allow: true, closed: Vec::new() };
+        let mut result = AdmitResult {
+            allow: true,
+            closed: Vec::new(),
+        };
         let mut err = String::new();
-        live_admit_gap_profile(&src, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::new(), action_path: String::new() }, &mut result, &mut err);
-        assert_eq ! (err.as_str(), "");
-        assert_eq ! (result.allow, false);
+        live_admit_gap_profile(
+            &src,
+            &LiveAdmitRequest {
+                agent_id: String::from("agent-a"),
+                action: String::from("write"),
+                wrap: String::new(),
+                action_path: String::new(),
+            },
+            &mut result,
+            &mut err,
+        );
+        assert_eq!(err.as_str(), "");
+        assert_eq!(result.allow, false);
         let mut hit = false;
         let mut i = 0usize;
         while i < result.closed.len() {
@@ -1024,7 +1140,7 @@ mod tests_more {
             }
             i += 1;
         }
-        assert_eq ! (hit, true);
+        assert_eq!(hit, true);
     }
 
     #[test]
@@ -1036,17 +1152,17 @@ mod tests_more {
         svc.request.wrap = String::from("finance");
         svc.request.action_path = String::from("finance/pay");
         svc.process();
-        assert_eq ! (svc.err.as_str(), "");
-        assert_eq ! (svc.result.allow, true);
+        assert_eq!(svc.err.as_str(), "");
+        assert_eq!(svc.result.allow, true);
         let mut load = false;
         enabled_is_load_time(&mut load);
-        assert_eq ! (load, true);
+        assert_eq!(load, true);
     }
 
     #[test]
     fn leftover_rank_wall_id_is_gap_leftover_rank_field() {
-        assert_eq ! (WALL_LEFTOVER_RANK_FIELD, "gap:leftover_rank_field");
-        assert_eq ! (WALL_LEFTOVER_RANK_FIELD.contains("trust_ring:rank"), false);
+        assert_eq!(WALL_LEFTOVER_RANK_FIELD, "gap:leftover_rank_field");
+        assert_eq!(WALL_LEFTOVER_RANK_FIELD.contains("trust_ring:rank"), false);
     }
 
     #[test]
@@ -1062,14 +1178,31 @@ mod tests_more {
         let mut doc = Value::Null;
         let mut err = String::new();
         parse_gap_source(&src, &mut doc, &mut err);
-        assert_eq ! (err.as_str(), "");
-        let mut wall = AdmitWall { id: String::new(), closed: false, reason: String::new() };
+        assert_eq!(err.as_str(), "");
+        let mut wall = AdmitWall {
+            id: String::new(),
+            closed: false,
+            reason: String::new(),
+        };
         compile_trust_ring_rank_wall(&doc, &mut wall);
-        assert_eq ! (wall.closed, false);
-        assert_eq ! (wall.id.as_str(), WALL_LEFTOVER_RANK_FIELD);
-        let mut result = AdmitResult { allow: true, closed: Vec::new() };
-        live_admit_gap_profile(&src, &LiveAdmitRequest { agent_id: String::from("agent-a"), action: String::from("write"), wrap: String::from("finance"), action_path: String::from("finance/pay") }, &mut result, &mut err);
-        assert_eq ! (err.as_str(), "");
+        assert_eq!(wall.closed, false);
+        assert_eq!(wall.id.as_str(), WALL_LEFTOVER_RANK_FIELD);
+        let mut result = AdmitResult {
+            allow: true,
+            closed: Vec::new(),
+        };
+        live_admit_gap_profile(
+            &src,
+            &LiveAdmitRequest {
+                agent_id: String::from("agent-a"),
+                action: String::from("write"),
+                wrap: String::from("finance"),
+                action_path: String::from("finance/pay"),
+            },
+            &mut result,
+            &mut err,
+        );
+        assert_eq!(err.as_str(), "");
         let mut hit = false;
         let mut i = 0usize;
         while i < result.closed.len() {
@@ -1078,7 +1211,6 @@ mod tests_more {
             }
             i += 1;
         }
-        assert_eq ! (hit, false);
+        assert_eq!(hit, false);
     }
 }
-

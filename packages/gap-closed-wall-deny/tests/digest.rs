@@ -37,7 +37,9 @@ fn golden_instruction_object_digest_is_sha256_structure() {
     require(digest.len() == DIGEST_HEX_LEN);
     let mut seal = CapsuleSeal::default();
     seal_capsule(golden, "0", &mut seal);
-    require(seal.digest.as_str() == "7c157893865603e66a709092de57819666950c39e3ab5949b13a676f91dd3b26");
+    require(
+        seal.digest.as_str() == "7c157893865603e66a709092de57819666950c39e3ab5949b13a676f91dd3b26",
+    );
     require(seal.digest.len() == DIGEST_HEX_LEN);
     let mut sealed = String::from(golden);
     sealed.push(char::from(10));

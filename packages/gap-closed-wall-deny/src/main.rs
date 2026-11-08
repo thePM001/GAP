@@ -4,7 +4,8 @@
 // Collect-all closed-wall Deny. Retry reseals.
 
 use gap_closed_wall_deny::{
-    is_replay, live_admit, reseal_on_retry, seal_capsule, AdmitEnvelope, CapsuleSeal, ClosedWallDeny,
+    is_replay, live_admit, reseal_on_retry, seal_capsule, AdmitEnvelope, CapsuleSeal,
+    ClosedWallDeny,
 };
 use std::io::{self, Read, Write};
 

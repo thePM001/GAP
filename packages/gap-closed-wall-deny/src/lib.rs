@@ -5,7 +5,6 @@
 // GAP-285-P3. Classic GAP closed-wall Deny. enabled is load-time. Retry reseals.
 use sha2::{Digest, Sha256};
 
-
 pub const TICKET: &str = "GAP-285-P3";
 pub const WALL_SCENE: &str = "gap:unbound:scene";
 pub const WALL_DOCK: &str = "gap:unbound:dock";
@@ -17,7 +16,8 @@ pub const REPAIR_DOCK: &str = "bind dock on the sealed capsule then reseal";
 pub const REPAIR_TIME: &str = "bind timestamp at seal then reseal";
 pub const REPAIR_SEQUENCE: &str = "bind sequence on the sealed capsule then reseal";
 pub const REPAIR_WRITING: &str = "repair writing then reseal a new capsule";
-pub const ENABLED_CONTRACT: &str = "Load-time flag. When false the instruction is still loaded. Live Admit still evaluates walls.";
+pub const ENABLED_CONTRACT: &str =
+    "Load-time flag. When false the instruction is still loaded. Live Admit still evaluates walls.";
 pub const DIGEST_MODE: &str = "sha256-structure";
 pub const DIGEST_HEX_LEN: usize = 64;
 
@@ -148,19 +148,43 @@ fn close_if_unbound(id: &str, value: &str, reason: &str, repair: &str, wall: &mu
 }
 
 pub fn compile_scene_wall(env: &AdmitEnvelope, wall: &mut ClosedWall) {
-    close_if_unbound(WALL_SCENE, &env.scene, "unbound scene closes Admit", REPAIR_SCENE, wall);
+    close_if_unbound(
+        WALL_SCENE,
+        &env.scene,
+        "unbound scene closes Admit",
+        REPAIR_SCENE,
+        wall,
+    );
 }
 
 pub fn compile_dock_wall(env: &AdmitEnvelope, wall: &mut ClosedWall) {
-    close_if_unbound(WALL_DOCK, &env.dock, "unbound dock closes Admit", REPAIR_DOCK, wall);
+    close_if_unbound(
+        WALL_DOCK,
+        &env.dock,
+        "unbound dock closes Admit",
+        REPAIR_DOCK,
+        wall,
+    );
 }
 
 pub fn compile_time_wall(env: &AdmitEnvelope, wall: &mut ClosedWall) {
-    close_if_unbound(WALL_TIME, &env.timestamp, "unbound timestamp closes Admit", REPAIR_TIME, wall);
+    close_if_unbound(
+        WALL_TIME,
+        &env.timestamp,
+        "unbound timestamp closes Admit",
+        REPAIR_TIME,
+        wall,
+    );
 }
 
 pub fn compile_sequence_wall(env: &AdmitEnvelope, wall: &mut ClosedWall) {
-    close_if_unbound(WALL_SEQUENCE, &env.sequence, "unbound sequence closes Admit", REPAIR_SEQUENCE, wall);
+    close_if_unbound(
+        WALL_SEQUENCE,
+        &env.sequence,
+        "unbound sequence closes Admit",
+        REPAIR_SEQUENCE,
+        wall,
+    );
 }
 
 pub fn compile_writing_wall(env: &AdmitEnvelope, wall: &mut ClosedWall) {
@@ -351,8 +375,6 @@ pub mod forensic_attractor {
     }
 }
 
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -447,7 +469,13 @@ mod tests {
 
     #[test]
     fn grant_lists_stay_off_repair() {
-        let repairs = [REPAIR_SCENE, REPAIR_DOCK, REPAIR_TIME, REPAIR_SEQUENCE, REPAIR_WRITING];
+        let repairs = [
+            REPAIR_SCENE,
+            REPAIR_DOCK,
+            REPAIR_TIME,
+            REPAIR_SEQUENCE,
+            REPAIR_WRITING,
+        ];
         let mut i = 0usize;
         while i < repairs.len() {
             let mut grants = true;

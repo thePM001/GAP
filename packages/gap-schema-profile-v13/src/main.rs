@@ -1,9 +1,7 @@
 // @PAD: gap-285-p1-schema-profile-v13-cli
 // GAP-285-P1 CLI. source= then agent_id= action= wrap= action_path=. Collect-all live Admit.
 
-use gap_schema_profile_v13::{
-    live_admit_gap_profile, AdmitResult, LiveAdmitRequest,
-};
+use gap_schema_profile_v13::{live_admit_gap_profile, AdmitResult, LiveAdmitRequest};
 use std::io::{self, Read, Write};
 
 fn emit(s: &str) {

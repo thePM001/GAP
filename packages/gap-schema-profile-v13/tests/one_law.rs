@@ -32,63 +32,63 @@ mod tests {
     fn one_law_text_is_presence_deny() {
         let mut body = String::new();
         one_law_body(&mut body);
-        assert_eq ! (body.contains("Presence of trust_ring is Deny"), true);
-        assert_eq ! (body.contains("Agent permission is agent_permission"), true);
-        assert_eq ! (body.contains("documentary"), false);
-        assert_eq ! (body.contains("unused at Admit"), false);
+        assert_eq!(body.contains("Presence of trust_ring is Deny"), true);
+        assert_eq!(body.contains("Agent permission is agent_permission"), true);
+        assert_eq!(body.contains("documentary"), false);
+        assert_eq!(body.contains("unused at Admit"), false);
     }
 
     #[test]
     fn writing_fixture_always_on_has_grants() {
-        let src = include_str ! ("../fixtures/writing.gap");
+        let src = include_str!("../fixtures/writing.gap");
         let mut ring = true;
         let mut may = false;
         has_trust_ring_key(src, &mut ring);
         has_agent_permission_key(src, &mut may);
-        assert_eq ! (ring, false);
-        assert_eq ! (may, true);
-        assert_eq ! (src.contains("\"guard\": \"true\""), true);
-        assert_eq ! (src.contains("\"wrap\""), false);
+        assert_eq!(ring, false);
+        assert_eq!(may, true);
+        assert_eq!(src.contains("\"guard\": \"true\""), true);
+        assert_eq!(src.contains("\"wrap\""), false);
     }
 
     #[test]
     fn security_fixture_always_on_has_grants() {
-        let src = include_str ! ("../fixtures/security.gap");
+        let src = include_str!("../fixtures/security.gap");
         let mut ring = true;
         let mut may = false;
         has_trust_ring_key(src, &mut ring);
         has_agent_permission_key(src, &mut may);
-        assert_eq ! (ring, false);
-        assert_eq ! (may, true);
-        assert_eq ! (src.contains("\"guard\": \"true\""), true);
-        assert_eq ! (src.contains("\"wrap\""), false);
+        assert_eq!(ring, false);
+        assert_eq!(may, true);
+        assert_eq!(src.contains("\"guard\": \"true\""), true);
+        assert_eq!(src.contains("\"wrap\""), false);
     }
 
     #[test]
     fn deployment_fixture_binds_wrap_and_prefix() {
-        let src = include_str ! ("../fixtures/deployment.gap");
+        let src = include_str!("../fixtures/deployment.gap");
         let mut ring = true;
         let mut may = false;
         has_trust_ring_key(src, &mut ring);
         has_agent_permission_key(src, &mut may);
-        assert_eq ! (ring, false);
-        assert_eq ! (may, true);
-        assert_eq ! (src.contains("\"wrap\": \"deployment\""), true);
-        assert_eq ! (src.contains("\"action_path_prefix\": \"ops:\""), true);
+        assert_eq!(ring, false);
+        assert_eq!(may, true);
+        assert_eq!(src.contains("\"wrap\": \"deployment\""), true);
+        assert_eq!(src.contains("\"action_path_prefix\": \"ops:\""), true);
     }
 
     #[test]
     fn governance_fixture_binds_wrap() {
-        let src = include_str ! ("../fixtures/governance.gap");
+        let src = include_str!("../fixtures/governance.gap");
         let mut ring = true;
         let mut may = false;
         let mut wrap = false;
         has_trust_ring_key(src, &mut ring);
         has_agent_permission_key(src, &mut may);
         metadata_wrap_present(src, &mut wrap);
-        assert_eq ! (ring, false);
-        assert_eq ! (may, true);
-        assert_eq ! (wrap, true);
-        assert_eq ! (src.contains("\"wrap\": \"governance\""), true);
+        assert_eq!(ring, false);
+        assert_eq!(may, true);
+        assert_eq!(wrap, true);
+        assert_eq!(src.contains("\"wrap\": \"governance\""), true);
     }
 }
