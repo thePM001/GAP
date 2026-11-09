@@ -288,6 +288,19 @@ mod tests {
     }
 
     #[test]
+    fn host_extensions_hold_host_keys() {
+        let good = format!(
+            "{YAML_OK}extensions:\n  aep:\n    lrp_id: gdpr\n    subprotocols:\n      caw:\n        validator: caw\n"
+        );
+        let r = checker().check_source(&good);
+        assert_eq!(r.problems, Vec::new());
+        let not_object = format!("{YAML_OK}extensions:\n  aep: gdpr\n");
+        assert!(!checker().check_source(&not_object).ok());
+        let bad_host = format!("{YAML_OK}extensions:\n  Aep-Host:\n    lrp_id: gdpr\n");
+        assert!(!checker().check_source(&bad_host).ok());
+    }
+
+    #[test]
     fn missing_required_field_fails_schema() {
         let src = YAML_OK.replace("weight: 1.0\n", "");
         let r = checker().check_source(&src);

@@ -2,6 +2,13 @@
 
 This is the public GAP open-source tree. Dated product changes belong here. README teaching and the package folders are not the same set of work and this file does not claim the public tree is fully upgraded.
 
+## 2026-11-09 - Host extensions in the live schema
+
+- Meta schema v1.3 accepts an optional top-level `extensions` object. Each key names one host and holds an object whose fields that host defines. gapc and live Admit ignore the content. AEP keeps its own policy keys such as `lrp_id`, `ede_repos` and the CAW `subprotocols` block under `extensions.aep`, so its reference policies pass `gapc check` while metadata remains closed.
+- The change adds an optional field, so the schema version remains 1.3 as VERSIONING.md allows. The schema `$id` is unchanged.
+- `gap-schema-profile-v13` is 0.2.1 because its embedded schema body changed. No Admit outcome changed.
+- A gapc test proves that a host object passes, that a host value which is not an object fails and that a host name outside lower case letters, digits and underscores fails.
+
 ## 2026-11-08 - GAP CI, gapc and one source for the profile crate
 
 GAP now checks itself. `.github/workflows/ci.yml` runs cargo fmt, cargo clippy with warnings denied, cargo test and `gapc check` over every fixture on each push from a clean checkout.

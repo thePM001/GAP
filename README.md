@@ -112,6 +112,7 @@ Keep `.gap` as GAP source because collect-all Admit collects by capsule hash and
 - Encoding: UTF-8
 - Syntax: YAML 1.2 source. Live kernel policies may be JSON-encoded GAP instructions. YAML remains valid GAP source. The kernel reads the instruction object not the skin.
 - One instruction per document. Multi-instruction families use YAML multi-document syntax (`---` separators).
+- Host data that GAP does not read lives under the optional top-level `extensions` object. Each key names one host such as `aep` and holds an object that host defines. gapc and live Admit ignore it. Metadata and the top level accept only the fields the schema names.
 - Keep `.gap` as GAP source.
 - Collect-all Admit collects by capsule hash. Live AEP 2.9.0 EPSCOM trust bundle mode is sha256-structure.
 - Writing and security are always-on stems and they evaluate on every action path.

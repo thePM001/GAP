@@ -9,7 +9,7 @@ GAP carries four kinds of version number. This file states what each one means a
 | language_spec | 1.1 | GAP language specification version |
 | live_schema | 1.3 | Meta schema that live Admit and `gapc check` use |
 | aep | 2.9.0 | AEP release this GAP tree is aligned to |
-| gap-schema-profile-v13 | 0.2.0 | Live Admit profile crate |
+| gap-schema-profile-v13 | 0.2.1 | Live Admit profile crate |
 | gap-closed-wall-deny | 0.1.0 | Closed wall Deny crate |
 | gapc | 0.1.0 | GAP compiler crate |
 
