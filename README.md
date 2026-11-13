@@ -6,6 +6,7 @@
 **Author:** thePM_001 ([https://x.com/thePM_001](https://x.com/thePM_001))  
 **Licence:** Apache-2.0  
 **Public repository:** [https://github.com/thePM001/GAP](https://github.com/thePM001/GAP)  
+**GAP page on the NLA website:** [https://newlisbon.agency/gap](https://newlisbon.agency/gap)  
 **Research paper:** [https://github.com/thePM001/GAP-research-paper-002](https://github.com/thePM001/GAP-research-paper-002)
 
 ---
