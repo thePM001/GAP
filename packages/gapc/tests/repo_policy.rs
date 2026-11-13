@@ -107,6 +107,7 @@ fn schema_files_are_kebab_case_and_named_by_their_id() {
         Ok(d) => d
             .filter_map(|e| e.ok())
             .map(|e| e.file_name().to_string_lossy().into_owned())
+            .filter(|n| n != "README.md")
             .collect(),
         Err(e) => panic!("schemas: {e}"),
     };
