@@ -1,6 +1,6 @@
 # GAP file format
 
-A GAP file holds GAP source. This document states the rules that `gapc check` enforces on a file. The root README shows the fields of an instruction.
+A GAP file contains GAP source. This document states the rules that `gapc check` enforces on a file. The root README shows the fields of an instruction.
 
 ## Rules
 
@@ -9,7 +9,7 @@ A GAP file holds GAP source. This document states the rules that `gapc check` en
 | Extension | `.gap` |
 | Encoding | UTF-8 |
 | Syntax | YAML 1.2 source or JSON. Both are read by the same reader |
-| Documents | One instruction per document. A YAML source may hold several documents, each separated by a line of three hyphens |
+| Documents | One instruction per document. A YAML source may contain several documents, each separated by a line of three hyphens |
 | Instruction | A document is an instruction when it carries an `address` object with a `domain` and an `id` |
 | Closed shape | The top level and `metadata` accept only the fields that the schema names |
 | Host data | Data that GAP does not read lives under the optional top level object `extensions` |
@@ -60,7 +60,7 @@ metadata:
 
 ## Host data under extensions
 
-Each key of `extensions` names one host such as `aep`. The key holds an object that this host defines. A host name uses lower case letters, digits and underscores. `gapc` and live Admit ignore the content. A host keeps its own keys there, so the fields of `metadata` remain the fields of the language.
+Each key of `extensions` names one host such as `aep`. The key contains an object that this host defines. A host name uses lower case letters, digits and underscores. `gapc` and live Admit ignore the content. A host keeps its own keys there, so the fields of `metadata` remain the fields of the language.
 
 ```yaml
 extensions:
@@ -70,7 +70,7 @@ extensions:
 
 ## How an instruction binds
 
-Writing and security are always-on stems and they evaluate on every action path. Every other GAP wall binds to a wrap or to an action path prefix. [kernel-json-wrap.md](kernel-json-wrap.md) holds the detail of that bind.
+Writing and security are always-on stems and they evaluate on every action path. Every other GAP wall binds to a wrap or to an action path prefix. [kernel-json-wrap.md](kernel-json-wrap.md) contains the detail of that bind.
 
 ## Related notes in the AEP repository
 

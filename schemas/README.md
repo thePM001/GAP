@@ -1,6 +1,6 @@
 # GAP meta schemas
 
-A meta schema is the JSON Schema that every GAP instruction must satisfy. This folder holds three of them and one is live.
+A meta schema is the JSON Schema that every GAP instruction must satisfy. This folder contains three of them and one is live.
 
 | File | Status | Use |
 | --- | --- | --- |
@@ -21,4 +21,4 @@ The repository root still carries `GAP meta schema v1.json`, `GAP meta schema v1
 
 ## How to read the live schema
 
-The eleven top level fields are listed in the root README with one line each. The blocks under `$defs` hold the detail: `Composition` for the six composition types, `Action` for the five action types, `Metadata` for the governance fields and `GenerationConstraints` for self-generation. From the folder `packages` the command `target/debug/gapc schema` prints the same schema that the check uses.
+The eleven top level fields are listed in the root README with one line each. The blocks under `$defs` contain the detail: `Composition` for the six composition types, `Action` for the five action types, `Metadata` for the governance fields and `GenerationConstraints` for self-generation. From the folder `packages` the command `target/debug/gapc schema` prints the same schema that the check uses.

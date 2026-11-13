@@ -2,7 +2,7 @@
 
 GAP is the language and AEP is the runtime. This document describes how a Base Node of AEP 2.9.0 judges an action against the GAP instructions it has loaded. The runtime itself lives in the AEP repository at https://github.com/thePM001/AEP-agent-element-protocol and its README describes the One Validation Envelope, the Admit Gate and the Base Node Pulse in full.
 
-The GAP tree ships two packages that teach parts of this path: `packages/gap-schema-profile-v13/` holds the walls that read an instruction and `packages/gap-closed-wall-deny/` holds the walls that read the sealed capsule.
+The GAP tree ships two packages that teach parts of this path: `packages/gap-schema-profile-v13/` contains the walls that read an instruction and `packages/gap-closed-wall-deny/` contains the walls that read the sealed capsule.
 
 ## The path of one action
 

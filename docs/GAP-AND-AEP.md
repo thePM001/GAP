@@ -1,6 +1,6 @@
 # GAP and AEP
 
-GAP is the instruction language of the Agent Element Protocol. This tree holds the language: the schemas, the compiler and the profile packages. The AEP repository at https://github.com/thePM001/AEP-agent-element-protocol holds the runtime that loads GAP instructions and judges actions against them. This document names the points where the two trees meet.
+GAP is the instruction language of the Agent Element Protocol. This tree contains the language: the schemas, the compiler and the profile packages. The AEP repository at https://github.com/thePM001/AEP-agent-element-protocol contains the runtime that loads GAP instructions and judges actions against them. This document names the points where the two trees meet.
 
 ## What lives where
 

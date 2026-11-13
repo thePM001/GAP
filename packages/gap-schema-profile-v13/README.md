@@ -2,7 +2,7 @@
 
 ## What it is
 
-This package is the live Admit profile of the GAP meta schema v1.3. It holds the reader of GAP source, the embedded live meta schema and the four walls that read an instruction. It is the one source of that profile and AEP holds a byte pinned copy of it.
+This package is the live Admit profile of the GAP meta schema v1.3. It contains the reader of GAP source, the embedded live meta schema and the four walls that read an instruction. It is the one source of that profile and AEP holds a byte pinned copy of it.
 
 ## Place in GAP
 

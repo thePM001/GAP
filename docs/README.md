@@ -1,6 +1,6 @@
 # GAP documents
 
-This folder holds the documents of the GAP tree. The root README describes the language and these documents carry the detail.
+This folder contains the documents of the GAP tree. The root README describes the language and these documents carry the detail.
 
 ## Current documents
 

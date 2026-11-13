@@ -26,13 +26,13 @@ flowchart LR
   M --> W[Walls a runtime judges at Admit]
 ```
 
-This repository holds the language: the meta schemas, the compiler `gapc` and two packages that judge an instruction. The runtime that applies instructions to live actions is the Agent Element Protocol, which the section GAP and AEP describes.
+This repository contains the language: the meta schemas, the compiler `gapc` and two packages that judge an instruction. The runtime that applies instructions to live actions is the Agent Element Protocol, which the section GAP and AEP describes.
 
 ## Anatomy of an instruction
 
 An instruction has eleven top level fields and six of them are required. The live meta schema is closed, so a field outside this table fails the check.
 
-| Field | Required | What it holds |
+| Field | Required | What it contains |
 | --- | --- | --- |
 | `address` | yes | The `domain` and the `id` that name the instruction |
 | `pattern` | yes | A text or an object with a guard, input, output, events, constraints and invariants |
@@ -69,7 +69,7 @@ metadata:
     - finance.pay
 ```
 
-A file uses the extension `.gap`, the encoding UTF-8 and YAML 1.2 or JSON as its syntax, with one instruction per document. [docs/FILE-FORMAT.md](docs/FILE-FORMAT.md) holds the full rules.
+A file uses the extension `.gap`, the encoding UTF-8 and YAML 1.2 or JSON as its syntax, with one instruction per document. [docs/FILE-FORMAT.md](docs/FILE-FORMAT.md) contains the full rules.
 
 ## Quick start
 
@@ -446,7 +446,7 @@ flowchart LR
 
 ## GAP and AEP
 
-GAP is the language and the Agent Element Protocol is its runtime. The AEP repository at [https://github.com/thePM001/AEP-agent-element-protocol](https://github.com/thePM001/AEP-agent-element-protocol) holds the Base Node, the docks and the sandbox that enforce what GAP instructions declare.
+GAP is the language and the Agent Element Protocol is its runtime. The AEP repository at [https://github.com/thePM001/AEP-agent-element-protocol](https://github.com/thePM001/AEP-agent-element-protocol) contains the Base Node, the docks and the sandbox that enforce what GAP instructions declare.
 
 - AEP holds a byte pinned copy of the profile package, of the meta schemas and of `gap-versions.toml`. Its check fails when a pinned byte differs.
 - AEP keeps its own policy keys under `extensions.aep` of an instruction. The compiler and live Admit ignore that object.
@@ -466,7 +466,7 @@ A kernel loads policies as JSON-encoded GAP. The form below is legal GAP, becaus
 }
 ```
 
-[docs/GAP-AND-AEP.md](docs/GAP-AND-AEP.md) holds the detail, with the default sandbox profile for a coding agent.
+[docs/GAP-AND-AEP.md](docs/GAP-AND-AEP.md) contains the detail, with the default sandbox profile for a coding agent.
 
 ## Packages and toolchain
 
@@ -482,7 +482,7 @@ The workflow of the repository runs four jobs on each push and each pull request
 
 ## Repository layout
 
-| Path | What it holds |
+| Path | What it contains |
 | --- | --- |
 | `README.md` | This file |
 | `CHANGELOG.md` | The dated changes of the tree |
