@@ -352,3 +352,259 @@ fn readme_instruction_examples_pass_gapc_check() {
     }
     assert!(3 <= checked, "README holds {checked} instruction examples");
 }
+
+// README tests. The root README follows the seven sections of the GAP page, describes the
+// language of the live schema once and every package and folder carries a README.
+
+/// The seven sections of the GAP page in page order, as the root README heads them.
+const PAGE_SECTIONS: [&str; 7] = [
+    "## 01 / Six Native Primitives",
+    "## 02 / Everything as Instruction",
+    "## 03 / Write. Check. Admit.",
+    "## 04 / Instructions Generate Instructions",
+    "## 05 / Structural Governance",
+    "## 06 / Mathematically Verified",
+    "## 07 / Six-Rung Ladder",
+];
+
+/// The four labels every one of the seven sections carries.
+const SECTION_LABELS: [&str; 4] = [
+    "**What it is:**",
+    "**What ships:**",
+    "**Where it lives:**",
+    "**Run and test:**",
+];
+
+/// Packages with their key in gap-versions.toml. Each carries a README of one shape.
+const PACKAGES: [&str; 3] = ["gapc", "gap-schema-profile-v13", "gap-closed-wall-deny"];
+
+/// The parts of a package README after its title, in order.
+const PACKAGE_PARTS: [&str; 7] = [
+    "## What it is",
+    "## Place in GAP",
+    "## What ships",
+    "## Interfaces",
+    "## Limits",
+    "## Run and test",
+    "## Related documents",
+];
+
+/// Folders of the tree whose inline code paths a document must resolve.
+const TREE_ROOTS: [&str; 4] = ["packages/", "schemas/", "docs/", ".github/"];
+
+/// Lines of a document outside fenced code blocks, with their one-based line number.
+fn prose_lines(text: &str) -> Vec<(usize, String)> {
+    let mut out = Vec::new();
+    let mut fenced = false;
+    for (i, line) in text.lines().enumerate() {
+        let body = line.trim_start_matches('>').trim();
+        if body.starts_with("```") {
+            fenced = !fenced;
+            continue;
+        }
+        if !fenced {
+            out.push((i + 1, body.to_string()));
+        }
+    }
+    out
+}
+
+/// Inline code spans of one line.
+fn inline_code(line: &str) -> Vec<String> {
+    line.split('`')
+        .skip(1)
+        .step_by(2)
+        .map(str::to_string)
+        .collect()
+}
+
+/// Targets of the links of one line, the text between "](" and ")".
+fn link_targets(line: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut rest = line;
+    while let Some(i) = rest.find("](") {
+        let after = &rest[i + 2..];
+        let Some(end) = after.find(')') else {
+            break;
+        };
+        out.push(after[..end].to_string());
+        rest = &after[end..];
+    }
+    out
+}
+
+/// Every inline code span of the prose of a document.
+fn code_spans(text: &str) -> Vec<String> {
+    prose_lines(text)
+        .iter()
+        .flat_map(|(_, line)| inline_code(line))
+        .collect()
+}
+
+/// The root README, the folder README files and every document under docs.
+fn documents() -> Vec<String> {
+    let mut out = vec![String::from("README.md")];
+    for name in PACKAGES {
+        out.push(format!("packages/{name}/README.md"));
+    }
+    out.push(String::from("schemas/README.md"));
+    out.push(String::from("docs/README.md"));
+    let entries = match fs::read_dir(repo().join("docs")) {
+        Ok(e) => e,
+        Err(e) => panic!("docs: {e}"),
+    };
+    let mut docs: Vec<String> = entries
+        .filter_map(Result::ok)
+        .filter_map(|e| e.file_name().into_string().ok())
+        .filter(|n| n.ends_with(".md") && n != "README.md")
+        .map(|n| format!("docs/{n}"))
+        .collect();
+    docs.sort();
+    out.extend(docs);
+    out
+}
+
+/// String values of a JSON array.
+fn strings(value: &serde_json::Value) -> Vec<String> {
+    value
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter_map(|v| v.as_str().map(str::to_string))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+#[test]
+fn readme_holds_the_seven_page_sections_in_order() {
+    let readme = read("README.md");
+    let lines = prose_lines(&readme);
+    let mut starts = Vec::new();
+    for heading in PAGE_SECTIONS {
+        match lines.iter().position(|(_, l)| l == heading) {
+            Some(i) => starts.push(i),
+            None => panic!("README has no heading {heading}"),
+        }
+    }
+    assert!(
+        starts.windows(2).all(|w| w[0] < w[1]),
+        "README sections are not in the order of the GAP page"
+    );
+    for (n, start) in starts.iter().enumerate() {
+        let end = lines[start + 1..]
+            .iter()
+            .position(|(_, l)| l.starts_with("## "))
+            .map_or(lines.len(), |i| start + 1 + i);
+        let section = &lines[*start..end];
+        for label in SECTION_LABELS {
+            assert!(
+                section.iter().any(|(_, l)| l.starts_with(label)),
+                "README section {} has no label {label}",
+                PAGE_SECTIONS[n]
+            );
+        }
+    }
+}
+
+#[test]
+fn readme_repeats_no_line() {
+    let readme = read("README.md");
+    let mut seen: BTreeMap<String, usize> = BTreeMap::new();
+    for (number, line) in prose_lines(&readme) {
+        let rule = line.chars().all(|c| matches!(c, '|' | '-' | ':' | ' '));
+        if line.is_empty() || rule {
+            continue;
+        }
+        if let Some(first) = seen.insert(line.clone(), number) {
+            panic!("README line {number} repeats line {first}: {line}");
+        }
+    }
+}
+
+#[test]
+fn readme_names_the_vocabulary_of_the_live_schema() {
+    let schema = json("schemas/gap-meta-schema-v1.3.json");
+    let spans = code_spans(&read("README.md"));
+    let mut words: Vec<String> = match schema["properties"].as_object() {
+        Some(p) => p.keys().cloned().collect(),
+        None => panic!("live schema has no properties"),
+    };
+    assert_eq!(words.len(), 11, "top level fields of the live schema");
+    for pointer in [
+        "/$defs/Composition/properties/type/enum",
+        "/$defs/Action/properties/type/enum",
+        "/$defs/Metadata/properties/scanners/items/enum",
+        "/$defs/ConstraintExpression/properties/severity/enum",
+    ] {
+        let list = match schema.pointer(pointer) {
+            Some(v) => strings(v),
+            None => panic!("live schema has no {pointer}"),
+        };
+        assert!(!list.is_empty(), "{pointer} is empty");
+        words.extend(list);
+    }
+    for word in words {
+        assert!(
+            spans.contains(&word),
+            "README does not name `{word}` of the live schema"
+        );
+    }
+}
+
+#[test]
+fn documents_resolve_their_links_and_tree_paths() {
+    let root = repo();
+    for doc in documents() {
+        let text = read(&doc);
+        let folder = Path::new(&doc).parent().unwrap_or(Path::new(""));
+        for (number, line) in prose_lines(&text) {
+            for target in link_targets(&line) {
+                if target.contains("://") || target.starts_with('#') || target.is_empty() {
+                    continue;
+                }
+                let file = target.split('#').next().unwrap_or("");
+                assert!(
+                    root.join(folder).join(file).exists(),
+                    "{doc} line {number}: link {target} does not resolve"
+                );
+            }
+            for span in inline_code(&line) {
+                let path = span.trim_end_matches('/');
+                let names_tree = TREE_ROOTS.iter().any(|r| span.starts_with(r));
+                if !names_tree || span.contains(['<', '*', ' ']) {
+                    continue;
+                }
+                assert!(
+                    root.join(path).exists(),
+                    "{doc} line {number}: path {span} is not in the tree"
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn every_package_carries_a_readme_of_one_shape() {
+    for name in PACKAGES {
+        let rel = format!("packages/{name}/README.md");
+        let text = read(&rel);
+        let lines = prose_lines(&text);
+        let title = format!("# {name} {}", version(name));
+        assert_eq!(
+            lines.first().map(|(_, l)| l.as_str()),
+            Some(title.as_str()),
+            "{rel} must start with its name and its version"
+        );
+        let mut last = 0usize;
+        for part in PACKAGE_PARTS {
+            match lines.iter().position(|(_, l)| l == part) {
+                Some(i) => {
+                    assert!(last < i, "{rel}: part {part} is out of order");
+                    last = i;
+                }
+                None => panic!("{rel} has no part {part}"),
+            }
+        }
+    }
+}
