@@ -2,6 +2,18 @@
 
 This is the public GAP open-source tree. Dated product changes belong here. README teaching and the package folders are not the same set of work and this file does not claim the public tree is fully upgraded.
 
+## 2026-11-13 - The README files follow the GAP page
+
+The root README is rewritten around the seven sections of the GAP page: Six Native Primitives, Everything as Instruction, Write. Check. Admit., Instructions Generate Instructions, Structural Governance, Mathematically Verified and Six-Rung Ladder. Each section says what it is, what the tree ships, where it lives and how to run or test it.
+
+- The README now describes the language itself. It lists the eleven top level fields, the six composition types, the five action types, the eleven scanner names and the three severities of a constraint. A test reads these lists from the live schema and fails when the README does not name one of them.
+- Quick start moved to the top with the build of gapc, its four commands and the output of a clean check.
+- Each rule is written once. A test fails when a line of the README repeats.
+- Four documents under docs receive the detail that left the README: LIVE-EVALUATION.md, FILE-FORMAT.md, GAP-AND-AEP.md and GAP-AND-CONSTRAINED-DECODING.md. No text was dropped.
+- The three packages, the schemas folder and the docs folder each carry a README. The package README files share one shape of eight parts and state the input format of the two binaries.
+- A sentence that named two files outside this tree left the README. Seven package files lost a head comment that named an internal format. No code line changed.
+- The tests live in `packages/gapc/tests/repo_policy.rs` and run with cargo test on each push. No Admit outcome and no version changed.
+
 ## 2026-11-09 - Host extensions in the live schema
 
 - Meta schema v1.3 accepts an optional top-level `extensions` object. Each key names one host and holds an object whose fields that host defines. gapc and live Admit ignore the content. AEP keeps its own policy keys such as `lrp_id`, `ede_repos` and the CAW `subprotocols` block under `extensions.aep`, so its reference policies pass `gapc check` while metadata remains closed.
