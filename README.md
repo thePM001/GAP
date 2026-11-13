@@ -2,7 +2,7 @@
 
 GAP is the native instructions language for governed agency in the Agent Element Protocol and an instruction is the atomic unit so agents, workflows, validators, compositions and governance rules are all instructions that generate further instructions.
 
-Live evaluation follows AEP 2.9.0: seal a lattice-channel capsule, freeze the clock at seal, wait 1000 ms, run every check together as collect-all Admit and then Apply the allowed action. After the wait the client collects by capsule hash and live AEP 2.9.0 EPSCOM trust bundle mode is sha256-structure. Presence of trust_ring is Deny. Agent permission is agent_permission.
+Live evaluation in AEP 2.9.0 is described in docs/LIVE-EVALUATION.md.
 
 ## Public GAP tree
 
@@ -12,19 +12,9 @@ Classic GAP on this repository is the public language surface for schema files, 
 - The old root names `GAP meta schema v1.json`, `GAP meta schema v1.2.json` and `GAP meta schema v1.3.json` are byte copies kept for one release. VERSIONING.md names the release that removes them.
 - Product packages live under packages. Live package folders include `packages/gap-schema-profile-v13/`, `packages/gap-closed-wall-deny/` and `packages/gapc/`.
 - `gapc` in `packages/gapc/` checks every `.gap` source against the live schema and the load time profile walls and compiles it to JSON-encoded GAP. GAP compiles its own fixtures with it.
-- CAW profile compile for AEP runtimes lives on the AEP vendor tree at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/lib/gap-compile.mjs
-- Reference instructions live on the AEP vendor tree at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/policies/reference/
-- GAP policies here declare what agents must do.
-- GAP authors instructions and CAW enforces the host sandbox so they are not two policy stacks.
-- Operators edit `.gap` and run the vendor compile script then `aep-caw session create --profile <name>`.
 - Run `gapc check` on every edited `.gap` file before the vendor compile script.
-- `caw-coding-agent.gap` at `dev.aep.caw/coding-agent.v1` is the default profile for a governed coding agent.
-- `${PROJECT_ROOT}` is read-write.
-- `${AEP_AGENT_CONFIG_DIR}`, `${HOME}/.config/agent` and `${HOME}/.local/share/agent` are read-only.
-- The base policy is `default` with agent_permission grants and the LLM proxy enabled.
-- Use `agent-sandbox` for untrusted code and `compiled-runtime` when the LLM proxy must stay off.
-- UCB is optional. Foreign ingest needs a task manifest that is caller-provided, stored or from an explicitly configured synthesis tier.
 - File format notes live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/FILE-FORMAT.md
+- How AEP uses GAP, with the sandbox profile for a coding agent, is described in docs/GAP-AND-AEP.md
 
 ## Three-layer enforcement
 
@@ -42,84 +32,11 @@ GAP uses three layers and no layer requires the LLM to have seen GAP during trai
 
 The AEP 2.9.0 live path seals a lattice-channel capsule, freezes the clock at seal and waits 1000 ms for the compiled Base Node kernel pulse. Every check then runs together as collect-all Admit and the allowed action is Applied.
 
-- `PULSE_MS` is a kernel constant rather than a dynAEP YAML key.
-- Putting a capsule on the dock is a transport step.
-- After the wait the client collects by capsule hash.
-- A closed-wall close names the closed walls, the reasons and a prescribed repair for missing fields and writing.
-- Grant lists stay off that repair.
-- A retry must seal a new capsule.
-- Skip is not a live verb.
-- All applicable walls are judged together.
-- If two walls fail both are listed and row order does not change yes or no.
-- Writing and security are always-on stems and they evaluate on every action path.
-- Other GAP walls bind to a wrap or prefix.
-
-### Derived fifteen-row ledger
-
-Fifteen named rows are a derived ledger of that evaluation and the ledger is a forensic record written from the check.
-
-- Row 0 Task scope: action within subtask scope.
-- Row 1 Session state: session active and valid.
-- Row 2 Agent permission: agent_permission, this agent is written as allowed to do this action.
-- Row 3 System rate limit: planetwide cap not exceeded.
-- Row 4 Session rate limit: per-session cap not exceeded.
-- Row 5 Intent drift: action aligns with baseline behaviour.
-- Row 6 Escalation: higher authority required.
-- Row 7 Covenant evaluation: permit, forbid and require rules.
-- Row 8 Pattern check: environment forbidden patterns.
-- Row 9 Capability: written capabilities. Agent permission is agent_permission. A numeric trust score is evidence on the derived ledger.
-- Row 10 Budget: token, cost and time limits.
-- Row 11 Gate: human or webhook approval.
-- Row 12 Cross-agent: counterparty identity handshake.
-- Row 13 Knowledge: covenant-scoped retrieval.
-- Row 14 Scanners: content scanners, lattice and perception bounds.
-- Attractors stay forensic records on that derived ledger rather than live Admit skips.
-
-### Kernel pulse
-
-Pulse hold is the wait after a sealed capsule is opened. Base Node freezes the clock at seal, waits 1000 ms, then runs every check together and only then carries out the allowed action.
-
-- Allowed clock drift is 50 ms against the freeze.
-- A capsule held longer than five seconds is aged out.
-- Wire `sent_at` freshness is a separate clock before open.
-- The wire window is wider because it covers transit.
-- Pulse age covers hold after freeze.
-- A builder who wants a different wait rebuilds Base Node with a different compiled pulse length.
-- Freeze-at-seal stays.
-- Allowed drift stays independent of the wait length.
-- Pulse age stays longer than the wait.
-- Unbound scene, dock, timestamp or sequence closes Admit because those fields must be bound before collect-all.
-
-### Live trust bundle
-
-- Live AEP 2.9.0 EPSCOM trust bundle mode is sha256-structure.
-- Optional proof algorithms may still name Ed25519 or ML-DSA-65.
-- The signatures loader denies an ML-DSA claim on sha256-structure.
-- Signed proof is not the default live AEP 2.9.0 attach.
-- Collect-all Admit collects by capsule hash on that same path.
-- Presence of trust_ring is Deny.
-- Presence of trust_ring on a live GAP document is Deny.
-- Closed wall gap:leftover_rank_field.
-- Agent permission is agent_permission.
-- Do not set trust_ring on live documents.
+The detail of that path, the derived ledger of fifteen rows, the kernel pulse and the live trust bundle are described in docs/LIVE-EVALUATION.md.
 
 ## File format
 
-Keep `.gap` as GAP source because collect-all Admit collects by capsule hash and live hash bundle mode on that path is sha256-structure.
-
-- File format notes also live at https://github.com/thePM001/AEP-agent-element-protocol path AEP-Components/gap/FILE-FORMAT.md
-- Extension: `.gap`
-- Encoding: UTF-8
-- Syntax: YAML 1.2 source. Live kernel policies may be JSON-encoded GAP instructions. YAML remains valid GAP source. The kernel reads the instruction object not the skin.
-- One instruction per document. Multi-instruction families use YAML multi-document syntax (`---` separators).
-- Host data that GAP does not read lives under the optional top-level `extensions` object. Each key names one host such as `aep` and holds an object that host defines. gapc and live Admit ignore it. Metadata and the top level accept only the fields the schema names.
-- Keep `.gap` as GAP source.
-- Collect-all Admit collects by capsule hash. Live AEP 2.9.0 EPSCOM trust bundle mode is sha256-structure.
-- Writing and security are always-on stems and they evaluate on every action path.
-- Other GAP walls bind to a wrap or prefix.
-- A finance wrap GAP item does not close an inventory wrap ping.
-- A non-always-on GAP with empty wrap does not fold onto every event.
-- Kernel bind detail lives at docs/kernel-json-wrap.md
+The rules of a GAP file are described in docs/FILE-FORMAT.md.
 
 ### YAML GAP source
 
@@ -291,7 +208,6 @@ Classic GAP source lives on this repository and `.gap` files stay GAP source.
 > ```
 > cargo run --manifest-path packages/gap-schema-profile-v13/Cargo.toml --bin gap-schema-profile-v13
 > cargo run --manifest-path packages/gap-closed-wall-deny/Cargo.toml --bin gap-closed-wall-deny
-> aep-caw wrap --profile coding-agent
 > ```
 
 Build and run gapc from the packages workspace:
@@ -330,17 +246,7 @@ This OSS snapshot does not include `GAP v1 spec sheet.md` or `BIOSECURITY.md` be
 
 ## Comparison: GAP vs dottxt
 
-dottxt constrains tokens to match JSON Schema, regex or CFG at the logits level and that structural constraint work is the entirety of what it does. GAP is a complete programming language. Live evaluation is collect-all Admit after freeze-at-seal and the 1000 ms kernel pulse. Optional Layer 1 authoring may constrain tokens when a decoder is wired. Constrained decoding is not Admit.
-
-- Mathematical types with native validators
-- Collect-all Admit then Apply after freeze-at-seal and the 1000 ms kernel pulse
-- A derived fifteen-row ledger of that evaluation
-- agent_permission grants
-- Behavioural covenants
-- Live AEP 2.9.0 EPSCOM trust bundle mode is sha256-structure with optional proof algorithms
-- Self-generating instructions that evolve specialized variants
-- dottxt's structural constraint capability is equivalent to one action flag in GAP: `structured_generation: true`
-- GAP covers that authoring gate plus live collect-all Admit. Constrained decoding is not Admit. This snapshot does not ship a wired Layer 1 Admit engine
+The comparison of GAP with dottxt and with constrained decoding is in docs/GAP-AND-CONSTRAINED-DECODING.md.
 
 ## License
 
