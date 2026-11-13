@@ -1,5 +1,4 @@
 # @PAD: gap-gapc-compiler
-# @GCDE: gaplune.policy.v1
 [package]
 name = "gapc"
 version = "0.1.0"

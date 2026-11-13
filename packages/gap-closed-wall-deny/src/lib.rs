@@ -1,6 +1,5 @@
 // crate: gap-closed-wall-deny
 // @PAD: gap-285-p3-closed-wall-deny
-// @GCDE: gaplune.policy.v1
 // HVVCAS: closed_wall_collect domain:admit type:service
 // GAP-285-P3. Classic GAP closed-wall Deny. enabled is load-time. Retry reseals.
 use sha2::{Digest, Sha256};

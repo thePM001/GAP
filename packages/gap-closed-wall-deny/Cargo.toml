@@ -1,5 +1,4 @@
 # @PAD: gap-285-p3-closed-wall-deny
-# @GCDE: gaplune.policy.v1
 [package]
 name = "gap-closed-wall-deny"
 version = "0.1.0"

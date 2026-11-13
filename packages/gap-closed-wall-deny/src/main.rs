@@ -1,5 +1,4 @@
 // @PAD: gap-285-p3-closed-wall-deny-cli
-// @GCDE: gaplune.policy.v1
 // GAP-285-P3 CLI. scene= dock= timestamp= sequence= writing= enabled= input=
 // Collect-all closed-wall Deny. Retry reseals.
 

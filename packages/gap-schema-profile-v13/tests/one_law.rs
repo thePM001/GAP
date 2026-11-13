@@ -1,5 +1,4 @@
 // @PAD: gap-285-p6-one-law-reference
-// @GCDE: gaplune.policy.v1
 // GAP-285-P6 one-law reference crate. Presence of trust_ring is Deny. Agent permission is agent_permission.
 
 pub const TICKET: &str = "GAP-285-P6";
